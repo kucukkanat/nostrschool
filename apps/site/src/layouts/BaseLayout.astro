@@ -1,0 +1,107 @@
+---
+/** Owner: shell agent. Every page renders inside this: head/meta, header, main, footer. */
+import { getDictionary, LOCALE_TAGS, type Locale } from "@nostrschool/i18n";
+import Footer from "~/components/shell/Footer.astro";
+import Header from "~/components/shell/Header.astro";
+import { alternateLinks } from "~/components/shell/lib/links";
+import { assetHref } from "~/lib/href";
+import "~/styles/global.css";
+
+interface Props {
+  readonly locale: Locale;
+  readonly title: string;
+  readonly description?: string | undefined;
+  /** Landing-style pages manage their own section widths. */
+  readonly fullBleed?: boolean;
+  /** Public path of the social preview image; defaults to the site-wide one. */
+  readonly ogImage?: string;
+}
+
+const { locale, title, description, fullBleed = false, ogImage = "og-default.png" } = Astro.props;
+const t = getDictionary(locale).common;
+const pageTitle = title === t.site.name ? title : `${title} · ${t.site.name}`;
+const summary = description ?? t.site.description;
+// Absolute URLs for crawlers; Astro.site comes from SITE_URL (see astro.config.ts).
+const absolute = (path: string) => (Astro.site ? new URL(path, Astro.site).href : path);
+const canonical = absolute(Astro.url.pathname);
+const image = absolute(assetHref(ogImage));
+---
+
+<!doctype html>
+<html lang={LOCALE_TAGS[locale]}>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>{pageTitle}</title>
+    <meta name="description" content={summary}>
+    <link rel="canonical" href={canonical}>
+    {alternateLinks(Astro.url.pathname).map((alt) => (
+      <link rel="alternate" hreflang={LOCALE_TAGS[alt.locale]} href={absolute(alt.href)} />
+    ))}
+    <link rel="icon" type="image/svg+xml" href={assetHref("favicon.svg")}>
+    <link rel="apple-touch-icon" href={assetHref("apple-touch-icon.png")}>
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content={t.site.name}>
+    <meta property="og:title" content={pageTitle}>
+    <meta property="og:description" content={summary}>
+    <meta property="og:url" content={canonical}>
+    <meta property="og:image" content={image}>
+    <meta property="og:image:alt" content={t.shell.ogImageAlt}>
+    <meta property="og:locale" content={LOCALE_TAGS[locale].replace("-", "_")}>
+    <meta name="twitter:card" content="summary_large_image">
+    <script is:inline>
+      // Apply the saved theme before paint to avoid a flash (mirrors components/shell/lib/theme.ts).
+      // Storage may be blocked (private mode); then we follow the system theme.
+      try {
+        const theme = localStorage.getItem("nostrschool:theme");
+        if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.live =
+          localStorage.getItem("nostrschool:live") === "1" ? "on" : "off";
+      } catch (error) {
+        console.warn("[shell] preferences unavailable", error);
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main" data-testid="skip-link">{t.nav.skipToContent}</a>
+    <Header locale={locale} />
+    <slot name="top" />
+    <main
+      id="main"
+      tabindex="-1"
+      data-testid="main"
+      class:list={["main", { contained: !fullBleed }]}
+    >
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    inset-block-start: var(--space-xs);
+    inset-inline-start: var(--space-xs);
+    z-index: var(--z-toast);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-pill);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-weight: var(--font-weight-bold);
+    translate: 0 -200%;
+    transition: translate var(--motion-duration-fast) var(--motion-easing-standard);
+  }
+  .skip-link:focus {
+    translate: 0 0;
+  }
+  .main:focus {
+    outline: none;
+  }
+  .contained {
+    max-inline-size: var(--size-wide);
+    margin-inline: auto;
+    padding: var(--space-xl) var(--space-md);
+  }
+</style>

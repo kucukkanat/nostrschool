@@ -1,0 +1,25 @@
+{
+  "name": "@nostrschool/protocol",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pure, step-exposing Nostr protocol functions",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@noble/ciphers": "^2.4.0",
+    "@noble/curves": "^2.4.0",
+    "@noble/hashes": "^2.4.0",
+    "@scure/base": "^2.4.0",
+    "nostr-tools": "^2.25.2"
+  }
+}

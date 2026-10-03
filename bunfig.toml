@@ -1,0 +1,6 @@
+[test]
+# happy-dom globals + a Svelte 5 compiler plugin so components can be rendered in `bun test`.
+preload = ["./tooling/test-preload.ts"]
+# Playwright specs live in e2e/ dirs and run only via `bun run test:e2e`.
+pathIgnorePatterns = ["**/e2e/**", "**/node_modules/**", "**/dist/**"]
+coverageSkipTestFiles = true

@@ -1,0 +1,30 @@
+---
+/** Owner: shell agent. Tools index: standalone versions of the course interactives. */
+import { getDictionary } from "@nostrschool/i18n";
+import ToolCards from "~/components/shell/ToolCards.astro";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { assertLocale, localeStaticPaths } from "~/lib/locale";
+
+export const getStaticPaths = localeStaticPaths;
+const locale = assertLocale(Astro.params.locale);
+const t = getDictionary(locale).common;
+---
+
+<BaseLayout locale={locale} title={t.tools.title}>
+  <h1 data-testid="tools-title">{t.tools.title}</h1>
+  <p class="intro">{t.tools.intro}</p>
+  <ToolCards locale={locale} headingLevel={2} />
+</BaseLayout>
+
+<style>
+  h1 {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-black);
+  }
+  .intro {
+    margin: 0 0 var(--space-xl);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-muted);
+  }
+</style>

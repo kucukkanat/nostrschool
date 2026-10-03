@@ -1,0 +1,268 @@
+---
+order: 1
+slug: why-nostr
+title: "Why Nostr?"
+summary: "What goes wrong when one company owns the server, and how relays change the game."
+estimatedMinutes: 12
+nips: ["01", "65"]
+takeaways:
+  - "On a centralized platform the company holds your account, your audience and the off switch."
+  - "Federation spreads the servers out, but your account still lives on (and dies with) one instance."
+  - "On Nostr your identity is a keypair you hold, and you post the same signed notes to several relays at once."
+  - "Relays are simple and replaceable: losing one, or being banned by one, does not cost you your voice."
+  - "Nostr is censorship-resistant, not moderation-free: each relay and client still chooses what it carries and shows."
+mascotIntro: "Hi, I'm Nos! Before we touch any keys, let's break some servers. For science."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import TopologySandbox from "~/components/chapters/01-why-nostr/TopologySandbox.svelte";
+import ResilienceChart from "~/components/chapters/01-why-nostr/ResilienceChart.svelte";
+
+## The morning Alice vanished
+
+Alice bakes the best cinnamon buns in town. Over five years she built an audience of
+20,000 people on a big social app. That's where her customers find the daily menu, where
+she posts the sold-out alerts, where her regulars say hi.
+
+One Tuesday she opens the app and sees a grey box: *"Your account has been suspended."*
+No human to call. No list of her followers to export. An automated filter decided
+something, and five years of relationships went quiet in a single click.
+
+Nobody had to hack Alice. Nobody had to argue with her. The company simply **owned the
+room** she was talking in, and it switched off her microphone.
+
+<Callout locale="en" tone="info" testid="ch01-callout-not-just-bans" title="It's not only about bans">
+The same single point of control also decides **what you see** (the algorithm), **what it
+costs** (fees, ads), and **whether the place exists at all** (shutdowns, acquisitions,
+outages). A ban is just the most dramatic version of the problem.
+</Callout>
+
+## Four ways to wire up a social network
+
+Let's take the same five friends (Alice, Bob, Carol, Dave and Erin) and connect them four
+different ways. Your job is to be the chaos monkey: knock servers offline, then press
+**Ban Alice** and see who can still be heard.
+
+- **Centralized**: one company, one server, everyone lives there.
+- **Federated**: many independent servers that relay posts to each other. This is the
+  <Term id="federation" locale="en">federation</Term> model of Mastodon and email.
+- **Nostr**: simple <Term id="relay" locale="en">relays</Term> that store and forward
+  notes, and people who post to *several* relays at once.
+- **Bluesky**: a newer design where your data lives on a personal data server (PDS), and big
+  aggregators stitch everyone's posts into timelines.
+
+<TopologySandbox client:visible locale="en" />
+
+Try this order: kill **BigCo** in Centralized, **tea.social** in Federated, **alpha** in
+Nostr, and the **AppView** in Bluesky. Then flip back and press **Ban Alice** in each one.
+Notice the pattern?
+
+## What just happened?
+
+**Centralized** is a single trunk: chop it and the whole tree falls. Ban Alice and she is
+simply gone, because the company *is* the network.
+
+**Federated** is a lot better. Losing one instance only hurts the people who live there.
+But look at Alice's scoreboard row: *"Account gone with tea.social."* In a federated world
+your name looks like `@alice@tea.social`, and that last half is the landlord. If the
+instance shuts down, or the admin bans you, your account and your follower list go with
+it. You can move house, but only while the old landlord is still answering the door.
+
+**Nostr** shrugs. Alice's identity is not an account on anyone's server: it's a
+<Term id="keypair" locale="en">keypair</Term> that lives on her own device. Every note she
+writes is <Term id="signature" locale="en">signed</Term> with her secret key, so *any*
+relay can store it and *any* reader can check it really came from her. She sends each note
+to two relays. If one dies, or bans her, the other still has it.
+
+**Bluesky** sits in between. Accounts can move between data servers, which is great. But
+in practice most people read through one big relay and one big AppView, so knocking out
+either one still darkens almost everything today.
+
+<ResilienceChart client:visible locale="en" />
+
+## Why relays are dumb on purpose
+
+Here's the trick that makes Nostr work: relays **don't talk to each other** and **don't own
+anyone**. A relay is a small server that accepts signed notes (called
+<Term id="event" locale="en">events</Term>) over a <Term id="websocket" locale="en">WebSocket</Term>
+and hands them back to whoever asks.
+
+Think of relays like **post office boxes** rather than a town square. Alice rents a box at
+two post offices and drops a copy of every letter into both. Her friends' mailmen (their
+<Term id="client" locale="en">clients</Term>) know which post offices she uses and go pick
+up her letters there. If one post office burns down or refuses her business, the letters
+are still waiting at the other one, and Alice can open a third box tomorrow without asking
+anyone's permission.
+
+That's the whole recipe:
+
+1. **You are your keys.** No sign-up, no username to confiscate. Your public key
+   (<Term id="npub" locale="en">npub</Term>) is your name.
+2. **Every note is signed.** Relays can't forge or quietly edit what you said.
+3. **Publish everywhere.** You pick several relays, and you can change them any time.
+4. **Readers follow you.** Clients use your published relay list to find your notes:
+   that's the <Term id="outbox-model" locale="en">outbox model</Term>.
+
+<Drawer client:visible testid="ch01-uth-event" locale="en" title="Under the hood: what a relay actually receives">
+
+Everything in Nostr is one data shape, defined in [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md).
+A client sends it to a relay inside an `EVENT` message over a WebSocket:
+
+```json
+["EVENT", {
+  "id": "<32-byte sha256 of the serialized event, hex>",
+  "pubkey": "<Alice's 32-byte public key, hex>",
+  "created_at": 1735689600,
+  "kind": 1,
+  "tags": [],
+  "content": "Cinnamon buns are back at 8am!",
+  "sig": "<64-byte Schnorr signature of the id, hex>"
+}]
+```
+
+The relay answers with `["OK", "<event id>", true, ""]` if it stored the note, or `false`
+plus a reason (for example `"blocked: ..."` or `"rate-limited: ..."`) if it refuses. Note
+what's *missing*: there's no account id, no password, no server name in Alice's identity.
+The `pubkey` and `sig` are all a relay (or reader) needs to know who wrote it.
+
+</Drawer>
+
+<Drawer client:visible testid="ch01-uth-publish" locale="en" title="Under the hood: publishing to several relays with nostr-tools">
+
+Redundancy is just a loop. With [nostr-tools](https://github.com/nbd-wtf/nostr-tools):
+
+```ts
+import { finalizeEvent, generateSecretKey } from "nostr-tools/pure";
+import { SimplePool } from "nostr-tools/pool";
+
+const sk = generateSecretKey(); // your identity: 32 random bytes, never leaves the device
+const note = finalizeEvent(
+  { kind: 1, created_at: Math.floor(Date.now() / 1000), tags: [], content: "hello, relays!" },
+  sk, // computes pubkey, id and signature
+);
+
+const pool = new SimplePool();
+const relays = ["wss://relay.alpha.example", "wss://relay.beta.example"];
+// One promise per relay: it's enough that *some* relay accepts the note.
+await Promise.any(pool.publish(relays, note));
+```
+
+A relay that rejects the note can't change it or claim it as its own; it can only decline
+to store it.
+
+</Drawer>
+
+<Drawer client:visible testid="ch01-uth-outbox" locale="en" title="Under the hood: the outbox model (NIP-65)">
+
+How do Bob's client and Alice's relays find each other? Alice publishes a small
+replaceable event of kind `10002` listing her relays, as described in
+[NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md):
+
+```json
+{
+  "kind": 10002,
+  "tags": [
+    ["r", "wss://relay.alpha.example"],
+    ["r", "wss://relay.beta.example", "write"],
+    ["r", "wss://relay.gamma.example", "read"]
+  ],
+  "content": "",
+  "...": "pubkey, created_at, id, sig as usual"
+}
+```
+
+An `r` tag without a marker means "read *and* write". To show Alice's notes, Bob's client
+fetches her kind `10002` and opens subscriptions on her **write** relays; to reach Alice
+(replies, mentions), it publishes to her **read** relays. That's why the sandbox lets any
+reader pull from any relay Alice writes to: the client goes to the author, not the other
+way around.
+
+</Drawer>
+
+<Drawer client:visible testid="ch01-uth-compare" locale="en" title="Under the hood: Mastodon and Bluesky, a bit more precisely">
+
+- **Mastodon / ActivityPub.** Your identity is `@name@instance`, resolved through the
+  instance's WebFinger endpoint, and your posts are signed with keys **the instance holds**.
+  Account migration exists (a `Move` activity redirects followers), but it needs the old
+  instance to still be online and cooperative.
+- **Bluesky / AT Protocol.** Your identity is a DID (usually `did:plc`) that points at your
+  current PDS, and your posts live in a signed repository there. Accounts can migrate
+  between PDSes, which is real portability. Timelines, though, come from relays that crawl
+  every PDS and AppViews that index them; anyone may run one, but most traffic today goes
+  through a few large ones.
+- **Nostr.** The identity *is* the signing key and every event carries its own signature,
+  so there's nothing to migrate: you just point at different relays.
+
+The sandbox's scoring (see `sandbox.ts` in this chapter's components) treats a conversation
+as alive when an author's post can travel to a reader through online, non-banning
+infrastructure, and people never relay for each other.
+
+</Drawer>
+
+## Is this just "no moderation"?
+
+No, and that's an important nuance. Each relay is free to set its own rules: block spam,
+require payment (a <Term id="paid-relay" locale="en">paid relay</Term>), or only accept
+members of a community. Each client can filter what you see, for example using your
+<Term id="web-of-trust" locale="en">web of trust</Term>.
+
+What Nostr removes is the **single** chokepoint. Moderation becomes a choice made by many
+relays and many apps, instead of a verdict from one company that also happens to hold your
+identity. That property has a name:
+<Term id="censorship-resistance" locale="en">censorship resistance</Term>.
+
+<Callout locale="en" tone="warning" testid="ch01-callout-tradeoff" title="Nothing is free">
+Owning your identity means owning the risk: if you lose your secret key there's no
+"forgot password" button (we'll cover <Term id="key-loss" locale="en">key loss</Term> and
+how to protect yourself later). And with many independent relays, there's no global
+search or single "view count" to check. Chapter 12 is all about these trade-offs.
+</Callout>
+
+## Where did Nostr come from?
+
+Nostr stands for **"Notes and Other Stuff Transmitted by Relays."** It was proposed in 2020
+by a developer known as fiatjaf, as a deliberately tiny protocol: a JSON event format, a
+handful of WebSocket messages, and public-key signatures. Everything else is added
+through optional, numbered proposals called <Term id="nip" locale="en">NIPs</Term>
+(Nostr Implementation Possibilities), maintained openly at
+[github.com/nostr-protocol/nips](https://github.com/nostr-protocol/nips).
+
+The rest of this course is a tour of that recipe. Next up: the keypair that *is* you.
+
+## Quick check
+
+<Quiz
+  client:visible
+  testid="ch01-quiz-1"
+  locale="en"
+  question="On a federated network like Mastodon, what happens to Alice's account if her instance shuts down for good?"
+  options={[
+    { id: "a", label: "It's gone, along with her follower list.", correct: true, explanation: "Her account lives on that instance. Migration needs the old server to be online." },
+    { id: "b", label: "Other instances automatically take it over.", correct: false, explanation: "Other instances only had copies of her posts, not her account." },
+    { id: "c", label: "Nothing, because she owns her keys.", correct: false, explanation: "On Mastodon the instance holds the signing keys, not Alice." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch01-quiz-2"
+  locale="en"
+  question="Relay alpha bans Alice on Nostr. Why can Bob still read her notes?"
+  options={[
+    { id: "a", label: "Relays secretly forward bans to each other and cancel them.", correct: false, explanation: "Relays don't coordinate at all." },
+    { id: "b", label: "Alice also publishes to other relays, and Bob's client fetches from those.", correct: true, explanation: "That's the outbox model: readers go where the author writes." },
+    { id: "c", label: "Bob's client ignores bans.", correct: false, explanation: "Alpha won't serve Alice's notes; Bob gets them elsewhere." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch01-quiz-3"
+  locale="en"
+  question="Which statement about Nostr relays is true?"
+  options={[
+    { id: "a", label: "They own user accounts and passwords.", correct: false, explanation: "There are no accounts: your identity is your keypair." },
+    { id: "b", label: "They can forge notes in your name.", correct: false, explanation: "Every event is signed; a forged one fails verification." },
+    { id: "c", label: "They can refuse to store your notes, but can't stop other relays from storing them.", correct: true, explanation: "Each relay moderates only itself." },
+  ]}
+/>

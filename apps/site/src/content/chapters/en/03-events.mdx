@@ -1,0 +1,255 @@
+---
+order: 3
+slug: events
+title: "Anatomy of an event"
+summary: "Every post, like and profile is a signed JSON event. Take one apart."
+estimatedMinutes: 12
+nips: ["01", "10"]
+takeaways:
+  - "Everything on Nostr (notes, likes, profiles, follow lists) is one shape: a JSON event with seven fields."
+  - "The id is the SHA-256 hash of the serialized event, so changing a single byte changes the id."
+  - "The sig is a Schnorr signature over that id: only the secret key holder can make it, anyone can check it."
+  - "Tags are labelled lists that link events to other events, people and topics; single-letter tags are searchable on relays."
+  - "created_at is a claim made by the author, not a proof of time."
+mascotIntro: "Time for surgery! Let's open up an event and see what makes it tick. Don't worry, it can't feel a thing."
+---
+import Term from "~/components/shell/Term.astro";
+import { href } from "~/lib/href";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import EventLab from "~/components/chapters/03-events/EventLab.svelte";
+
+In the last chapter you got a <Term id="keypair" locale="en">keypair</Term>. Now let's use it.
+On Nostr, **everything you do is an <Term id="event" locale="en">event</Term>**: a post, a like,
+your profile, the list of people you follow. Different jobs, one shape. Learn that shape once and
+you can read the whole protocol.
+
+## A sealed envelope with a fingerprint
+
+Think of an event as a postcard you put in a clear plastic sleeve:
+
+- The **postcard** is what you want to say: the text, when you wrote it, what kind of message it is,
+  and a few sticky labels.
+- The **fingerprint** stamped on the sleeve is calculated from the postcard. Change one letter on the
+  card and the fingerprint no longer matches.
+- Your **wax seal** goes on top of the fingerprint. Only you can press it, but anyone can check it's yours.
+
+That's it. That's an event. The fingerprint is the <Term id="event-id" locale="en">id</Term>, and the
+wax seal is the <Term id="signature" locale="en">signature</Term>.
+
+Here is a real one, written by Alice. Click any field to learn what it does.
+
+<EventLab client:visible locale="en" />
+
+Try it now: switch to **A forger (no key)** and change the text. The content updates, but the old
+id and signature are still stuck on it, and the verification pipeline catches you at the very first
+check. Switch back to Alice and the same edit is perfectly fine, because she can re-sign.
+
+## The seven fields
+
+Every event has exactly these seven fields. Nothing more is required, nothing less is allowed.
+
+| Field | In plain words |
+|---|---|
+| `id` | The fingerprint: a hash of everything else |
+| `pubkey` | Who wrote it (the author's <Term id="pubkey" locale="en">public key</Term>) |
+| `created_at` | When the author says they wrote it, in seconds since 1970 |
+| `kind` | What sort of event it is: a number |
+| `tags` | Sticky labels: links to other events, people, hashtags |
+| `content` | The actual message (or data) |
+| `sig` | The wax seal: a signature only the author can make |
+
+### kind: one number, many jobs
+
+The <Term id="kind" locale="en">kind</Term> tells apps how to read the rest. Kind `1` is a short
+text note, kind `0` is your profile, kind `3` your follow list, kind `7` a reaction (a "like").
+The number also tells relays how to store it: most events are kept forever, but some are
+**replaceable** (only your latest profile matters), and some are **ephemeral** (pass it on, don't keep it).
+We'll tour the whole zoo in chapter 6.
+
+### tags: sticky labels
+
+<Term id="tag" locale="en">Tags</Term> are a list of little lists. The first item is the label's
+name, the rest are its values:
+
+- `["e", "<event id>"]` points at another event. That's how replies and quotes work.
+- `["p", "<pubkey>"]` mentions a person, so their app can notify them.
+- `["t", "nostr"]` is a hashtag.
+
+Labels with a **single letter** are special: relays index them, so a client can ask
+"give me every note tagged `#nostr`" or "every reply to this event".
+
+### created_at: a claim, not a clock
+
+`created_at` is a Unix timestamp, chosen by the author. Nothing stops Alice from writing
+"January 2009". Clients sort feeds by it, and many relays reject events from too far in the future,
+but don't treat it as proof of *when* something happened.
+
+<Callout tone="tip" locale="en" title="Why the timestamp is inside the fingerprint">
+Because `created_at` is hashed into the id, nobody can quietly re-date Alice's note after she signs
+it. Try **created_at +1 s** in the lab while playing the forger: the id breaks.
+</Callout>
+
+## How the fingerprint is made
+
+To compute the id, every client follows the same recipe from <Term id="nip01" locale="en">NIP-01</Term>:
+
+1. **Serialize.** Put the fields in a fixed order inside a JSON array, with no extra spaces:
+   `[0, pubkey, created_at, kind, tags, content]`. The leading `0` is a version marker.
+2. **Hash.** Encode that text as UTF-8 bytes and run them through
+   <Term id="sha256" locale="en">SHA-256</Term>. Out come 32 bytes, written as 64 hex characters.
+   That's the `id`.
+3. **Sign.** Alice signs the id with her secret key using a
+   <Term id="schnorr" locale="en">Schnorr</Term> signature. That's the `sig`.
+
+A <Term id="hash" locale="en">hash</Term> has a wonderful property called the **avalanche effect**:
+change one character of the input and roughly half of the output bits flip. Watch the
+"id digits changed" counter in the lab: a single letter usually scrambles about 60 of the 64 hex digits.
+
+<Drawer client:visible testid="ch03-uth-serialize" locale="en" title="Under the hood: the exact bytes">
+
+This is the string that actually gets hashed for a tiny note. Note: no spaces, no newlines, and the
+fields in exactly this order.
+
+```json
+[0,"a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",1735686600,1,[],"testing testing is this thing on"]
+```
+
+Inside `content` (and tag values), JSON escaping applies: line breaks become `\n`, double quotes
+`\"`, backslashes `\\`, plus `\r`, `\t`, `\b` and `\f`. Everything else, emoji included, is written
+as raw UTF-8. Two clients that disagree on a single byte here will compute different ids, which is why
+[NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) spells the rules out so carefully.
+For ordinary text, `JSON.stringify` on the array produces exactly this form in JavaScript. It differs only for
+rare control characters (such as U+0001, which it writes as `\u0001`) and lone surrogates, which NIP-01 says to
+emit verbatim.
+
+```ts
+import { sha256 } from "@noble/hashes/sha2.js";
+import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils.js";
+
+const serialized = JSON.stringify([0, pubkey, created_at, kind, tags, content]);
+const id = bytesToHex(sha256(utf8ToBytes(serialized)));
+```
+
+</Drawer>
+
+## Checking the seal
+
+When your app receives an event from a <Term id="relay" locale="en">relay</Term>, it doesn't trust it
+just because it arrived. It **verifies** it, in two steps:
+
+1. Recompute the id from the fields. Does it match the `id` the event claims? If not, something was
+   changed after signing.
+2. Check the `sig` against the id and the `pubkey`. If it fails, the event wasn't signed by that key.
+
+Both checks are pure math, and they run on your own device. That's the big idea: **you don't need to
+trust the relay**. A relay can refuse to deliver Alice's notes, but it cannot change a single word of
+them, or invent new ones in her name, without getting caught.
+
+<Callout tone="info" locale="en" title="Try to break it">
+In the lab, hit **Flip one digit of the sig**. The id still matches (the content didn't change), so
+the pipeline gets all the way to the last stage before it fails. Now try **Flip a letter in content**:
+it fails earlier, at "Compare id".
+</Callout>
+
+<Drawer client:visible testid="ch03-uth-sign" locale="en" title="Under the hood: signing and verifying with nostr-tools">
+
+Signatures are [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki) Schnorr
+signatures on the <Term id="secp256k1" locale="en">secp256k1</Term> curve: 64 bytes (128 hex
+characters), signing the 32-byte id. The `pubkey` is the 32-byte "x-only" public key, always in
+hex on the wire (the `npub…` form from chapter 2 is only for humans).
+
+```ts
+import { finalizeEvent, generateSecretKey, verifyEvent } from "nostr-tools/pure";
+
+const sk = generateSecretKey(); // Uint8Array(32)
+const event = finalizeEvent(
+  {
+    kind: 1,
+    created_at: Math.floor(Date.now() / 1000),
+    tags: [["t", "nostr"]],
+    content: "Hello Nostr!",
+  },
+  sk,
+); // adds pubkey, id and sig
+
+verifyEvent(event); // true
+
+// A tampered copy, as it would arrive from the network (plain JSON):
+const tampered = JSON.parse(JSON.stringify({ ...event, content: "Hello Nostr?" }));
+verifyEvent(tampered); // false: the id no longer matches
+```
+
+<Callout tone="warning" locale="en" title="Gotcha: nostr-tools caches verification">
+`finalizeEvent` and `verifyEvent` remember their result on the event object under a hidden symbol.
+`verifyEvent({ ...event, content: "changed" })` copies that cached `true` along and still says
+`true`! Events parsed from JSON (what you get from relays) carry no cache, so real verification works,
+but beware when you mutate objects in your own code.
+</Callout>
+
+`finalizeEvent` computes the id with `getEventHash` (the serialize + SHA-256 recipe above) and signs
+it. `verifyEvent` does the reverse: recompute the hash, compare it with `id`, then check `sig`.
+Relays run the same checks before accepting an event (NIP-01 tells them to reject invalid ones).
+
+</Drawer>
+
+<Drawer client:visible testid="ch03-uth-tags" locale="en" title="Under the hood: the tag formats">
+
+Per [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md):
+
+```json
+["e", "<32-byte hex event id>", "<recommended relay URL, optional>", "<author pubkey, optional>"]
+["p", "<32-byte hex pubkey>", "<recommended relay URL, optional>"]
+["a", "<kind>:<pubkey hex>:<d tag value>", "<recommended relay URL, optional>"]
+```
+
+All single-letter tags (`a`–`z`, `A`–`Z`) are expected to be indexed by relays, so a
+<Term id="filter" locale="en">filter</Term> like `{"#t": ["nostr"]}` or `{"#e": ["<id>"]}` works.
+Threading conventions (the `root` / `reply` markers you'll see in the 4th position of `e` tags on
+replies) live in [NIP-10](https://github.com/nostr-protocol/nips/blob/master/10.md). Tags with
+longer names (`imeta`, `client`, …) are fine too, they just aren't indexed.
+
+</Drawer>
+
+## Inspect any event
+
+Got an event from somewhere else? Paste it into the
+<a href={href("en", "tools/event-inspector")} data-testid="ch03-inspector-link">event inspector</a> tool: it checks the id and
+signature right in your browser and explains every field.
+
+## Quick check
+
+<Quiz
+  client:visible
+  testid="ch03-quiz-id"
+  locale="en"
+  question="Bob edits one word in Alice's note but keeps her id and sig. What happens when your app verifies it?"
+  options={[
+    { id: "a", label: "It fails: the recomputed id no longer matches the claimed id.", correct: true, explanation: "The id is a hash of the content, so any edit changes it." },
+    { id: "b", label: "It passes, because the signature is still Alice's.", correct: false, explanation: "The signature covers the id, and the id covers the content. Change the content and the chain breaks." },
+    { id: "c", label: "It passes if the relay vouches for Bob.", correct: false, explanation: "Verification is pure math on your device. Relays don't get a vote." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch03-quiz-fields"
+  locale="en"
+  question="Which fields go into the id hash?"
+  options={[
+    { id: "a", label: "Only content", correct: false, explanation: "Then anyone could re-date or re-tag your note without breaking the id." },
+    { id: "b", label: "Everything, including sig", correct: false, explanation: "The sig signs the id, so the id can't include the sig. That would be circular." },
+    { id: "c", label: "pubkey, created_at, kind, tags and content", correct: true, explanation: "Serialized as [0, pubkey, created_at, kind, tags, content]." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch03-quiz-time"
+  locale="en"
+  question="An event says created_at = 1231006505 (3 January 2009). What does that prove?"
+  options={[
+    { id: "a", label: "That the event was really written in 2009.", correct: false, explanation: "The author picks created_at freely. Nostr didn't even exist in 2009!" },
+    { id: "b", label: "Only that the author chose that timestamp when signing.", correct: true, explanation: "created_at is a claim by the author. It's signed, so nobody else can change it, but it isn't proof of time." },
+    { id: "c", label: "That a relay stored it in 2009.", correct: false, explanation: "Relays don't stamp events; created_at comes from the author." },
+  ]}
+/>

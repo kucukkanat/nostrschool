@@ -1,0 +1,219 @@
+---
+/** Owner: shell agent. Landing page: hero + mascot + network, how it works, course map, tools. */
+import { getDictionary } from "@nostrschool/i18n";
+import { Mascot } from "@nostrschool/mascot";
+import ContinueLink from "~/components/shell/ContinueLink.svelte";
+import CourseMap from "~/components/shell/CourseMap.svelte";
+import HeroNetwork from "~/components/shell/HeroNetwork.svelte";
+import { chapterLinks } from "~/components/shell/lib/links";
+import ToolCards from "~/components/shell/ToolCards.astro";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { href, mascotRive } from "~/lib/href";
+import { assertLocale, localeStaticPaths } from "~/lib/locale";
+
+export const getStaticPaths = localeStaticPaths;
+const locale = assertLocale(Astro.params.locale);
+const t = getDictionary(locale).common;
+const chapters = chapterLinks(locale);
+---
+
+<BaseLayout locale={locale} title={t.site.name} fullBleed>
+  <section class="hero" aria-labelledby="home-title">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">{t.home.eyebrow}</p>
+        <h1 id="home-title" data-testid="home-title">{t.home.title}</h1>
+        <p class="lead">{t.home.lead}</p>
+        <div class="ctas">
+          <ContinueLink client:idle locale={locale} chapters={chapters} />
+          <a class="secondary" href={href(locale, "tools")} data-testid="home-tools"
+            >{t.home.ctaTools}</a
+          >
+        </div>
+      </div>
+      <div class="hero-art">
+        <HeroNetwork client:visible locale={locale} />
+        <div class="hero-mascot">
+          <Mascot
+            client:idle
+            locale={locale}
+            size="lg"
+            pose="wave"
+            say={t.home.mascotHello}
+            {...mascotRive}
+            testid="hero-mascot"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" aria-labelledby="features-title" data-testid="home-features">
+    <h2 id="features-title">{t.home.featuresTitle}</h2>
+    <ul class="features">
+      {t.home.features.map((f, i) => (
+        <li class="feature" data-testid={`home-feature-${i}`}>
+          <span class="feature-num" aria-hidden="true">
+            {i + 1}
+          </span>
+          <h3>{f.title}</h3>
+          <p>{f.body}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="wrap section" aria-labelledby="map-title" data-testid="home-course">
+    <h2 id="map-title">{t.home.mapTitle}</h2>
+    <p class="section-intro">{t.home.mapIntro}</p>
+    <CourseMap client:visible locale={locale} chapters={chapters} />
+  </section>
+
+  <section class="wrap section" aria-labelledby="tools-title" data-testid="home-tools-section">
+    <h2 id="tools-title">{t.home.toolsTitle}</h2>
+    <p class="section-intro">{t.home.toolsIntro}</p>
+    <ToolCards locale={locale} />
+  </section>
+
+  <section class="wrap section finale">
+    <p class="finale-text">{t.learn.intro}</p>
+    <ContinueLink client:visible locale={locale} chapters={chapters} testid="home-start-bottom" />
+  </section>
+</BaseLayout>
+
+<style>
+  .wrap {
+    max-inline-size: var(--size-wide);
+    margin-inline: auto;
+    padding-inline: var(--space-md);
+  }
+  .hero {
+    padding-block: var(--space-2xl) var(--space-3xl);
+    background:
+      radial-gradient(circle at 85% 20%, var(--color-accent-subtle), transparent 45%),
+      radial-gradient(circle at 10% 90%, var(--color-primary-subtle), transparent 50%),
+      var(--color-bg);
+    border-block-end: var(--border-width-medium) solid var(--color-text);
+  }
+  .hero-grid {
+    display: grid;
+    gap: var(--space-2xl);
+    align-items: center;
+  }
+  .eyebrow {
+    display: inline-block;
+    margin: 0 0 var(--space-sm);
+    padding: var(--space-3xs) var(--space-sm);
+    border-radius: var(--radius-pill);
+    background: var(--color-secondary);
+    color: var(--color-on-secondary);
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    rotate: -2deg;
+  }
+  h1 {
+    margin: 0 0 var(--space-md);
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-black);
+    letter-spacing: var(--font-letter-spacing-tight);
+  }
+  .lead {
+    margin: 0 0 var(--space-xl);
+    font-size: var(--font-size-xl);
+    color: var(--color-text-muted);
+    max-inline-size: var(--size-content);
+  }
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+  }
+  .secondary {
+    color: var(--color-text);
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    text-decoration-thickness: var(--border-width-medium);
+    text-underline-offset: var(--space-2xs);
+  }
+  .hero-art {
+    position: relative;
+    display: grid;
+    justify-items: center;
+  }
+  .hero-mascot {
+    position: absolute;
+    inset-block-end: calc(var(--space-lg) * -1);
+    inset-inline-start: 0;
+    z-index: var(--z-raised);
+    min-block-size: var(--size-mascot-lg);
+  }
+  .section {
+    padding-block: var(--space-3xl) 0;
+  }
+  h2 {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--font-size-3xl);
+  }
+  .section-intro {
+    margin: 0 0 var(--space-xl);
+    max-inline-size: var(--size-content);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-lg);
+  }
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--size-rail)), 1fr));
+    gap: var(--space-md);
+    margin: var(--space-lg) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .feature {
+    padding: var(--space-lg);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+  }
+  .feature h3 {
+    margin: var(--space-sm) 0 var(--space-xs);
+    font-size: var(--font-size-xl);
+  }
+  .feature p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+  .feature-num {
+    display: grid;
+    place-items: center;
+    inline-size: var(--size-control-md);
+    block-size: var(--size-control-md);
+    border-radius: var(--radius-round);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-black);
+    font-size: var(--font-size-lg);
+  }
+  .finale {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-md);
+    text-align: center;
+  }
+  .finale-text {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+  }
+  /* >= tokens.breakpoint.lg */
+  @media (min-width: 1024px) {
+    .hero-grid {
+      grid-template-columns: 3fr 2fr;
+    }
+    h1 {
+      font-size: var(--font-size-6xl);
+    }
+  }
+</style>

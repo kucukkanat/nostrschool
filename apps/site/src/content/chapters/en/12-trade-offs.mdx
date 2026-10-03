@@ -1,0 +1,316 @@
+---
+order: 12
+slug: trade-offs
+title: "Trade-offs"
+summary: "Spam, discovery, relay economics and key loss: an honest look at what Nostr is bad at, what it's great at, and how it compares to X, Mastodon and Bluesky."
+estimatedMinutes: 15
+nips: ["13", "11", "42", "65", "51", "56", "09", "62", "49", "46"]
+takeaways:
+  - "Nostr trades convenience for control: nobody can take your identity away, but nobody can give it back either."
+  - "There's no central spam team. Relays and clients fight spam with proof-of-work (NIP-13), paid relays, authentication and web-of-trust filters."
+  - "Relays are run by people who pay real bills. Free relays may delete old data; publishing to several relays (NIP-65) keeps your notes findable."
+  - "Moderation is a choice your client and relays make for you, not one global rulebook."
+  - "Losing or leaking your private key is Nostr's hardest problem: there's no password reset and no standard key rotation yet."
+mascotIntro: "Every superpower has a kryptonite. Let's be honest about Nostr's! 🦸"
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer } from "@nostrschool/ui";
+import ComparisonMatrix from "~/components/chapters/12-trade-offs/ComparisonMatrix.svelte";
+import ScenarioExplorer from "~/components/chapters/12-trade-offs/ScenarioExplorer.svelte";
+import PowMiner from "~/components/chapters/12-trade-offs/PowMiner.svelte";
+import ChapterQuiz from "~/components/chapters/12-trade-offs/ChapterQuiz.svelte";
+import CourseComplete from "~/components/chapters/12-trade-offs/CourseComplete.svelte";
+
+You made it to the last chapter. 🎉 For eleven chapters we've been showing off Nostr's tricks:
+keys you own, events anyone can verify, <Term id="relay" locale="en">relays</Term> anyone can run.
+Now it's time for the part sales brochures skip: **what Nostr is bad at**.
+
+Think of Nostr like owning a house instead of renting an apartment. Nobody can kick you out, and
+you can paint the walls any color you like. But when the boiler breaks at 3 a.m., there's no
+landlord to call. Every "pro" in this chapter comes with a matching "con", and that's not a bug:
+it's the price of having no one in charge.
+
+## Spam: nobody's guarding the door
+
+On a big platform, a whole team (plus a lot of software) fights bots for you. On Nostr there's no
+"the company", so there's no spam team. Creating a new identity costs nothing: generate a
+<Term id="keypair" locale="en">keypair</Term> and you're in. That's wonderful for a dissident
+and equally wonderful for a spammer who can make a million accounts per minute.
+
+So Nostr fights <Term id="spam" locale="en">spam</Term> in layers, and each relay and client picks
+its own mix:
+
+- **Make posting cost something.** A relay can ask for
+  <Term id="proof-of-work" locale="en">proof-of-work</Term> (a little math puzzle per note) or
+  money: a <Term id="paid-relay" locale="en">paid relay</Term> only accepts notes from people who
+  paid a small fee.
+- **Know who's talking.** Relays can require a login handshake (NIP-42) before accepting notes.
+- **Trust your friends' friends.** A <Term id="web-of-trust" locale="en">web of trust</Term>
+  filter only lets through people your follows (or their follows) follow. Bots rarely get followed
+  by real people, so they bounce off.
+
+Let's try the first one. **Proof-of-work** asks your device to find a note whose
+<Term id="event-id" locale="en">event id</Term> starts with a bunch of zeros. The only way to find
+one is trial and error: change a counter, re-hash, check, repeat. Each extra zero *bit* doubles the
+work. Crank up the difficulty and press "Start mining":
+
+<PowMiner client:visible locale="en" />
+
+Notice the trade-off in the last box? A note that costs you a blink costs a spammer sending ten
+thousand of them hours. But a spam farm with fast computers pays far less than your phone does,
+so proof-of-work is a speed bump, not a wall.
+
+<Drawer client:visible testid="ch12-uth-pow" locale="en" title="Under the hood: NIP-13 proof of work">
+
+**NIP-13 in one tag.** The miner adds a `nonce` tag: `["nonce", "<counter>", "<target difficulty>"]`
+and bumps the counter until the event id (the SHA-256 of the serialized event, see chapter 3) has
+at least *target* leading zero **bits**. The third entry commits to the target, so a lucky
+low-effort hit can't pretend it aimed higher. Here's the example from
+[NIP-13](https://github.com/nostr-protocol/nips/blob/master/13.md), which has 21 leading zero bits
+(`00000` = 20 bits, then `6` = `0110` adds one more):
+
+```json
+{
+  "id": "000006d8c378af1779d2feebc7603a125d99eca0ccf1085959b307f64e5dd358",
+  "pubkey": "a48380f4cfcc1ad5378294fcac36439770f9c878dd880ffa94bb74ea54a6f243",
+  "created_at": 1651794653,
+  "kind": 1,
+  "tags": [["nonce", "776797", "20"]],
+  "content": "It's just me mining my own business",
+  "sig": "284622fc0a3f4f1303455d5175f7ba962a3300d136085b9566801bc2e0699de0c7e31e44c81fb40ad9049173742e904713c3594a1da0fc5d2382a25c11aba977"
+}
+```
+
+Because the id doesn't cover the signature, PoW can even be **delegated**: a phone can pay a service
+to mine the nonce, then sign the result itself. With nostr-tools:
+
+```ts
+import { finalizeEvent, generateSecretKey, getPublicKey } from "nostr-tools/pure";
+import { getPow, minePow } from "nostr-tools/nip13";
+
+const sk = generateSecretKey();
+const unsigned = {
+  kind: 1,
+  created_at: Math.floor(Date.now() / 1000),
+  tags: [],
+  content: "gm",
+  pubkey: getPublicKey(sk),
+};
+// Synchronous and CPU-heavy: run it in a Web Worker in real apps.
+const mined = minePow(unsigned, 16);
+console.log(getPow(mined.id)); // ≥ 16
+const event = finalizeEvent(mined, sk); // id is unchanged by signing
+```
+
+Relays advertise what they demand in their
+[NIP-11](https://github.com/nostr-protocol/nips/blob/master/11.md) information document, under
+`limitation`: `min_pow_difficulty`, `auth_required`
+([NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md)), `payment_required` and
+`restricted_writes`.
+
+</Drawer>
+
+## Discovery: there's no front page
+
+Twitter-style apps have one giant database and an algorithm that decides what you see. Nostr has
+hundreds of relays, and none of them sees everything. That's great for
+<Term id="censorship-resistance" locale="en">censorship resistance</Term> (no single off switch),
+but it makes some everyday things surprisingly hard:
+
+- **Search** only covers the relays you ask, and only relays that support it.
+- **Finding people** often happens by word of mouth, shared follow lists or a NIP-05 name.
+- **Counting** likes or followers is a best guess: you can only count what your relays have.
+
+The ecosystem patches this with search relays, aggregator relays that crawl many others, and
+custom feeds. They work, but they quietly re-introduce a few big players. Keep an eye on that.
+
+## Relay economics: someone pays for the servers
+
+Relays are computers with electricity bills, bandwidth and disks that fill up with every note,
+image link and reaction. Running one costs real money, and on Nostr there are no ads to pay for it.
+So relays end up in a few buckets:
+
+- **Free relays** run by enthusiasts or companies. Lovely, but they can rate-limit you, drop old
+  notes to save space, or simply shut down when the volunteer moves on.
+- **Paid relays** charge a one-time or monthly fee. Less spam, more stability, but now posting
+  has a price tag.
+- **Your own relay**, run at home or on a cheap server, so your notes have at least one home you
+  control.
+
+This is why the <Term id="outbox-model" locale="en">outbox model</Term> from chapter 7 matters so
+much: by publishing to several relays and advertising them in your relay list, no single relay's
+budget decides whether your notes survive.
+
+<Drawer client:visible testid="ch12-uth-relay-economics" locale="en" title="Under the hood: paid relays and NIP-11 fees">
+
+**How a relay says "this costs money".** The NIP-11 document (fetched over HTTP with
+`Accept: application/nostr+json`) can include `payments_url` and a `fees` object:
+
+```json
+{
+  "name": "relay.alpha.example",
+  "limitation": {
+    "payment_required": true,
+    "auth_required": true,
+    "min_pow_difficulty": 0,
+    "restricted_writes": true
+  },
+  "payments_url": "https://relay.alpha.example/pay",
+  "fees": {
+    "admission": [{ "amount": 21000000, "unit": "msats" }],
+    "subscription": [{ "amount": 5000000, "unit": "msats", "period": 2592000 }],
+    "publication": [{ "kinds": [4], "amount": 100, "unit": "msats" }]
+  }
+}
+```
+
+```ts
+import { fetchRelayInformation } from "nostr-tools/nip11";
+
+const info = await fetchRelayInformation("wss://relay.alpha.example");
+if (info.limitation?.payment_required) console.log("Pay here:", info.payments_url);
+```
+
+Paid relays usually combine this with [NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md)
+`AUTH`, so they know which pubkey is connecting and whether it has paid. Writers keep themselves
+findable with a kind 10002 relay list
+([NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md)).
+
+</Drawer>
+
+## Moderation is a client choice
+
+On X, one rulebook applies to everyone. On Mastodon, your server's admin writes the rulebook. On
+Nostr, there's no rulebook at all, just **choices**:
+
+- A **relay** decides what it stores. It can refuse notes, ban pubkeys, or only serve paying members.
+- Your **client** decides what it shows. It can hide words, apply your mute list, or respect reports
+  from people you trust.
+- **You** decide which relays and which client to use, and you can switch any time.
+
+The good news: nobody can silence you everywhere. The less-good news: nobody will clean up your
+feed for you either, and a relay you'd never use can still host things you'd hate. "Free speech"
+on Nostr means "free to speak", not "guaranteed an audience".
+
+<Drawer client:visible testid="ch12-uth-moderation" locale="en" title="Under the hood: mute lists, reports and deletions">
+
+**The building blocks** are ordinary events, so any client can use them:
+
+- **Mute list**, kind 10000 ([NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md)):
+  a replaceable list of `p` (people), `t` (hashtags), `word` and `e` (threads) to hide. Entries can
+  also be encrypted into `content` so nobody sees whom you muted.
+- **Reports**, kind 1984 ([NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md)): a
+  `p` tag (and optionally `e`) with a report type such as `spam`, `impersonation` or `illegal`.
+  Clients decide whose reports to trust, typically only from people you follow.
+- **Deletion requests**, kind 5 ([NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md))
+  and **request to vanish**, kind 62 ([NIP-62](https://github.com/nostr-protocol/nips/blob/master/62.md)):
+  polite asks. Honest relays comply, but a copy someone already downloaded can't be un-downloaded.
+
+```json
+{
+  "kind": 10000,
+  "tags": [
+    ["p", "<spammer pubkey hex>"],
+    ["t", "crypto-giveaway"],
+    ["word", "airdrop"]
+  ],
+  "content": ""
+}
+```
+
+</Drawer>
+
+## Data availability: who keeps your notes?
+
+Your notes live wherever relays decided to keep them. If you posted to one free relay and it
+wiped its database, those notes are gone. Nobody promised to keep them, and there's no "Nostr
+archive" in the sky. The flip side: if you publish to several relays (or run your own), your notes
+are about as durable as it gets, because no single company can delete all the copies.
+
+<Callout locale="en" tone="tip" title="Rule of thumb">
+Write to at least two or three relays you trust, and keep one of them under your control if you
+care about your history. Exporting your own notes now and then is cheap insurance.
+</Callout>
+
+## Key loss: no "forgot password" button
+
+This is the big one. Your identity *is* your private key (your
+<Term id="nsec" locale="en">nsec</Term>). That's what makes Nostr uncensorable, and it's also what
+makes <Term id="key-loss" locale="en">key loss</Term> brutal:
+
+- **Lose it** and your account is gone. No email reset, no support ticket, no admin who can help.
+  You make a new key and ask everyone to follow you again.
+- **Leak it** and it's even worse. The thief can post as you, forever, and relays can't tell you
+  apart: both of you make perfectly valid signatures. There's still **no standard way to rotate
+  a key** (swap it for a new one while keeping your followers); proposals exist, but none has
+  been widely adopted.
+
+So Nostr's answer is: **don't lose it, and don't let it leak.** Back it up (on paper, or as an
+encrypted `ncryptsec`), and keep it inside a <Term id="signer" locale="en">signer</Term> (chapter 10)
+so apps never see it.
+
+<Drawer client:visible testid="ch12-uth-keys" locale="en" title="Under the hood: key backups and remote signers">
+
+**Backups:** [NIP-49](https://github.com/nostr-protocol/nips/blob/master/49.md) encrypts your secret
+key with a password (scrypt + XChaCha20-Poly1305) into an `ncryptsec1…` string you can store more
+safely than a raw `nsec`. [NIP-06](https://github.com/nostr-protocol/nips/blob/master/06.md) derives
+keys from a BIP-39 seed phrase, but the NIPs index now marks it *unrecommended* in favor of a single
+nsec: back that nsec up as an `ncryptsec` instead.
+
+```ts
+import { generateSecretKey } from "nostr-tools/pure";
+import { decrypt, encrypt } from "nostr-tools/nip49";
+
+const sk = generateSecretKey();
+const backup = encrypt(sk, "correct horse battery staple"); // "ncryptsec1…"
+const restored = decrypt(backup, "correct horse battery staple"); // same bytes as sk
+```
+
+**Containment:** [NIP-46](https://github.com/nostr-protocol/nips/blob/master/46.md) remote signers
+(bunkers) and [NIP-07](https://github.com/nostr-protocol/nips/blob/master/07.md) extensions keep the
+key out of apps. **Rotation:** an early attempt at sub-keys,
+[NIP-26](https://github.com/nostr-protocol/nips/blob/master/26.md) delegation, is now marked
+*unrecommended*, and key-migration proposals are still debated. If your key leaks today, the
+practical answer is a new key plus a signed note from the old one telling followers where you went
+(which the thief could also fake).
+
+</Drawer>
+
+## What could possibly go wrong?
+
+Enough theory. Flip on a few bad days and see how each network copes. Then turn on some Nostr
+precautions and watch the red turn green (well, most of it).
+
+<ScenarioExplorer client:visible locale="en" />
+
+See the pattern? Big platforms are great at *recovering you* (they hold the keys) and terrible at
+*not banning you* (they hold the keys). Nostr is the exact mirror image. Which one you want depends
+on which bad day scares you more.
+
+## The big comparison
+
+Nostr isn't the only project trying to fix social media. **Mastodon** (part of the
+<Term id="federation" locale="en">federated</Term> "fediverse") spreads accounts across thousands
+of independent servers. **Bluesky** uses the AT Protocol: portable accounts, but most people use
+infrastructure run by Bluesky itself. And **X** is the classic one-company platform.
+
+There's no winner, only trade-offs. Tick the things you care about and watch the ranking change:
+
+<ComparisonMatrix client:visible locale="en" />
+
+<Callout locale="en" tone="info" title="These ratings are opinions">
+The scores are our honest, simplified judgement as of 2026, and every network is still changing
+fast. Tap a cell to see the reasoning, and feel free to disagree!
+</Callout>
+
+## Quick check
+
+<ChapterQuiz client:visible locale="en" />
+
+## You did it!
+
+From "why bother?" all the way to "what's the catch?". You can now explain keys, events,
+relays, filters, kinds, the social graph, private messages, zaps, signers, the ecosystem *and* its
+trade-offs. That's a lot of nostrich knowledge.
+
+<CourseComplete client:visible locale="en" />

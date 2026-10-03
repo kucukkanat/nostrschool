@@ -1,0 +1,143 @@
+// Owner: shell agent. Adding a key here? Also add it to ../es/common.ts (English placeholder + `// TODO(es)`).
+export const common = {
+  site: {
+    name: "Nostr School",
+    tagline: "Learn Nostr by poking at the real thing.",
+    description:
+      "An interactive course on the Nostr protocol: keys, events, relays, filters, zaps and more, running live in your browser.",
+  },
+  nav: {
+    home: "Home",
+    learn: "Learn",
+    tools: "Tools",
+    glossary: "Glossary",
+    skipToContent: "Skip to content",
+    primary: "Main navigation",
+    language: "Language",
+    menu: "Menu",
+    close: "Close",
+  },
+  theme: {
+    label: "Theme",
+    light: "Light",
+    dark: "Dark",
+    system: "System",
+  },
+  live: {
+    label: "Live mode",
+    on: "LIVE",
+    off: "Fixtures",
+    description: "Read real events from public relays. We never publish anything.",
+    enabled: "Live mode on: reading from public relays.",
+    disabled: "Live mode off: using built-in example data.",
+  },
+  chapter: {
+    chapter: "Chapter {n}",
+    minutes: "{n} min",
+    nips: "NIPs",
+    takeaways: "Takeaways",
+    previous: "Previous",
+    next: "Next",
+    complete: "Mark chapter complete",
+    completed: "Completed",
+    progress: "Course progress",
+    notTranslated: "This chapter has not been translated yet, so it is shown in English.",
+  },
+  learn: {
+    title: "Course",
+    intro: "Twelve short chapters. Each one has a hands-on interactive.",
+    start: "Start learning",
+    continue: "Continue",
+  },
+  tools: {
+    title: "Tools",
+    intro: "Standalone versions of the course interactives.",
+    keys: "Key tool",
+    eventInspector: "Event inspector",
+    filterPlayground: "Filter playground",
+    kinds: "Kinds table",
+  },
+  glossary: {
+    title: "Glossary",
+    intro: "Every Nostr term used on this site.",
+    search: "Search terms",
+    seeAlso: "See also",
+    noResults: "No matching terms.",
+    filterByChapter: "Filter by chapter",
+    jumpTo: "Jump to letter",
+    taughtIn: "Taught in",
+  },
+  notFound: {
+    title: "Page not found",
+    body: "This page wandered off. Maybe it was on a relay that went offline.",
+    home: "Back to the start",
+  },
+  safety: {
+    demoKeys: "Demo keys only. Never paste your real nsec into any website, including this one.",
+  },
+  footer: {
+    source: "Source code",
+    license: "License",
+    builtWith: "Built with Astro and Svelte",
+  },
+  home: {
+    eyebrow: "A playful, hands-on Nostr course",
+    title: "Learn Nostr by poking at the real thing",
+    lead: "Generate keys, sign events and watch packets fly between relays. Real cryptography, running right here in your browser.",
+    ctaTools: "Browse the tools",
+    ctaContinue: "Continue: {title}",
+    mascotHello: "Hi, I'm Nos! Let's learn Nostr together.",
+    networkTitle: "A Nostr network",
+    networkDescription:
+      "Five people each connect to several independent relays. Messages hop from people to relays and back, and no single server is in charge.",
+    pause: "Pause animation",
+    play: "Play animation",
+    featuresTitle: "How Nostr School works",
+    features: [
+      {
+        title: "Real crypto, live",
+        body: "Every key, hash and signature is computed in your browser with the same code real clients use.",
+      },
+      {
+        title: "Plain words first",
+        body: "Each idea starts in plain language. Open an Under the hood drawer whenever you want the JSON and the NIPs.",
+      },
+      {
+        title: "Example data or live relays",
+        body: "Lessons use friendly example data. Flip on live mode to read real events from public relays.",
+      },
+    ],
+    mapTitle: "Your course map",
+    mapIntro:
+      "Twelve stops, from why Nostr exists to its honest trade-offs. Jump in anywhere; we remember the chapters you finish.",
+    toolsTitle: "Tools for tinkering",
+    toolsIntro:
+      "The course interactives also work on their own. Handy when you just need to check an event.",
+  },
+  progress: {
+    completedCount: "{done} of {total} chapters complete",
+    done: "Done",
+    current: "Up next",
+    upcoming: "Not started",
+    markIncomplete: "Mark as not done",
+    celebrate: "Chapter complete! Nice work.",
+    allDone: "You finished the whole course!",
+    reading: "Reading progress",
+    showChapters: "Show chapters",
+    hideChapters: "Hide chapters",
+  },
+  toolCards: {
+    keys: "Generate demo keypairs and convert between hex, npub, nsec and friends.",
+    eventInspector: "Paste any event JSON: we check its id and signature and explain every field.",
+    filterPlayground:
+      "Build a REQ filter and see which events match, against examples or live relays.",
+    kinds: "A searchable periodic table of event kinds and the NIPs that define them.",
+    glossary: "Every Nostr term on this site, in plain words.",
+    open: "Open",
+  },
+  shell: {
+    readOnly: "Live mode is read-only: we never publish anything to relays.",
+    footerNav: "Footer",
+    ogImageAlt: "Nostr School: learn Nostr by poking at the real thing",
+  },
+};

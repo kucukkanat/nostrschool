@@ -1,0 +1,19 @@
+{
+  "name": "@nostrschool/i18n",
+  "version": "0.0.0",
+  "dependencies": {},
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": "./src/*"
+  },
+  "description": "Typed dictionaries, locales and glossary",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test"
+  },
+  "type": "module"
+}

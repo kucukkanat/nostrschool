@@ -1,0 +1,192 @@
+---
+order: 6
+slug: kinds
+title: "Kinds y NIPs"
+summary: "Una tabla periódica de los kinds de eventos y las especificaciones que los definen."
+estimatedMinutes: 12
+nips: ["01", "23", "51", "65"]
+takeaways:
+  - "Todo evento tiene un kind: un número que dice qué es (una nota, un perfil, una reacción…)."
+  - "El rango del número les dice a los relays cómo guardarlo: regular (guardar todos), reemplazable (guardar el último), efímero (no guardar ninguno), direccionable (guardar el último por etiqueta d)."
+  - "En los eventos reemplazables y direccionables gana el created_at más reciente; en caso de empate, gana el id más bajo."
+  - "Los NIPs son las especificaciones abiertas de la comunidad. Un kind nuevo es solo un número más un NIP que lo explica."
+  - "Los clientes ignoran los kinds que no entienden, así que las funciones nuevas nunca rompen las apps viejas."
+mascotIntro: "¡Mismo sobre, distinto sello! Vamos a ordenar el correo por kind."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import KindsTable from "~/components/chapters/06-kinds/KindsTable.svelte";
+import StorageSimulator from "~/components/chapters/06-kinds/StorageSimulator.svelte";
+import KindClassifier from "~/components/chapters/06-kinds/KindClassifier.svelte";
+
+## Un sobre, muchos sellos
+
+Hasta ahora todos los <Term id="event" locale="es">eventos</Term> se han visto iguales: un id, una <Term id="pubkey" locale="es">pubkey</Term>,
+una marca de tiempo, algunas etiquetas, algo de contenido y una firma. Una nota tipo tuit, tu perfil, un "me gusta",
+una entrada de blog y un recibo de Lightning viajan todos en **exactamente el mismo sobre**.
+
+Entonces, ¿cómo sabe una app qué es cada cosa? Por un campo diminuto: el <Term id="kind" locale="es">kind</Term>.
+Es solo un número entero, como un sello en el sobre. `1` significa "nota de texto corta", `0` significa "mi perfil",
+`7` significa "reacción", `30023` significa "artículo largo". Eso es todo. Ni tipos de mensaje nuevos ni
+endpoints nuevos: Nostr crece inventando números nuevos.
+
+Piensa en el kind como la **sección de una biblioteca**. Todos los libros (eventos) están encuadernados igual, pero
+la etiqueta del lomo le dice al bibliotecario (el <Term id="relay" locale="es">relay</Term>) en qué estante
+ponerlo, y les dice a los lectores (los clientes) cómo mostrarlo.
+
+## La tabla periódica de los kinds
+
+Los químicos ordenan los elementos según sus propiedades. Podemos hacer lo mismo con los kinds: el **color de una casilla**
+es su *categoría* de almacenamiento, que depende únicamente del rango del número. Explora un poco: cada casilla
+abre un evento de ejemplo real. Intenta visitar los cuatro colores.
+
+<KindsTable client:visible locale="es" />
+
+<Drawer client:visible testid="ch06-uth-registry" locale="es" title="Bajo el capó: dónde se registran los kinds">
+No existe un servidor de registro central: la lista de kinds conocidos vive en el README del
+repositorio [nostr-protocol/nips](https://github.com/nostr-protocol/nips#event-kinds), junto al NIP que
+define cada uno. Los ejemplos de la tabla de arriba son eventos reales de nuestros ejemplos (con firmas verificadas) o
+plantillas firmadas en tu navegador con una clave de demostración pública y un `auxRand` fijo, así que los bytes son
+idénticos en cada visita.
+
+```ts
+import { kinds } from "nostr-tools";
+
+kinds.ShortTextNote;            // 1
+kinds.LongFormArticle;          // 30023
+kinds.classifyKind(30023);      // "parameterized" (el nombre antiguo de nostr-tools para direccionable)
+kinds.isReplaceableKind(10002); // true
+```
+</Drawer>
+
+## Cuatro formas de guardarse
+
+El número le dice a un relay qué debe *conservar*. <Term id="nip01" locale="es">NIP-01</Term> divide la
+recta numérica en cuatro barrios:
+
+- **Regular** (`1`, `2`, `4`–`44`, `1000`–`9999`): un diario. Se conserva cada página. Las notas, reacciones,
+  reposts y recibos de zaps se acumulan para siempre (o hasta que el relay decida otra cosa).
+- **<Term id="replaceable-event" locale="es">Reemplazable</Term>** (`0`, `3`, `10000`–`19999`): una pizarra.
+  Cada persona tiene **una** por kind; al escribir una nueva se borra la anterior. Tu perfil (<Term id="metadata" locale="es">kind 0</Term>),
+  tu <Term id="follow-list" locale="es">lista de seguidos</Term> (kind 3) y tu lista de relays (kind 10002) funcionan así.
+- **<Term id="ephemeral-event" locale="es">Efímero</Term>** (`20000`–`29999`): una llamada telefónica. Los relays se lo pasan a
+  quien esté escuchando *en ese momento* y luego lo olvidan. Perfecto para desafíos de inicio de sesión y la charla de los firmantes.
+- **<Term id="addressable-event" locale="es">Direccionable</Term>** (`30000`–`39999`): un conjunto de pizarras
+  con etiqueta. Una por persona, por kind y **por etiqueta `d`**. Así puedes editar varios
+  <Term id="long-form" locale="es">artículos largos</Term> de forma independiente.
+
+Juega con él. Publica algunas versiones, cambia de categoría y luego prueba a **reenviar una copia antigua**:
+
+<StorageSimulator client:visible locale="es" />
+
+<Callout client:visible locale="es" tone="tip" title="¿Quién gana un empate?">
+En los eventos reemplazables y direccionables gana el `created_at` más reciente. Si dos versiones comparten exactamente
+el mismo segundo, los relays se quedan con la del **id más bajo** (la primera en orden alfabético), así que todos los relays
+terminan de acuerdo sobre el mismo ganador sin importar qué copia llegó primero.
+</Callout>
+
+<Drawer client:visible testid="ch06-uth-storage" locale="es" title="Bajo el capó: las reglas de almacenamiento de NIP-01">
+Las reglas exactas de [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md#kinds):
+
+| Categoría | Rango | El relay conserva |
+|---|---|---|
+| regular | `1000 <= n < 10000 \|\| 4 <= n < 45 \|\| n == 1 \|\| n == 2` | todos los eventos |
+| reemplazable | `10000 <= n < 20000 \|\| n == 0 \|\| n == 3` | el último por `(pubkey, kind)` |
+| efímero | `20000 <= n < 30000` | nada (solo los reenvía) |
+| direccionable | `30000 <= n < 40000` | el último por `(pubkey, kind, d)` |
+
+Los kinds 45–999 y 40000–65535 quedan fuera de todos los rangos: NIP-01 no dice nada sobre cómo guardarlos, y la mayoría de los
+relays los tratan como regulares. A un evento direccionable se le apunta con su *dirección* `kind:pubkey:d`, ya sea
+en una etiqueta `a` o codificada como <Term id="naddr" locale="es">naddr</Term>:
+
+```json
+["a", "30023:e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc:relays-explained", "wss://relay.alpha.example"]
+```
+
+Pedir "la versión actual" es un filtro normal, porque el relay solo guarda una:
+
+```json
+["REQ", "article", { "kinds": [30023], "authors": ["e550c6…"], "#d": ["relays-explained"] }]
+```
+</Drawer>
+
+¿Quieres poner a prueba tu intuición? Escribe cualquier número y mira en qué barrio vive:
+
+<KindClassifier client:visible locale="es" />
+
+## NIPs: cómo crece Nostr sin un jefe
+
+¿Quién decide que `7` significa "reacción"? Nadie y todos. Un <Term id="nip" locale="es">NIP</Term>
+(*Nostr Implementation Possibility*, "posibilidad de implementación de Nostr") es un documento corto y público que describe una convención: qué kind
+usar, qué etiquetas, qué significa el contenido. Viven en un único repositorio de GitHub, pero funcionan más como
+recetas compartidas en una comida a la canasta que como leyes:
+
+1. **Alguien tiene una idea.** Una desarrolladora quiere encuestas, o calendarios, o mercados.
+2. **Primero lo construye.** Idealmente en un cliente y un relay reales, eligiendo un número de kind que nadie más use.
+3. **Abre un pull request.** La gente discute, simplifica y le busca los fallos en público.
+4. **Se fusiona cuando es real.** El README pide que un NIP esté implementado en al menos dos clientes
+   y un relay (cuando aplique), que tenga sentido, que sea opcional y retrocompatible, y que no añada una segunda forma
+   de hacer lo mismo.
+
+El truco clave es la palabra *opcional*. Un cliente que no entiende el kind `31922` (un evento de calendario)
+simplemente lo ignora. No se rompe nada. Por eso Nostr puede crecer hacia los lados: microblogging, contenido largo,
+transmisiones en vivo, colaboración en código y wallets comparten los mismos relays y las mismas claves.
+
+<Callout client:visible locale="es" tone="info" title="Los nombres de los NIPs no siempre son números">
+La mayoría de los NIPs tienen nombres decimales de dos dígitos (`01`, `57`), pero los más nuevos pueden usar nombres con aspecto hexadecimal, como
+`7D` (hilos) o `C7` (chats). El número de kind y el número de NIP no tienen relación: el kind `7` se define
+en NIP-25, no en NIP-07.
+</Callout>
+
+<Drawer client:visible testid="ch06-uth-nips" locale="es" title="Bajo el capó: NIPs que vale la pena leer">
+Buenos puntos de partida en el [repositorio de NIPs](https://github.com/nostr-protocol/nips):
+
+- [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md): el formato de los eventos, el kind 0 y las cuatro categorías de almacenamiento (el kind 1 se especifica en [NIP-10](https://github.com/nostr-protocol/nips/blob/master/10.md))
+- [NIP-02](https://github.com/nostr-protocol/nips/blob/master/02.md): lista de seguidos (kind 3)
+- <Term id="nip23" locale="es">NIP-23</Term> ([especificación](https://github.com/nostr-protocol/nips/blob/master/23.md)): contenido largo (kind 30023, borradores 30024)
+- [NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md): listas, estándar (10000+) y conjuntos (30000+)
+- [NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md): metadatos de la lista de relays (kind 10002)
+- [NIP-31](https://github.com/nostr-protocol/nips/blob/master/31.md): pon una etiqueta `alt` legible por humanos en los kinds personalizados, para que los clientes que no los entienden puedan mostrar *algo*. El README de NIPs ahora marca NIP-31 como no recomendado, pero una etiqueta `alt` en un kind personalizado sigue siendo una cortesía inofensiva
+- [NIP-89](https://github.com/nostr-protocol/nips/blob/master/89.md): las apps anuncian qué kinds manejan (31990) y los usuarios recomiendan apps (31989)
+
+¿Vas a inventar un kind privado para tu app? Elige un número sin usar en el rango adecuado para el
+comportamiento de almacenamiento que quieres, añade una etiqueta `alt` y documéntalo.
+</Drawer>
+
+## Comprobación rápida
+
+<Quiz
+  client:visible
+  testid="ch06-quiz-profile"
+  locale="es"
+  question="Cambias tu foto de perfil tres veces. ¿Cuántos eventos de kind 0 tuyos conserva un relay que se porta bien?"
+  options={[
+    { id: "three", label: "Tres, uno por cada cambio", correct: false, explanation: "Así se comportan los kinds regulares. El kind 0 es reemplazable." },
+    { id: "one", label: "Uno: el más reciente", correct: true, explanation: "El kind 0 es reemplazable: uno por pubkey y kind." },
+    { id: "zero", label: "Ninguno, los perfiles son efímeros", correct: false, explanation: "Los kinds efímeros empiezan en 20000." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch06-quiz-addressable"
+  locale="es"
+  question="¿Qué kind te permite tener varias entradas de blog editables de forma independiente?"
+  options={[
+    { id: "k1", label: "Kind 1 (nota de texto corta)", correct: false, explanation: "Las notas son regulares: no puedes editarlas, solo publicar otras nuevas." },
+    { id: "k10002", label: "Kind 10002 (lista de relays)", correct: false, explanation: "Reemplazable: solo una por persona." },
+    { id: "k30023", label: "Kind 30023 (artículo largo)", correct: true, explanation: "Direccionable: uno por persona y por etiqueta d, así que cada artículo tiene su propio lugar." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch06-quiz-nips"
+  locale="es"
+  question="Un cliente recibe un evento con un kind del que nunca ha oído hablar. ¿Qué debería hacer?"
+  options={[
+    { id: "crash", label: "Rechazar toda la suscripción", correct: false, explanation: "Eso haría que cada NIP nuevo rompiera la compatibilidad." },
+    { id: "ignore", label: "Ignorarlo (o mostrar su texto alt)", correct: true, explanation: "Los NIPs son opcionales: los kinds desconocidos se saltan, así que las funciones nuevas nunca rompen las apps viejas." },
+    { id: "ask", label: "Pedir permiso a los autores del NIP", correct: false, explanation: "No hay a quién pedírselo: los NIPs son especificaciones abiertas, no un guardián." },
+  ]}
+/>

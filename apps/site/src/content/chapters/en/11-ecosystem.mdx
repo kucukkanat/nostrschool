@@ -1,0 +1,246 @@
+---
+order: 11
+slug: ecosystem
+title: "The ecosystem"
+summary: "Relays, clients and NIPs, in numbers: who runs Nostr, what they run, and how it grew."
+estimatedMinutes: 12
+nips: ["01", "11", "65", "66", "89"]
+takeaways:
+  - "Nostr has no headquarters: well over a thousand independent relays, run by different people with different software, make up the network."
+  - "We can count relays using Nostr itself: monitors publish signed NIP-66 reports (kind 30166) that anyone can read."
+  - "NIPs are optional specs. NIP-01 is the shared core; every other feature is adopted relay by relay and app by app."
+  - "Apps are interchangeable: your key, posts and follow list travel with you, so switching clients loses nothing."
+  - "Numbers like these are a snapshot, not a census: always check the date and the source."
+mascotIntro: "Time to zoom out! Grab your binoculars: we're going bird-watching across the whole Nostr flock."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer } from "@nostrschool/ui";
+import ecosystem from "~/data/ecosystem.json";
+import DataAsOf from "~/components/chapters/11-ecosystem/DataAsOf.svelte";
+import EcosystemExplorer from "~/components/chapters/11-ecosystem/EcosystemExplorer.svelte";
+import ChapterQuiz from "~/components/chapters/11-ecosystem/ChapterQuiz.svelte";
+
+<DataAsOf locale="en" capturedAt={ecosystem.capturedAt} sources={ecosystem.sources} testid="ch11-data-as-of-top" />
+
+## A city with no city hall
+
+So far we've looked at Nostr up close: one <Term id="keypair" locale="en">keypair</Term>, one
+<Term id="event" locale="en">event</Term>, one <Term id="relay" locale="en">relay</Term> at a time.
+Now let's climb the tallest tree and look at the whole forest.
+
+Picture a city where nobody owns the roads. Anyone can open a post office (a **relay**), anyone can
+build a car (a **client**, the app you read and write with), and the traffic rules (the
+<Term id="nip" locale="en">NIPs</Term>) are written in public, in a notebook anyone can propose changes to.
+There's no mayor, no census bureau, and no official phone book.
+
+Which raises a fun question: **if nobody is in charge, how do you even count the city?**
+
+## Counting a network that has no list
+
+There is no registry of relays. Spinning one up is like opening a lemonade stand: you don't ask
+permission. So instead of asking a central authority, we ask the network itself.
+
+Volunteer **monitors** constantly knock on relays' doors: "Are you open? What do you support? Do you
+charge?" Then they publish what they found as ordinary, signed Nostr events. Anyone can read those
+reports with a normal <Term id="filter" locale="en">filter</Term>, exactly like reading notes. That's
+what our snapshot script did: it asked three monitor relays for every report from the last 24 hours,
+checked every <Term id="signature" locale="en">signature</Term>, and tallied the results.
+
+<Callout locale="en" tone="info" testid="ch11-snapshot-callout">
+  These numbers are a **snapshot**, taken once and saved with the site, so the page never pings
+  anyone while you read. Check the "Data as of" badge above, and open **Sources** to see exactly where
+  each number came from.
+</Callout>
+
+<Drawer client:visible testid="ch11-uth-nip66" locale="en" title="Under the hood: NIP-66 relay reports">
+
+[NIP-66](https://github.com/nostr-protocol/nips/blob/master/66.md) defines two event kinds:
+
+- **kind 10166**: a monitor's announcement ("I check relays every hour, here are my timeouts").
+- **kind 30166**: a relay discovery report. It's an
+  <Term id="addressable-event" locale="en">addressable event</Term> whose `d` tag is the relay URL,
+  so each monitor keeps exactly one current report per relay.
+
+A real report looks like this (trimmed):
+
+```json
+{
+  "kind": 30166,
+  "pubkey": "<monitor pubkey>",
+  "content": "{\"software\":\"git+https://github.com/hoytech/strfry.git\",\"supported_nips\":[1,2,4,9,11,40]}",
+  "tags": [
+    ["d", "wss://some.relay/"],
+    ["n", "clearnet"],
+    ["N", "1"], ["N", "11"], ["N", "40"],
+    ["R", "!payment"],
+    ["R", "auth"],
+    ["rtt-open", "234"]
+  ]
+}
+```
+
+`N` tags list supported NIPs, `R` tags list requirements (a `!` prefix means "not required"), `n` is
+the network (`clearnet`, `tor`, `i2p`, `loki`), and `content` may carry the relay's
+[NIP-11](https://github.com/nostr-protocol/nips/blob/master/11.md) info document. Reading them with
+nostr-tools:
+
+```ts
+import { SimplePool } from "nostr-tools/pool";
+import { verifyEvent } from "nostr-tools/pure";
+
+const pool = new SimplePool();
+const since = Math.floor(Date.now() / 1000) - 24 * 3600;
+const reports = await pool.querySync(["wss://relay.nostr.watch"], { kinds: [30166], since });
+const relays = new Set(
+  reports.filter(verifyEvent).map((e) => e.tags.find((t) => t[0] === "d")?.[1]),
+);
+console.log(`${relays.size} relays reported in the last 24h`);
+```
+
+NIP-66 itself warns that a monitor can be wrong or lie, and that clients must never *require* these
+reports. So our script only counts reports from pubkeys that published a kind 10166 announcement,
+verifies every signature, merges reports from several monitors, and records any monitor relay that
+timed out in the snapshot's source notes. Relays monitors can't reach (or don't know about) are
+missing, so treat the totals as a floor, not a census.
+
+</Drawer>
+
+## Explore the snapshot
+
+Here's the city from above. Hop between the four views: **Relays** (who is running the post
+offices), **NIPs** (which traffic rules they follow), **Growth** (how the rulebook grew) and
+**Clients** (which cars you can drive). Visit all four for a little celebration.
+
+<EcosystemExplorer client:visible locale="en" />
+
+## What the relay numbers tell us
+
+Look at the **Relays** view and two things jump out.
+
+**Diversity.** No single program runs the network. A handful of open-source relay programs
+(`strfry`, `nostr-rs-relay`, `haven`, `khatru`-based relays and many more) split the work, and a long
+tail of homemade ones fill in the gaps. If one of them had a bug tomorrow, the others would keep
+humming. That's <Term id="censorship-resistance" locale="en">censorship resistance</Term> in
+practice: there's no single off switch.
+
+**Choice.** Most relays are free and open, but some ask for payment (a
+<Term id="paid-relay" locale="en">paid relay</Term>) or ask you to log in first with
+<Term id="nip42" locale="en">NIP-42</Term> before reading or writing. Those are trade-offs, not
+bugs: payment and login are some of the best tools relays have against
+<Term id="spam" locale="en">spam</Term>. A few relays also live on Tor or I2P, for people who need
+to hide where they connect from.
+
+<Drawer client:visible testid="ch11-uth-nip11" locale="en" title="Under the hood: asking a relay about itself (NIP-11)">
+
+Every relay can describe itself. Send a plain HTTP `GET` to the relay's URL (with `https://` instead
+of `wss://`) and the header `Accept: application/nostr+json`, and you get its
+[NIP-11](https://github.com/nostr-protocol/nips/blob/master/11.md) document:
+
+```ts
+const res = await fetch("https://relay.damus.io", {
+  headers: { Accept: "application/nostr+json" },
+});
+const info = await res.json();
+console.log(info.software, info.supported_nips, info.limitation?.payment_required);
+```
+
+The `software` field is "a URL to the project's homepage" (that's how we grouped relays by program),
+`supported_nips` is a list of NIP numbers, and `limitation` holds flags like `auth_required` and
+`payment_required`. Monitors copy this document into the `content` of their 30166 reports, which is
+how our snapshot got it without contacting each relay itself.
+
+</Drawer>
+
+## NIPs: a rulebook you can pick from
+
+A <Term id="nip" locale="en">NIP</Term> (Nostr Implementation Possibility) is a short public document
+describing one feature: how follow lists work, how zaps work, how private messages work. Only
+<Term id="nip01" locale="en">NIP-01</Term> is truly shared by everyone: it's the basic grammar of
+events, signatures and the `REQ`/`EVENT`/`EOSE` conversation. Everything else is **optional**.
+
+Think of it like a restaurant menu rather than a law book. Each relay and each app picks the dishes it
+wants to serve. That's why, in the **NIPs** view, NIP-01 is nearly universal while newer ideas are
+still catching on. You'll also notice some veterans like NIP-12, NIP-16, NIP-20 and NIP-33: those were
+folded into NIP-01 long ago, but many relays still list them, a nice reminder that the network
+upgrades slowly and unevenly.
+
+The **Growth** view shows the rulebook getting thicker over time. Drag the slider back to 2022 and
+watch it grow. Growth isn't only additions, either: a number of NIPs are now marked
+**unrecommended** (the old <Term id="nip04" locale="en">NIP-04</Term> direct messages, for example,
+gave way to <Term id="nip17" locale="en">NIP-17</Term>). Nobody can delete a feature from the
+network, so old and new live side by side.
+
+<Drawer client:visible testid="ch11-uth-nips-repo" locale="en" title="Under the hood: where NIPs live">
+
+NIPs live in one GitHub repository,
+[github.com/nostr-protocol/nips](https://github.com/nostr-protocol/nips). Each NIP is a Markdown file
+named with two hexadecimal characters (`01.md`, `5A.md`, `C7.md`), and the README holds the list of
+NIPs (unrecommended ones are struck through) plus a table of known event kinds.
+
+Our growth curve is computed from git history: for every NIP file, the date of the commit that first
+added it, counted per quarter. A tree-only clone keeps that fast:
+
+```bash
+git clone --filter=blob:none --no-checkout https://github.com/nostr-protocol/nips
+cd nips
+git log --first-parent -m --no-renames --diff-filter=A --name-only --format=@%aI HEAD
+```
+
+The README's acceptance criteria say a NIP should be fully implemented in at least two clients and
+one relay (when applicable), and must stay optional and backwards-compatible. Is a single repo a
+point of control? The README tackles that head-on: the index can be challenged, moved or even forked,
+and apps are always free to ignore a NIP they disagree with.
+
+</Drawer>
+
+## So many apps, one identity
+
+Open the **Clients** view and filter by the device in your pocket. There's something for every
+taste: Twitter-style timelines, photo feeds, group chats, long-form blogs, live streams, even a
+marketplace and an app store.
+
+Here's the magic trick, and it's the whole reason this ecosystem can exist: **the apps don't own
+you.** Your identity is your key, your posts sit on relays, and your
+<Term id="follow-list" locale="en">follow list</Term> is just another event. Log into any of these apps
+with the same key and your followers, your posts and your profile are all there. Switching apps is
+like switching web browsers: the websites don't care.
+
+That also means apps compete on being *good*, not on holding your friends hostage. Don't like
+how one app looks? Try another this afternoon. You lose nothing.
+
+<Drawer client:visible testid="ch11-uth-nip89" locale="en" title="Under the hood: how apps find each other (NIP-89)">
+
+Our client list is hand-picked (from [nostrapps.com](https://nostrapps.com) and each project's site),
+because there's no machine-readable census of apps. But Nostr has a way for apps to advertise
+themselves: [NIP-89](https://github.com/nostr-protocol/nips/blob/master/89.md).
+
+- An app publishes a **kind 31990** "handler information" event saying which event kinds it can
+  display, and how to link into it (per platform: `web`, `ios`, `android`).
+- A user can publish a **kind 31989** recommendation: "for kind 30023 long-form posts, I like this app".
+
+So when your client meets a kind it doesn't understand, it can query
+`{ "kinds": [31989], "#d": ["30023"] }` among the people you follow and say "open this in Habla".
+Your follow list is also how apps find *you*: with the
+<Term id="outbox-model" locale="en">outbox model</Term> they read your
+<Term id="nip65" locale="en">NIP-65</Term> relay list to know where your posts live, so any app can
+load your history.
+
+</Drawer>
+
+## Reading ecosystem stats like a pro
+
+Every Nostr dashboard you'll find online shows different numbers, and that's normal. Before you
+trust a figure, ask three questions:
+
+1. **Who measured it, and how?** Our relays come from NIP-66 monitors; another site might crawl
+   relay lists from user profiles, and get a bigger (or smaller) number.
+2. **When?** Relays come and go daily. Our snapshot shows its date at the top of the page.
+3. **What's missing?** Private relays, relays monitors haven't discovered yet, and apps that never
+   listed themselves are invisible to any census.
+
+That's not a weakness to hide. A network nobody owns is a network nobody can fully count, and that's
+exactly the point.
+
+## Quick check
+
+<ChapterQuiz client:visible locale="en" />

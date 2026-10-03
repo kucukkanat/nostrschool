@@ -1,0 +1,48 @@
+---
+/** Owner: chapter 03 agent. Standalone event inspector: paste any event, verify id/sig, explain fields. */
+import { getDictionary } from "@nostrschool/i18n";
+import EventInspector from "~/components/chapters/03-events/EventInspector.svelte";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { href } from "~/lib/href";
+import { assertLocale, localeStaticPaths } from "~/lib/locale";
+
+export const getStaticPaths = localeStaticPaths;
+const locale = assertLocale(Astro.params.locale);
+const dict = getDictionary(locale);
+const title = dict.common.tools.eventInspector;
+const t = dict.chapters.ch03;
+---
+
+<BaseLayout locale={locale} title={title} description={t.inspector.description}>
+  <div class="tool">
+    <h1 data-testid="tool-title">{title}</h1>
+    <p class="lede" data-testid="tool-lede">{t.inspector.description}</p>
+    <EventInspector client:load locale={locale} />
+    <p class="more">
+      <a data-testid="tool-chapter-link" href={href(locale, "learn/events")}>{t.title} →</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .tool {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-4xl);
+    color: var(--color-text-primary);
+  }
+  .lede {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-text-muted);
+  }
+  .more a {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-bold);
+  }
+</style>

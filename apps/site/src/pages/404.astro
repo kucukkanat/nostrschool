@@ -1,0 +1,80 @@
+---
+/** Owner: shell agent. GitHub Pages serves this for any unknown path (English; locale is unknown). */
+import { DEFAULT_LOCALE, getDictionary } from "@nostrschool/i18n";
+import { Mascot } from "@nostrschool/mascot";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { href, mascotRive } from "~/lib/href";
+
+const locale = DEFAULT_LOCALE;
+const t = getDictionary(locale).common;
+---
+
+<BaseLayout locale={locale} title={t.notFound.title}>
+  <div class="lost" data-testid="not-found">
+    <Mascot
+      client:idle
+      locale={locale}
+      size="lg"
+      pose="panic"
+      {...mascotRive}
+      testid="not-found-mascot"
+    />
+    <p class="code" aria-hidden="true">404</p>
+    <h1 data-testid="not-found-title">{t.notFound.title}</h1>
+    <p class="body">{t.notFound.body}</p>
+    <div class="links">
+      <a class="home" href={href(locale)} data-testid="not-found-home">{t.notFound.home}</a>
+      <a href={href(locale, "learn")} data-testid="not-found-learn">{t.nav.learn}</a>
+      <a href={href(locale, "glossary")} data-testid="not-found-glossary">{t.nav.glossary}</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .lost {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-sm);
+    padding-block: var(--space-2xl);
+    text-align: center;
+  }
+  .code {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-6xl);
+    font-weight: var(--font-weight-black);
+    line-height: var(--font-line-height-tight);
+    color: var(--color-text-primary);
+    rotate: -4deg;
+  }
+  h1 {
+    margin: 0;
+    font-size: var(--font-size-3xl);
+  }
+  .body {
+    margin: 0;
+    max-inline-size: var(--size-content);
+    color: var(--color-text-muted);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-block-start: var(--space-md);
+  }
+  .links a {
+    color: var(--color-text);
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+  }
+  .links .home {
+    padding: var(--space-xs) var(--space-lg);
+    border: var(--border-width-thick) solid var(--color-text);
+    border-radius: var(--radius-pill);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    text-decoration: none;
+    box-shadow: var(--shadow-pop);
+  }
+</style>

@@ -1,0 +1,259 @@
+---
+order: 10
+slug: signing
+title: "Signing & login"
+summary: "Let apps use your key without ever seeing it."
+estimatedMinutes: 12
+nips: ["07", "46", "05"]
+takeaways:
+  - "On Nostr, “logging in” just means an app learns your public key and can ask for signatures."
+  - "Pasting your nsec into an app hands over your whole identity, forever. Use a signer instead."
+  - "NIP-07: a browser extension exposes window.nostr; apps get your pubkey and signed events, never the key."
+  - "NIP-46: a remote “bunker” signs on another device; requests travel as NIP-44 encrypted kind 24133 events through a relay."
+  - "NIP-05 (name@domain) is a domain vouching for a pubkey: a handy label, not your identity."
+mascotIntro: "Keep your secret key in your pocket! Today we learn how apps can borrow your signature without ever touching it."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer } from "@nostrschool/ui";
+import SignerPlayground from "~/components/chapters/10-signing/SignerPlayground.svelte";
+import SignerSequences from "~/components/chapters/10-signing/SignerSequences.svelte";
+import Nip05Checker from "~/components/chapters/10-signing/Nip05Checker.svelte";
+import SigningQuiz from "~/components/chapters/10-signing/SigningQuiz.svelte";
+
+Back in chapter 2 you learned that your Nostr identity *is* a
+<Term id="keypair" locale="en">keypair</Term>. The <Term id="pubkey" locale="en">public key</Term> is
+your name tag; the <Term id="privkey" locale="en">secret key</Term> (shown as an
+<Term id="nsec" locale="en">nsec</Term>) is the pen that writes your
+<Term id="signature" locale="en">signature</Term> on every <Term id="event" locale="en">event</Term>.
+
+So here's the puzzle: you want to use ten different Nostr apps. Every one of them needs your
+signature on the notes you post. **Do you hand your pen to all ten?**
+
+Please don't. Think of your secret key like the master key to your house. You wouldn't give a copy
+to every delivery driver. You'd rather have a doorman who opens the door *for* them, checks what
+they're carrying, and never lets the key out of his pocket. On Nostr, that doorman is called a
+<Term id="signer" locale="en">signer</Term>.
+
+## Login without passwords
+
+There are no accounts on Nostr, so there's no password to type. When an app says “log in”, all it
+really needs is:
+
+1. **Your public key**, so it knows whose feed to show and whose notes to fetch.
+2. **A way to get things signed**, so your posts, likes and follows count as yours.
+
+The dangerous shortcut is to give the app your nsec, which covers both at once. The safe way is to
+give it only number 1, plus a *phone line* to a signer for number 2.
+
+## Try it: who gets to touch your key?
+
+Below is the same note signed three ways. Everything is real: real keys, real
+<Term id="schnorr" locale="en">Schnorr</Term> signatures and real encryption running in your browser.
+The keys are demo keys made just for this page, so play freely.
+
+<SignerPlayground client:visible locale="en" />
+
+Things to try:
+
+- Sign with **Paste your nsec** and watch the key-leak detector go red. The app now *is* you.
+- Switch to **Browser extension**, sign, then press **Reject** in the signer. Nothing gets signed.
+- Try **Remote bunker** and open the hops in the middle column: the relay only ever carries gibberish.
+
+<Callout tone="danger" locale="en" title="Never paste a real nsec">
+A web page that holds your nsec can sign *anything* as you, today or years from now, and there is
+no “reset password” on Nostr. A leaked key is a lost identity
+(<Term id="key-loss" locale="en">key loss</Term> is forever). This site will never ask for your real
+keys.
+</Callout>
+
+## The browser extension (NIP-07)
+
+The most common signer is a browser extension (popular ones include Alby, nos2x and Nostr Connect).
+It follows <Term id="nip07" locale="en">NIP-07</Term>, which is wonderfully small: the extension
+adds an object called `window.nostr` to every web page. A web app calls it like a phone:
+
+- “Who is this?” → `getPublicKey()` returns your public key. That's the entire login.
+- “Please sign this note.” → `signEvent(template)` makes the extension pop up, show you the note,
+  and, if you approve, hand back the finished, signed event.
+
+The secret key lives inside the extension's private storage. The web page can't read it, just as
+one website can't peek into another website's cookies.
+
+<SignerSequences client:visible locale="en" />
+
+Step through both tabs. In the first one, notice that only *finished* things travel to the app: a
+public key and a signed event.
+
+<Drawer client:visible testid="ch10-uth-nip07" locale="en" title="Under the hood: window.nostr">
+
+[NIP-07](https://github.com/nostr-protocol/nips/blob/master/07.md) defines two required methods and
+a few optional ones:
+
+```ts
+interface WindowNostr {
+  getPublicKey(): Promise<string>; // hex pubkey
+  signEvent(event: { created_at: number; kind: number; tags: string[][]; content: string }): Promise<Event>; // adds id, pubkey, sig
+  nip44?: {
+    encrypt(pubkey: string, plaintext: string): Promise<string>;
+    decrypt(pubkey: string, ciphertext: string): Promise<string>;
+  };
+  nip04?: { /* same shape, deprecated */ };
+}
+```
+
+A typical “Log in with extension” button:
+
+```ts
+if (!window.nostr) throw new Error("No NIP-07 signer found. Install a Nostr extension.");
+
+const pubkey = await window.nostr.getPublicKey(); // the whole "login"
+
+const signed = await window.nostr.signEvent({
+  kind: 1,
+  created_at: Math.floor(Date.now() / 1000),
+  tags: [],
+  content: "gm!",
+}); // throws if the user clicks "Reject"
+```
+
+The app sends a template **without** `pubkey`, `id` or `sig`; the extension fills in all three.
+Extensions should inject `window.nostr` at `document_end` so it exists before your app's scripts run.
+Always verify what comes back (e.g. `verifyEvent` from `nostr-tools/pure`) before you trust it.
+
+</Drawer>
+
+## The remote signer, or “bunker” (NIP-46)
+
+Extensions are great on a laptop, but what about your phone, a shared computer, or an app that
+can't install extensions? <Term id="nip46" locale="en">NIP-46</Term> moves the signer to a
+**different device**, called a <Term id="bunker" locale="en">bunker</Term>. It could be an app on
+your phone, a little server at home, or a hosted service.
+
+The clever part: the app and the bunker talk **through an ordinary Nostr
+<Term id="relay" locale="en">relay</Term>**, like passing notes through a mailbox. Every note in the
+mailbox is locked with <Term id="nip44" locale="en">NIP-44</Term>
+<Term id="encryption" locale="en">encryption</Term>, so the relay sees *who* is passing notes but not
+what they say.
+
+1. The bunker gives you a connection link: `bunker://<bunker pubkey>?relay=wss://…&secret=…`.
+2. You paste it into the app. The app makes a **throwaway keypair** just for talking to the bunker.
+3. The app sends an encrypted `connect` request; the bunker checks the one-time secret and answers `ack`.
+4. The app sends `get_public_key` to learn **your** pubkey, which can differ from the bunker's own key in the link.
+5. From then on, every `sign_event` request pops up on your phone. Approve, and the signed event comes back.
+
+Flip the diagram above to the **NIP-46 bunker** tab and step through it. Open a hop's details to
+compare what the relay sees with what the bunker decrypts.
+
+<Drawer client:visible testid="ch10-uth-nip46" locale="en" title="Under the hood: kind 24133 and JSON-RPC">
+
+[NIP-46](https://github.com/nostr-protocol/nips/blob/master/46.md) is JSON-RPC inside encrypted
+events. Every request and response is a **kind 24133** event, `p`-tagged to the other side, with
+NIP-44 encrypted `content`:
+
+```json
+{
+  "kind": 24133,
+  "pubkey": "<client pubkey (throwaway)>",
+  "tags": [["p", "<remote-signer pubkey>"]],
+  "content": "<nip44(request)>",
+  "created_at": 1735689600,
+  "id": "…",
+  "sig": "…"
+}
+```
+
+Decrypted, a request and its response look like:
+
+```json
+{ "id": "s1", "method": "sign_event", "params": ["{\"kind\":1,\"content\":\"gm\",\"tags\":[],\"created_at\":1735689600}"] }
+{ "id": "s1", "result": "{\"kind\":1,…,\"id\":\"…\",\"pubkey\":\"…\",\"sig\":\"…\"}" }
+```
+
+Methods: `connect`, `sign_event`, `ping`, `get_public_key`, `nip04_encrypt`/`nip04_decrypt`,
+`nip44_encrypt`/`nip44_decrypt`, `switch_relays` and `logout`. Three different keypairs are in play:
+the **client keypair** (throwaway, lives in the app), the **remote-signer keypair** (the bunker's
+mailbox address) and the **user keypair** (your identity, which never leaves the bunker). Always call
+`get_public_key` after connecting: the bunker's pubkey is not necessarily your pubkey.
+
+Connections can also start from the app with a `nostrconnect://<client-pubkey>?relay=…&secret=…`
+link that you scan with the bunker; the app then checks the returned `secret` to avoid spoofing. If
+the bunker needs extra login, it answers `"result": "auth_url"` with a URL in `error` for the app to open.
+
+```ts
+import { generateSecretKey } from "nostr-tools/pure";
+import { BunkerSigner, parseBunkerInput } from "nostr-tools/nip46";
+
+const pointer = await parseBunkerInput("bunker://…?relay=wss://relay.example&secret=…");
+if (!pointer) throw new Error("Invalid bunker URL");
+
+const clientKey = generateSecretKey(); // throwaway: store it to resume the session later
+const bunker = BunkerSigner.fromBunker(clientKey, pointer, { onauth: (url) => window.open(url) });
+await bunker.connect();
+
+const pubkey = await bunker.getPublicKey(); // the user's key, not the bunker's
+const signed = await bunker.signEvent({ kind: 1, created_at: Math.floor(Date.now() / 1000), tags: [], content: "gm" });
+```
+
+</Drawer>
+
+<Callout tone="tip" locale="en" title="Which signer should I use?">
+On a desktop browser, a NIP-07 extension is the easiest. On a phone or across many devices, a NIP-46
+bunker keeps one key safe in one place. Either way, the golden rule is the same: apps get
+**signatures**, never the **key**.
+</Callout>
+
+## Names you can read: NIP-05
+
+Public keys are great for computers and terrible for humans. Nobody wants to tell a friend
+“follow me at npub1qy88wumn8ghj7…”. <Term id="nip05" locale="en">NIP-05</Term> adds an email-like
+label such as `alice@alpha.example`.
+
+It works like a name badge that a company prints for you. Alice writes `alice@alpha.example` in her
+profile (<Term id="metadata" locale="en">kind 0 metadata</Term>). Your app doesn't just believe her:
+it asks the domain `alpha.example` for a little file called `nostr.json` and checks that the name
+`alice` points to Alice's public key. If the domain agrees, the app shows a checkmark.
+
+<Nip05Checker client:visible locale="en" />
+
+Try **Borrowed name**: Alice's profile claims to be `bob@beta.example`, but the domain lists Bob's
+key there, so the check fails. Anyone can *type* any name into their profile; only the domain owner
+can vouch for it.
+
+<Callout tone="info" locale="en" title="A badge, not an identity">
+A NIP-05 checkmark means “this domain vouches for this key”. It does not mean the person is famous,
+real, or trustworthy, and if the domain disappears, the badge does too. Your identity is still your
+key, which is why apps remember who you follow by pubkey, not by name.
+</Callout>
+
+<Drawer client:visible testid="ch10-uth-nip05" locale="en" title="Under the hood: /.well-known/nostr.json">
+
+For `alice@alpha.example`, a client fetches
+`https://alpha.example/.well-known/nostr.json?name=alice` and expects:
+
+```json
+{
+  "names": { "alice": "<64-char lowercase hex pubkey>" },
+  "relays": { "<that pubkey>": ["wss://relay.alpha.example"] }
+}
+```
+
+Rules from [NIP-05](https://github.com/nostr-protocol/nips/blob/master/05.md):
+
+- The local part may only use `a-z0-9-_.`; `_@alpha.example` is the “root” name and is displayed as just `alpha.example`.
+- Keys must be **hex**, never `npub`.
+- The endpoint must not redirect (clients must ignore redirects) and should send
+  `Access-Control-Allow-Origin: *` so web apps can read it.
+- The optional `relays` map tells clients where to find that user.
+
+```ts
+import { queryProfile, isValid } from "nostr-tools/nip05";
+
+const pointer = await queryProfile("alice@alpha.example"); // { pubkey, relays } | null
+const ok = await isValid(profilePubkey, "alice@alpha.example"); // true if the domain agrees
+```
+
+</Drawer>
+
+## Quick check
+
+<SigningQuiz client:visible locale="en" />

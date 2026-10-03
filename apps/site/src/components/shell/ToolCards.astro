@@ -1,0 +1,103 @@
+---
+/** Tool cards, shared by the landing page and the tools index. Static: no JS. */
+import type { Locale } from "@nostrschool/i18n";
+import { getDictionary } from "@nostrschool/i18n";
+import { toolLinks } from "./lib/links";
+
+interface Props {
+  readonly locale: Locale;
+  /** Heading level of each card title, so the outline stays correct on both pages. */
+  readonly headingLevel?: 2 | 3;
+}
+const { locale, headingLevel = 3 } = Astro.props;
+const open = getDictionary(locale).common.toolCards.open;
+const Heading = headingLevel === 2 ? "h2" : "h3";
+// Simple line icons; decorative (the card title names the tool).
+const ICONS: Record<string, string> = {
+  keys: "M14 10a4 4 0 1 0-3.5 3.97L9 15.5V18h2.5v2H14v-2.5l1.6-1.6A4 4 0 0 0 14 10z M16 8h.01",
+  "event-inspector": "M10 4a6 6 0 1 0 0 12a6 6 0 0 0 0-12z M14.5 14.5L20 20 M8 10h4",
+  "filter-playground": "M4 5h16l-6 7v6l-4 2v-8z",
+  kinds: "M4 4h7v7H4z M13 4h7v7h-7z M4 13h7v7H4z M13 13h7v7h-7z",
+  glossary: "M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z M5 17a3 3 0 0 1 3-3h10",
+};
+---
+
+<ul class="tools" data-testid="tool-list">
+  {toolLinks(locale).map((tool, i) => (
+    <li class="tool" style={`--i: ${i}`}>
+      <a href={tool.href} class="card" data-testid={`tool-link-${tool.id}`}>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d={ICONS[tool.id] ?? ""} />
+        </svg>
+        <Heading class="title">{tool.title}</Heading>
+        <p class="text">{tool.description}</p>
+        <span class="open" aria-hidden="true">
+          {open} →
+        </span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--size-rail) * 1.1)), 1fr));
+    gap: var(--space-md);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card {
+    display: grid;
+    align-content: start;
+    gap: var(--space-xs);
+    block-size: 100%;
+    padding: var(--space-lg);
+    border: var(--border-width-medium) solid var(--color-text);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-decoration: none;
+    box-shadow: var(--shadow-pop-sm);
+    transition:
+      transform var(--motion-duration-normal) var(--motion-easing-bounce),
+      box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
+  }
+  .card:hover,
+  .card:focus-visible {
+    transform: translate(calc(var(--space-3xs) * -1), calc(var(--space-3xs) * -1)) rotate(-0.6deg);
+    box-shadow: var(--shadow-pop);
+  }
+  svg {
+    inline-size: var(--size-icon-xl);
+    block-size: var(--size-icon-xl);
+    padding: var(--space-2xs);
+    border-radius: var(--radius-md);
+    background: var(--color-accent-subtle);
+    fill: none;
+    stroke: var(--color-text);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tool:nth-child(3n + 2) svg {
+    background: var(--color-primary-subtle);
+  }
+  .tool:nth-child(3n) svg {
+    background: var(--color-secondary-subtle);
+  }
+  .title {
+    margin: 0;
+    font-size: var(--font-size-xl);
+  }
+  .text {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+  .open {
+    color: var(--color-text-primary);
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+  }
+</style>

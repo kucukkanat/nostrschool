@@ -1,0 +1,255 @@
+---
+order: 3
+slug: events
+title: "Anatomía de un evento"
+summary: "Cada publicación, cada like y cada perfil es un evento JSON firmado. Vamos a desarmar uno."
+estimatedMinutes: 12
+nips: ["01", "10"]
+takeaways:
+  - "Todo en Nostr (notas, likes, perfiles, listas de seguidos) tiene una sola forma: un evento JSON con siete campos."
+  - "El id es el hash SHA-256 del evento serializado, así que cambiar un solo byte cambia el id."
+  - "La sig es una firma Schnorr sobre ese id: solo quien tiene la clave secreta puede crearla, y cualquiera puede comprobarla."
+  - "Los tags son listas con etiqueta que conectan eventos con otros eventos, personas y temas; los tags de una sola letra se pueden buscar en los relays."
+  - "created_at es lo que afirma el autor, no una prueba del momento."
+mascotIntro: "¡Hora de operar! Abramos un evento para ver cómo funciona por dentro. Tranquilo, no siente nada."
+---
+import Term from "~/components/shell/Term.astro";
+import { href } from "~/lib/href";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import EventLab from "~/components/chapters/03-events/EventLab.svelte";
+
+En el capítulo anterior obtuviste un <Term id="keypair" locale="es">par de claves</Term>. Ahora vamos a usarlo.
+En Nostr, **todo lo que haces es un <Term id="event" locale="es">evento</Term>**: una publicación, un like,
+tu perfil, la lista de personas que sigues. Trabajos distintos, una sola forma. Aprende esa forma una vez
+y podrás leer todo el protocolo.
+
+## Un sobre sellado con huella
+
+Piensa en un evento como una postal que guardas en una funda de plástico transparente:
+
+- La **postal** es lo que quieres decir: el texto, cuándo lo escribiste, qué tipo de mensaje es
+  y unas cuantas etiquetas adhesivas.
+- La **huella** estampada en la funda se calcula a partir de la postal. Cambia una sola letra de la
+  postal y la huella deja de coincidir.
+- Tu **sello de lacre** va encima de la huella. Solo tú puedes estamparlo, pero cualquiera puede comprobar que es tuyo.
+
+Eso es todo. Eso es un evento. La huella es el <Term id="event-id" locale="es">id</Term>, y el
+sello de lacre es la <Term id="signature" locale="es">firma</Term>.
+
+Aquí tienes uno de verdad, escrito por Alice. Haz clic en cualquier campo para saber qué hace.
+
+<EventLab client:visible locale="es" />
+
+Pruébalo ya: cambia a **Un falsificador (sin clave)** y modifica el texto. El contenido se actualiza, pero
+el id y la firma viejos siguen pegados, y la verificación te descubre en la primera comprobación.
+Vuelve a Alice y la misma edición está perfecta, porque ella puede volver a firmar.
+
+## Los siete campos
+
+Todo evento tiene exactamente estos siete campos. No se exige nada más, y no se permite nada menos.
+
+| Campo | En palabras simples |
+|---|---|
+| `id` | La huella: un hash de todo lo demás |
+| `pubkey` | Quién lo escribió (la <Term id="pubkey" locale="es">clave pública</Term> del autor) |
+| `created_at` | Cuándo dice el autor que lo escribió, en segundos desde 1970 |
+| `kind` | Qué clase de evento es: un número |
+| `tags` | Etiquetas adhesivas: enlaces a otros eventos, personas, hashtags |
+| `content` | El mensaje en sí (o los datos) |
+| `sig` | El sello de lacre: una firma que solo el autor puede crear |
+
+### kind: un número, muchos trabajos
+
+El <Term id="kind" locale="es">kind</Term> les dice a las apps cómo leer el resto. El kind `1` es una nota
+de texto corta, el kind `0` es tu perfil, el kind `3` tu lista de seguidos y el kind `7` una reacción (un "like").
+El número también les dice a los relays cómo guardarlo: la mayoría de los eventos se guardan para siempre,
+pero algunos son **reemplazables** (solo importa tu perfil más reciente) y otros son **efímeros** (pásalo, no lo guardes).
+Recorreremos todo el zoológico en el capítulo 6.
+
+### tags: etiquetas adhesivas
+
+Los <Term id="tag" locale="es">tags</Term> son una lista de listas pequeñas. El primer elemento es el
+nombre de la etiqueta y el resto son sus valores:
+
+- `["e", "<event id>"]` apunta a otro evento. Así funcionan las respuestas y las citas.
+- `["p", "<pubkey>"]` menciona a una persona, para que su app le avise.
+- `["t", "nostr"]` es un hashtag.
+
+Las etiquetas de **una sola letra** son especiales: los relays las indexan, así que un cliente puede pedir
+"dame todas las notas con el tag `#nostr`" o "todas las respuestas a este evento".
+
+### created_at: una afirmación, no un reloj
+
+`created_at` es una marca de tiempo Unix que elige el autor. Nada impide que Alice escriba
+"enero de 2009". Los clientes ordenan los feeds según este campo, y muchos relays rechazan eventos de un
+futuro demasiado lejano, pero no lo tomes como prueba de *cuándo* ocurrió algo.
+
+<Callout tone="tip" locale="es" title="Por qué la marca de tiempo está dentro de la huella">
+Como `created_at` entra en el hash del id, nadie puede cambiarle la fecha a la nota de Alice en silencio
+después de que ella la firme. Prueba **created_at +1 s** en el laboratorio mientras juegas de falsificador: el id se rompe.
+</Callout>
+
+## Cómo se hace la huella
+
+Para calcular el id, todos los clientes siguen la misma receta de <Term id="nip01" locale="es">NIP-01</Term>:
+
+1. **Serializar.** Pon los campos en un orden fijo dentro de un arreglo JSON, sin espacios extra:
+   `[0, pubkey, created_at, kind, tags, content]`. El `0` inicial es un marcador de versión.
+2. **Hashear.** Codifica ese texto como bytes UTF-8 y pásalos por
+   <Term id="sha256" locale="es">SHA-256</Term>. Salen 32 bytes, escritos como 64 caracteres hexadecimales.
+   Ese es el `id`.
+3. **Firmar.** Alice firma el id con su clave secreta usando una firma
+   <Term id="schnorr" locale="es">Schnorr</Term>. Esa es la `sig`.
+
+Un <Term id="hash" locale="es">hash</Term> tiene una propiedad maravillosa llamada **efecto avalancha**:
+cambia un carácter de la entrada y aproximadamente la mitad de los bits de salida se invierten. Mira el
+contador de "dígitos del id que cambiaron" en el laboratorio: una sola letra suele revolver unos 60 de los 64 dígitos hexadecimales.
+
+<Drawer client:visible testid="ch03-uth-serialize" locale="es" title="Bajo el capó: los bytes exactos">
+
+Esta es la cadena que realmente se hashea para una nota pequeñita. Fíjate: sin espacios, sin saltos de línea,
+y con los campos exactamente en este orden.
+
+```json
+[0,"a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",1735686600,1,[],"testing testing is this thing on"]
+```
+
+Dentro de `content` (y de los valores de los tags) se aplica el escapado de JSON: los saltos de línea se vuelven `\n`,
+las comillas dobles `\"`, las barras invertidas `\\`, además de `\r`, `\t`, `\b` y `\f`. Todo lo demás, emojis incluidos,
+se escribe como UTF-8 crudo. Dos clientes que no coincidan en un solo byte aquí calcularán ids distintos, por eso
+[NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) detalla las reglas con tanto cuidado.
+Para texto normal, `JSON.stringify` sobre el arreglo produce exactamente esta forma en JavaScript. Solo difiere en
+caracteres de control poco comunes (como U+0001, que escribe como `\u0001`) y en surrogates sueltos, que NIP-01
+pide emitir tal cual.
+
+```ts
+import { sha256 } from "@noble/hashes/sha2.js";
+import { bytesToHex, utf8ToBytes } from "@noble/hashes/utils.js";
+
+const serialized = JSON.stringify([0, pubkey, created_at, kind, tags, content]);
+const id = bytesToHex(sha256(utf8ToBytes(serialized)));
+```
+
+</Drawer>
+
+## Comprobar el sello
+
+Cuando tu app recibe un evento de un <Term id="relay" locale="es">relay</Term>, no confía en él
+solo porque llegó. Lo **verifica**, en dos pasos:
+
+1. Vuelve a calcular el id a partir de los campos. ¿Coincide con el `id` que dice tener el evento? Si no,
+   algo se cambió después de firmar.
+2. Comprueba la `sig` contra el id y la `pubkey`. Si falla, el evento no fue firmado con esa clave.
+
+Ambas comprobaciones son matemática pura y se ejecutan en tu propio dispositivo. Esa es la gran idea: **no necesitas
+confiar en el relay**. Un relay puede negarse a entregar las notas de Alice, pero no puede cambiar ni una palabra
+de ellas, ni inventar notas nuevas en su nombre, sin que lo descubran.
+
+<Callout tone="info" locale="es" title="Intenta romperlo">
+En el laboratorio, pulsa **Cambia un dígito de la sig**. El id sigue coincidiendo (el contenido no cambió), así que
+la verificación llega hasta la última etapa antes de fallar. Ahora prueba **Cambia una letra en content**:
+falla antes, en "Comparar id".
+</Callout>
+
+<Drawer client:visible testid="ch03-uth-sign" locale="es" title="Bajo el capó: firmar y verificar con nostr-tools">
+
+Las firmas son firmas Schnorr [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki)
+sobre la curva <Term id="secp256k1" locale="es">secp256k1</Term>: 64 bytes (128 caracteres
+hexadecimales) que firman el id de 32 bytes. La `pubkey` es la clave pública "x-only" de 32 bytes, siempre en
+hexadecimal en el protocolo (la forma `npub…` del capítulo 2 es solo para humanos).
+
+```ts
+import { finalizeEvent, generateSecretKey, verifyEvent } from "nostr-tools/pure";
+
+const sk = generateSecretKey(); // Uint8Array(32)
+const event = finalizeEvent(
+  {
+    kind: 1,
+    created_at: Math.floor(Date.now() / 1000),
+    tags: [["t", "nostr"]],
+    content: "¡Hola Nostr!",
+  },
+  sk,
+); // agrega pubkey, id y sig
+
+verifyEvent(event); // true
+
+// Una copia alterada, tal como llegaría desde la red (JSON plano):
+const tampered = JSON.parse(JSON.stringify({ ...event, content: "¿Hola Nostr?" }));
+verifyEvent(tampered); // false: el id ya no coincide
+```
+
+<Callout tone="warning" locale="es" title="Ojo: nostr-tools guarda en caché la verificación">
+`finalizeEvent` y `verifyEvent` recuerdan su resultado en el objeto del evento bajo un símbolo oculto.
+¡`verifyEvent({ ...event, content: "changed" })` copia ese `true` en caché y sigue diciendo
+`true`! Los eventos parseados desde JSON (lo que recibes de los relays) no traen caché, así que la verificación real funciona,
+pero ten cuidado cuando modifiques objetos en tu propio código.
+</Callout>
+
+`finalizeEvent` calcula el id con `getEventHash` (la receta de serializar + SHA-256 de arriba) y lo firma.
+`verifyEvent` hace lo contrario: vuelve a calcular el hash, lo compara con `id` y luego comprueba la `sig`.
+Los relays hacen las mismas comprobaciones antes de aceptar un evento (NIP-01 les indica que rechacen los inválidos).
+
+</Drawer>
+
+<Drawer client:visible testid="ch03-uth-tags" locale="es" title="Bajo el capó: los formatos de los tags">
+
+Según [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md):
+
+```json
+["e", "<32-byte hex event id>", "<recommended relay URL, optional>", "<author pubkey, optional>"]
+["p", "<32-byte hex pubkey>", "<recommended relay URL, optional>"]
+["a", "<kind>:<pubkey hex>:<d tag value>", "<recommended relay URL, optional>"]
+```
+
+Se espera que los relays indexen todos los tags de una sola letra (`a`–`z`, `A`–`Z`), así que un
+<Term id="filter" locale="es">filtro</Term> como `{"#t": ["nostr"]}` o `{"#e": ["<id>"]}` funciona.
+Las convenciones para hilos (los marcadores `root` / `reply` que verás en la 4.ª posición de los tags `e` en
+las respuestas) están en [NIP-10](https://github.com/nostr-protocol/nips/blob/master/10.md). Los tags con
+nombres más largos (`imeta`, `client`, …) también están permitidos, solo que no se indexan.
+
+</Drawer>
+
+## Inspecciona cualquier evento
+
+¿Tienes un evento que sacaste de otro lado? Pégalo en la herramienta
+<a href={href("es", "tools/event-inspector")} data-testid="ch03-inspector-link">inspector de eventos</a>: comprueba el id y
+la firma directamente en tu navegador y explica cada campo.
+
+## Comprobación rápida
+
+<Quiz
+  client:visible
+  testid="ch03-quiz-id"
+  locale="es"
+  question="Bob edita una palabra de la nota de Alice pero conserva su id y su sig. ¿Qué pasa cuando tu app la verifica?"
+  options={[
+    { id: "a", label: "Falla: el id recalculado ya no coincide con el id declarado.", correct: true, explanation: "El id es un hash del contenido, así que cualquier edición lo cambia." },
+    { id: "b", label: "Pasa, porque la firma sigue siendo de Alice.", correct: false, explanation: "La firma cubre el id, y el id cubre el contenido. Cambia el contenido y la cadena se rompe." },
+    { id: "c", label: "Pasa si el relay responde por Bob.", correct: false, explanation: "La verificación es matemática pura en tu dispositivo. Los relays no tienen voto." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch03-quiz-fields"
+  locale="es"
+  question="¿Qué campos entran en el hash del id?"
+  options={[
+    { id: "a", label: "Solo content", correct: false, explanation: "Entonces cualquiera podría cambiar la fecha o los tags de tu nota sin romper el id." },
+    { id: "b", label: "Todo, incluida la sig", correct: false, explanation: "La sig firma el id, así que el id no puede incluir la sig. Sería circular." },
+    { id: "c", label: "pubkey, created_at, kind, tags y content", correct: true, explanation: "Serializados como [0, pubkey, created_at, kind, tags, content]." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch03-quiz-time"
+  locale="es"
+  question="Un evento dice created_at = 1231006505 (3 de enero de 2009). ¿Qué demuestra eso?"
+  options={[
+    { id: "a", label: "Que el evento de verdad se escribió en 2009.", correct: false, explanation: "El autor elige created_at libremente. ¡Nostr ni siquiera existía en 2009!" },
+    { id: "b", label: "Solo que el autor eligió esa marca de tiempo al firmar.", correct: true, explanation: "created_at es una afirmación del autor. Está firmada, así que nadie más puede cambiarla, pero no es una prueba del momento." },
+    { id: "c", label: "Que un relay lo guardó en 2009.", correct: false, explanation: "Los relays no les ponen sello de tiempo a los eventos; created_at viene del autor." },
+  ]}
+/>

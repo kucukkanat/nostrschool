@@ -1,0 +1,192 @@
+---
+order: 6
+slug: kinds
+title: "Kinds & NIPs"
+summary: "A periodic table of event kinds and the specs that define them."
+estimatedMinutes: 12
+nips: ["01", "23", "51", "65"]
+takeaways:
+  - "Every event has a kind: a number that says what it is (a note, a profile, a reaction…)."
+  - "The number's range tells relays how to store it: regular (keep all), replaceable (keep latest), ephemeral (keep none), addressable (keep latest per d tag)."
+  - "For replaceable and addressable events, the newest created_at wins; ties go to the lowest id."
+  - "NIPs are the community's open specs. A new kind is just a number plus a NIP that explains it."
+  - "Clients ignore kinds they don't understand, so new features never break old apps."
+mascotIntro: "Same envelope, different stamp! Let's sort the mail by kind."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import KindsTable from "~/components/chapters/06-kinds/KindsTable.svelte";
+import StorageSimulator from "~/components/chapters/06-kinds/StorageSimulator.svelte";
+import KindClassifier from "~/components/chapters/06-kinds/KindClassifier.svelte";
+
+## One envelope, many stamps
+
+So far every <Term id="event" locale="en">event</Term> has looked the same: an id, a <Term id="pubkey" locale="en">pubkey</Term>,
+a timestamp, some tags, some content and a signature. A tweet-style note, your profile, a "like",
+a blog post and a Lightning receipt all travel in **the exact same envelope**.
+
+So how does an app know which is which? One tiny field: the <Term id="kind" locale="en">kind</Term>.
+It's just an integer, like a stamp on the envelope. `1` means "short text note", `0` means "my profile",
+`7` means "reaction", `30023` means "long-form article". That's it. No new message types, no new
+endpoints: Nostr grows by inventing new numbers.
+
+Think of the kind as the **section of a library**. The books (events) are all bound the same way, but
+the sticker on the spine tells the librarian (the <Term id="relay" locale="en">relay</Term>) which shelf
+to put it on, and tells readers (clients) how to display it.
+
+## The periodic table of kinds
+
+Chemists sort elements by their properties. We can do the same with kinds: the **color of a tile**
+is its storage *category*, which is decided purely by the number's range. Click around: every tile
+opens a real example event. Try to visit all four colors.
+
+<KindsTable client:visible locale="en" />
+
+<Drawer client:visible testid="ch06-uth-registry" locale="en" title="Under the hood: where kinds are registered">
+There is no central registry server: the list of known kinds lives in the README of the
+[nostr-protocol/nips](https://github.com/nostr-protocol/nips#event-kinds) repository, next to the NIP that
+defines each one. Examples in the table above are either real fixture events (verified signatures) or
+templates signed in your browser with a public demo key using a fixed `auxRand`, so the bytes are
+identical on every visit.
+
+```ts
+import { kinds } from "nostr-tools";
+
+kinds.ShortTextNote;            // 1
+kinds.LongFormArticle;          // 30023
+kinds.classifyKind(30023);      // "parameterized" (nostr-tools' older name for addressable)
+kinds.isReplaceableKind(10002); // true
+```
+</Drawer>
+
+## Four ways to be stored
+
+The number tells a relay what to *keep*. <Term id="nip01" locale="en">NIP-01</Term> splits the
+number line into four neighborhoods:
+
+- **Regular** (`1`, `2`, `4`–`44`, `1000`–`9999`): a diary. Every page is kept. Notes, reactions,
+  reposts and zap receipts pile up forever (or until the relay decides otherwise).
+- **<Term id="replaceable-event" locale="en">Replaceable</Term>** (`0`, `3`, `10000`–`19999`): a whiteboard.
+  Each person gets **one** per kind; writing a new one wipes the old. Your profile (<Term id="metadata" locale="en">kind 0</Term>),
+  your <Term id="follow-list" locale="en">follow list</Term> (kind 3) and your relay list (kind 10002) work this way.
+- **<Term id="ephemeral-event" locale="en">Ephemeral</Term>** (`20000`–`29999`): a phone call. Relays pass it to
+  whoever is listening *right now* and then forget it. Perfect for login challenges and signer chatter.
+- **<Term id="addressable-event" locale="en">Addressable</Term>** (`30000`–`39999`): a set of labeled
+  whiteboards. One per person, per kind, **per `d` tag**. That's how you can edit several
+  <Term id="long-form" locale="en">long-form articles</Term> independently.
+
+Play with it. Publish a few versions, switch categories, and then try **re-sending an older copy**:
+
+<StorageSimulator client:visible locale="en" />
+
+<Callout client:visible locale="en" tone="tip" title="Who wins a tie?">
+For replaceable and addressable events the newest `created_at` wins. If two versions share the exact
+same second, relays keep the one with the **lowest id** (first in alphabetical order), so every relay
+ends up agreeing on the same winner no matter which copy arrived first.
+</Callout>
+
+<Drawer client:visible testid="ch06-uth-storage" locale="en" title="Under the hood: NIP-01 storage rules">
+The exact rules from [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md#kinds):
+
+| Category | Range | Relay keeps |
+|---|---|---|
+| regular | `1000 <= n < 10000 \|\| 4 <= n < 45 \|\| n == 1 \|\| n == 2` | every event |
+| replaceable | `10000 <= n < 20000 \|\| n == 0 \|\| n == 3` | latest per `(pubkey, kind)` |
+| ephemeral | `20000 <= n < 30000` | nothing (forward only) |
+| addressable | `30000 <= n < 40000` | latest per `(pubkey, kind, d)` |
+
+Kinds 45–999 and 40000–65535 fall outside every range: NIP-01 says nothing about storing them, and most
+relays treat them as regular. An addressable event is pointed at with its *address* `kind:pubkey:d`, either
+in an `a` tag or encoded as an <Term id="naddr" locale="en">naddr</Term>:
+
+```json
+["a", "30023:e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc:relays-explained", "wss://relay.alpha.example"]
+```
+
+Asking for "the current version" is a normal filter, because the relay only stores one:
+
+```json
+["REQ", "article", { "kinds": [30023], "authors": ["e550c6…"], "#d": ["relays-explained"] }]
+```
+</Drawer>
+
+Want to test your intuition? Type any number and see which neighborhood it lives in:
+
+<KindClassifier client:visible locale="en" />
+
+## NIPs: how Nostr grows without a boss
+
+Who decides that `7` means "reaction"? Nobody, and everybody. A <Term id="nip" locale="en">NIP</Term>
+(*Nostr Implementation Possibility*) is a short, public document describing a convention: which kind
+to use, which tags, what the content means. They live in one GitHub repository, but they work more like
+recipes shared at a potluck than laws:
+
+1. **Someone has an idea.** A developer wants polls, or calendars, or marketplaces.
+2. **They build it first.** Ideally in a real client and relay, picking a kind number nobody else uses.
+3. **They open a pull request.** People argue, simplify, and poke holes in it in public.
+4. **It gets merged when it's real.** The README asks that a NIP be implemented in at least two clients
+   and one relay (where applicable), make sense, be optional and backwards-compatible, and not add a second way
+   to do the same thing.
+
+The key trick is the word *optional*. A client that doesn't understand kind `31922` (a calendar event)
+simply ignores it. Nothing breaks. That's why Nostr can grow sideways: microblogging, long-form,
+livestreams, code collaboration and wallets all share the same relays and the same keys.
+
+<Callout client:visible locale="en" tone="info" title="NIP names are not always numbers">
+Most NIPs have two-digit decimal names (`01`, `57`), but newer ones may use hex-looking names such as
+`7D` (threads) or `C7` (chats). The kind number and the NIP number are unrelated: kind `7` is defined
+in NIP-25, not NIP-07.
+</Callout>
+
+<Drawer client:visible testid="ch06-uth-nips" locale="en" title="Under the hood: NIPs worth reading">
+Useful starting points in the [NIPs repository](https://github.com/nostr-protocol/nips):
+
+- [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md): the event format, kind 0 and the four storage categories (kind 1 is specified in [NIP-10](https://github.com/nostr-protocol/nips/blob/master/10.md))
+- [NIP-02](https://github.com/nostr-protocol/nips/blob/master/02.md): follow list (kind 3)
+- <Term id="nip23" locale="en">NIP-23</Term> ([spec](https://github.com/nostr-protocol/nips/blob/master/23.md)): long-form content (kind 30023, drafts 30024)
+- [NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md): lists, standard (10000+) and sets (30000+)
+- [NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md): relay list metadata (kind 10002)
+- [NIP-31](https://github.com/nostr-protocol/nips/blob/master/31.md): put a human-readable `alt` tag on custom kinds, so clients that don't understand them can still show *something*. The NIPs README now marks NIP-31 as unrecommended, but an `alt` tag on a custom kind is still a harmless courtesy
+- [NIP-89](https://github.com/nostr-protocol/nips/blob/master/89.md): apps announce which kinds they handle (31990), users recommend apps (31989)
+
+Inventing a private kind for your app? Pick an unused number in the right range for the storage
+behavior you want, add an `alt` tag, and document it.
+</Drawer>
+
+## Quick check
+
+<Quiz
+  client:visible
+  testid="ch06-quiz-profile"
+  locale="en"
+  question="You update your profile picture three times. How many kind 0 events does a well-behaved relay keep for you?"
+  options={[
+    { id: "three", label: "Three, one per change", correct: false, explanation: "That's how regular kinds behave. Kind 0 is replaceable." },
+    { id: "one", label: "One: the newest", correct: true, explanation: "Kind 0 is replaceable: one per pubkey and kind." },
+    { id: "zero", label: "None, profiles are ephemeral", correct: false, explanation: "Ephemeral kinds start at 20000." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch06-quiz-addressable"
+  locale="en"
+  question="Which kind lets you keep several independently editable blog posts?"
+  options={[
+    { id: "k1", label: "Kind 1 (short text note)", correct: false, explanation: "Notes are regular: you can't edit them, only publish new ones." },
+    { id: "k10002", label: "Kind 10002 (relay list)", correct: false, explanation: "Replaceable: only one per person." },
+    { id: "k30023", label: "Kind 30023 (long-form article)", correct: true, explanation: "Addressable: one per person per d tag, so each article has its own slot." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch06-quiz-nips"
+  locale="en"
+  question="A client receives an event with a kind it has never heard of. What should it do?"
+  options={[
+    { id: "crash", label: "Reject the whole subscription", correct: false, explanation: "That would make every new NIP a breaking change." },
+    { id: "ignore", label: "Ignore it (or show its alt text)", correct: true, explanation: "NIPs are optional: unknown kinds are skipped, so new features never break old apps." },
+    { id: "ask", label: "Ask the NIP authors for permission", correct: false, explanation: "There's no one to ask: NIPs are open specs, not a gatekeeper." },
+  ]}
+/>

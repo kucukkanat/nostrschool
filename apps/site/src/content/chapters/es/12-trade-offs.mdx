@@ -1,0 +1,316 @@
+---
+order: 12
+slug: trade-offs
+title: "Ventajas y desventajas"
+summary: "Spam, descubrimiento, economía de los relays y pérdida de claves: una mirada honesta a lo que Nostr hace mal, lo que hace genial y cómo se compara con X, Mastodon y Bluesky."
+estimatedMinutes: 15
+nips: ["13", "11", "42", "65", "51", "56", "09", "62", "49", "46"]
+takeaways:
+  - "Nostr cambia comodidad por control: nadie puede quitarte tu identidad, pero tampoco nadie puede devolvértela."
+  - "No hay un equipo central contra el spam. Relays y clientes lo combaten con proof-of-work (NIP-13), relays de pago, autenticación y filtros de red de confianza."
+  - "Los relays los mantienen personas que pagan facturas reales. Los relays gratuitos pueden borrar datos antiguos; publicar en varios relays (NIP-65) mantiene tus notas localizables."
+  - "La moderación es una decisión que toman por ti tu cliente y tus relays, no un reglamento global."
+  - "Perder o filtrar tu clave privada es el problema más difícil de Nostr: no hay restablecimiento de contraseña ni, por ahora, una forma estándar de rotar claves."
+mascotIntro: "Todo superpoder tiene su kryptonita. ¡Seamos honestos con la de Nostr! 🦸"
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer } from "@nostrschool/ui";
+import ComparisonMatrix from "~/components/chapters/12-trade-offs/ComparisonMatrix.svelte";
+import ScenarioExplorer from "~/components/chapters/12-trade-offs/ScenarioExplorer.svelte";
+import PowMiner from "~/components/chapters/12-trade-offs/PowMiner.svelte";
+import ChapterQuiz from "~/components/chapters/12-trade-offs/ChapterQuiz.svelte";
+import CourseComplete from "~/components/chapters/12-trade-offs/CourseComplete.svelte";
+
+Llegaste al último capítulo. 🎉 Durante once capítulos te mostramos los trucos de Nostr:
+claves que son tuyas, eventos que cualquiera puede verificar, <Term id="relay" locale="es">relays</Term> que cualquiera puede montar.
+Ahora toca la parte que los folletos publicitarios se saltan: **en qué es malo Nostr**.
+
+Piensa en Nostr como tener una casa propia en vez de alquilar un piso. Nadie puede echarte, y
+puedes pintar las paredes del color que quieras. Pero cuando se rompe la caldera a las 3 de la
+madrugada, no hay casero al que llamar. Cada "pro" de este capítulo viene con su "contra", y eso no
+es un fallo: es el precio de que nadie esté al mando.
+
+## Spam: nadie vigila la puerta
+
+En una gran plataforma, un equipo entero (y mucho software) combate a los bots por ti. En Nostr no
+existe "la empresa", así que no hay equipo contra el spam. Crear una identidad nueva no cuesta nada:
+generas un <Term id="keypair" locale="es">par de claves</Term> y ya estás dentro. Eso es maravilloso
+para un disidente e igual de maravilloso para un spammer capaz de crear un millón de cuentas por minuto.
+
+Por eso Nostr combate el <Term id="spam" locale="es">spam</Term> por capas, y cada relay y cada
+cliente elige su propia mezcla:
+
+- **Que publicar cueste algo.** Un relay puede pedir
+  <Term id="proof-of-work" locale="es">proof-of-work</Term> (un pequeño acertijo matemático por nota) o
+  dinero: un <Term id="paid-relay" locale="es">relay de pago</Term> solo acepta notas de quienes
+  pagaron una pequeña cuota.
+- **Saber quién habla.** Los relays pueden exigir un saludo de inicio de sesión (NIP-42) antes de aceptar notas.
+- **Confiar en los amigos de tus amigos.** Un filtro de <Term id="web-of-trust" locale="es">red de confianza</Term>
+  solo deja pasar a gente seguida por tus seguidos (o por los seguidos de ellos). A los bots casi nunca
+  los sigue gente real, así que rebotan.
+
+Probemos la primera. El **proof-of-work** le pide a tu dispositivo que encuentre una nota cuyo
+<Term id="event-id" locale="es">id de evento</Term> empiece con un montón de ceros. La única forma de
+encontrarla es por prueba y error: cambiar un contador, volver a calcular el hash, comprobar, repetir.
+Cada *bit* en cero adicional duplica el trabajo. Sube la dificultad y pulsa "Empezar a minar":
+
+<PowMiner client:visible locale="es" />
+
+¿Te fijaste en la contrapartida del último recuadro? Una nota que a ti te cuesta un parpadeo le cuesta
+horas a un spammer que envía diez mil. Pero una granja de spam con computadoras rápidas paga mucho menos
+que tu teléfono, así que el proof-of-work es un reductor de velocidad, no un muro.
+
+<Drawer client:visible testid="ch12-uth-pow" locale="es" title="Bajo el capó: prueba de trabajo NIP-13">
+
+**NIP-13 en una etiqueta.** Quien mina añade una etiqueta `nonce`: `["nonce", "<contador>", "<dificultad objetivo>"]`
+y va subiendo el contador hasta que el id del evento (el SHA-256 del evento serializado, ver capítulo 3) tenga
+al menos *objetivo* **bits** iniciales en cero. La tercera entrada compromete el objetivo, así que un acierto
+afortunado con poco esfuerzo no puede fingir que apuntaba más alto. Este es el ejemplo de
+[NIP-13](https://github.com/nostr-protocol/nips/blob/master/13.md), que tiene 21 bits iniciales en cero
+(`00000` = 20 bits, y luego `6` = `0110` suma uno más):
+
+```json
+{
+  "id": "000006d8c378af1779d2feebc7603a125d99eca0ccf1085959b307f64e5dd358",
+  "pubkey": "a48380f4cfcc1ad5378294fcac36439770f9c878dd880ffa94bb74ea54a6f243",
+  "created_at": 1651794653,
+  "kind": 1,
+  "tags": [["nonce", "776797", "20"]],
+  "content": "It's just me mining my own business",
+  "sig": "284622fc0a3f4f1303455d5175f7ba962a3300d136085b9566801bc2e0699de0c7e31e44c81fb40ad9049173742e904713c3594a1da0fc5d2382a25c11aba977"
+}
+```
+
+Como el id no cubre la firma, el PoW incluso se puede **delegar**: un teléfono puede pagarle a un servicio para que
+mine el nonce y luego firmar el resultado por su cuenta. Con nostr-tools:
+
+```ts
+import { finalizeEvent, generateSecretKey, getPublicKey } from "nostr-tools/pure";
+import { getPow, minePow } from "nostr-tools/nip13";
+
+const sk = generateSecretKey();
+const unsigned = {
+  kind: 1,
+  created_at: Math.floor(Date.now() / 1000),
+  tags: [],
+  content: "gm",
+  pubkey: getPublicKey(sk),
+};
+// Síncrono y muy intensivo en CPU: en apps reales, ejecútalo en un Web Worker.
+const mined = minePow(unsigned, 16);
+console.log(getPow(mined.id)); // ≥ 16
+const event = finalizeEvent(mined, sk); // firmar no cambia el id
+```
+
+Los relays anuncian lo que exigen en su documento de información
+[NIP-11](https://github.com/nostr-protocol/nips/blob/master/11.md), dentro de
+`limitation`: `min_pow_difficulty`, `auth_required`
+([NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md)), `payment_required` y
+`restricted_writes`.
+
+</Drawer>
+
+## Descubrimiento: no hay portada
+
+Las apps estilo Twitter tienen una base de datos gigante y un algoritmo que decide lo que ves. Nostr
+tiene cientos de relays, y ninguno lo ve todo. Eso es genial para la
+<Term id="censorship-resistance" locale="es">resistencia a la censura</Term> (no hay un único botón de apagado),
+pero vuelve sorprendentemente difíciles algunas cosas cotidianas:
+
+- **Buscar** solo abarca los relays a los que preguntas, y solo los que lo soportan.
+- **Encontrar gente** suele ocurrir de boca en boca, con listas de seguidos compartidas o un nombre NIP-05.
+- **Contar** likes o seguidores es una estimación: solo puedes contar lo que tienen tus relays.
+
+El ecosistema lo remienda con relays de búsqueda, relays agregadores que rastrean muchos otros y
+feeds personalizados. Funcionan, pero reintroducen discretamente a unos pocos actores grandes. Conviene no perderlo de vista.
+
+## La economía de los relays: alguien paga los servidores
+
+Los relays son computadoras con facturas de luz, ancho de banda y discos que se llenan con cada nota,
+enlace a imagen y reacción. Mantener uno cuesta dinero de verdad, y en Nostr no hay anuncios que lo paguen.
+Así que los relays acaban en unos pocos grupos:
+
+- **Relays gratuitos** mantenidos por entusiastas o empresas. Geniales, pero pueden limitarte la
+  frecuencia, borrar notas antiguas para ahorrar espacio o simplemente cerrar cuando el voluntario se va.
+- **Relays de pago** que cobran una cuota única o mensual. Menos spam, más estabilidad, pero ahora
+  publicar tiene precio.
+- **Tu propio relay**, en casa o en un servidor barato, para que tus notas tengan al menos un hogar que
+  controlas tú.
+
+Por eso importa tanto el <Term id="outbox-model" locale="es">modelo outbox</Term> del capítulo 7:
+al publicar en varios relays y anunciarlos en tu lista de relays, el presupuesto de un solo relay no
+decide si tus notas sobreviven.
+
+<Drawer client:visible testid="ch12-uth-relay-economics" locale="es" title="Bajo el capó: relays de pago y tarifas NIP-11">
+
+**Cómo dice un relay "esto cuesta dinero".** El documento NIP-11 (que se obtiene por HTTP con
+`Accept: application/nostr+json`) puede incluir `payments_url` y un objeto `fees`:
+
+```json
+{
+  "name": "relay.alpha.example",
+  "limitation": {
+    "payment_required": true,
+    "auth_required": true,
+    "min_pow_difficulty": 0,
+    "restricted_writes": true
+  },
+  "payments_url": "https://relay.alpha.example/pay",
+  "fees": {
+    "admission": [{ "amount": 21000000, "unit": "msats" }],
+    "subscription": [{ "amount": 5000000, "unit": "msats", "period": 2592000 }],
+    "publication": [{ "kinds": [4], "amount": 100, "unit": "msats" }]
+  }
+}
+```
+
+```ts
+import { fetchRelayInformation } from "nostr-tools/nip11";
+
+const info = await fetchRelayInformation("wss://relay.alpha.example");
+if (info.limitation?.payment_required) console.log("Paga aquí:", info.payments_url);
+```
+
+Los relays de pago suelen combinar esto con el `AUTH` de
+[NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md), para saber qué pubkey se está
+conectando y si ya pagó. Quienes escriben se mantienen localizables con una lista de relays de kind 10002
+([NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md)).
+
+</Drawer>
+
+## La moderación la elige el cliente
+
+En X, un único reglamento se aplica a todos. En Mastodon, el administrador de tu servidor escribe el
+reglamento. En Nostr no hay reglamento alguno, solo **decisiones**:
+
+- Un **relay** decide qué guarda. Puede rechazar notas, bloquear pubkeys o atender solo a miembros que pagan.
+- Tu **cliente** decide qué muestra. Puede ocultar palabras, aplicar tu lista de silenciados o tener en
+  cuenta los reportes de gente en la que confías.
+- **Tú** decides qué relays y qué cliente usar, y puedes cambiar cuando quieras.
+
+La buena noticia: nadie puede silenciarte en todas partes. La no tan buena: nadie va a limpiar tu
+feed por ti, y un relay que jamás usarías puede alojar cosas que detestarías. La "libertad de expresión"
+en Nostr significa "libre para hablar", no "con audiencia garantizada".
+
+<Drawer client:visible testid="ch12-uth-moderation" locale="es" title="Bajo el capó: listas de silenciados, reportes y borrados">
+
+**Las piezas básicas** son eventos normales, así que cualquier cliente puede usarlas:
+
+- **Lista de silenciados**, kind 10000 ([NIP-51](https://github.com/nostr-protocol/nips/blob/master/51.md)):
+  una lista reemplazable de `p` (personas), `t` (hashtags), `word` y `e` (hilos) que ocultar. Las entradas
+  también pueden cifrarse dentro de `content` para que nadie vea a quién silenciaste.
+- **Reportes**, kind 1984 ([NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md)): una
+  etiqueta `p` (y opcionalmente `e`) con un tipo de reporte como `spam`, `impersonation` o `illegal`.
+  Cada cliente decide de quién confiar los reportes, normalmente solo de la gente que sigues.
+- **Solicitudes de borrado**, kind 5 ([NIP-09](https://github.com/nostr-protocol/nips/blob/master/09.md))
+  y **solicitud de desaparecer**, kind 62 ([NIP-62](https://github.com/nostr-protocol/nips/blob/master/62.md)):
+  peticiones educadas. Los relays honestos las cumplen, pero una copia que alguien ya descargó no se puede "desdescargar".
+
+```json
+{
+  "kind": 10000,
+  "tags": [
+    ["p", "<spammer pubkey hex>"],
+    ["t", "crypto-giveaway"],
+    ["word", "airdrop"]
+  ],
+  "content": ""
+}
+```
+
+</Drawer>
+
+## Disponibilidad de datos: ¿quién guarda tus notas?
+
+Tus notas viven donde los relays decidieron guardarlas. Si publicaste en un solo relay gratuito y este
+borró su base de datos, esas notas se perdieron. Nadie prometió conservarlas, y no existe un "archivo de
+Nostr" en el cielo. La otra cara: si publicas en varios relays (o montas el tuyo), tus notas son
+casi tan duraderas como es posible, porque ninguna empresa por sí sola puede borrar todas las copias.
+
+<Callout locale="es" tone="tip" title="Regla práctica">
+Escribe en al menos dos o tres relays de confianza, y mantén uno bajo tu control si te importa tu
+historial. Exportar tus propias notas de vez en cuando es un seguro barato.
+</Callout>
+
+## Pérdida de claves: no hay botón de "olvidé mi contraseña"
+
+Este es el gordo. Tu identidad *es* tu clave privada (tu
+<Term id="nsec" locale="es">nsec</Term>). Eso es lo que hace a Nostr imposible de censurar, y también lo
+que hace que la <Term id="key-loss" locale="es">pérdida de claves</Term> sea brutal:
+
+- **Si la pierdes**, tu cuenta desaparece. No hay restablecimiento por correo, ni ticket de soporte, ni
+  administrador que pueda ayudarte. Creas una clave nueva y pides a todos que vuelvan a seguirte.
+- **Si se filtra**, es todavía peor. El ladrón puede publicar como tú, para siempre, y los relays no pueden
+  distinguir entre tú y el ladrón: ambos generan firmas perfectamente válidas. Todavía **no hay una forma estándar de rotar
+  una clave** (cambiarla por otra conservando tus seguidores); hay propuestas, pero ninguna se ha
+  adoptado de forma amplia.
+
+Así que la respuesta de Nostr es: **no la pierdas y no dejes que se filtre.** Haz una copia de seguridad
+(en papel, o como un `ncryptsec` cifrado) y guárdala dentro de un <Term id="signer" locale="es">firmante</Term> (capítulo 10)
+para que las apps nunca la vean.
+
+<Drawer client:visible testid="ch12-uth-keys" locale="es" title="Bajo el capó: copias de seguridad y firmantes remotos">
+
+**Copias de seguridad:** [NIP-49](https://github.com/nostr-protocol/nips/blob/master/49.md) cifra tu clave
+secreta con una contraseña (scrypt + XChaCha20-Poly1305) en una cadena `ncryptsec1…` que puedes guardar con
+más seguridad que una `nsec` sin cifrar. [NIP-06](https://github.com/nostr-protocol/nips/blob/master/06.md) deriva
+claves a partir de una frase semilla BIP-39, pero el índice de NIPs ahora lo marca como *no
+recomendado* en favor de una sola nsec: respalda esa nsec como `ncryptsec`.
+
+```ts
+import { generateSecretKey } from "nostr-tools/pure";
+import { decrypt, encrypt } from "nostr-tools/nip49";
+
+const sk = generateSecretKey();
+const backup = encrypt(sk, "correct horse battery staple"); // "ncryptsec1…"
+const restored = decrypt(backup, "correct horse battery staple"); // los mismos bytes que sk
+```
+
+**Contención:** los firmantes remotos de [NIP-46](https://github.com/nostr-protocol/nips/blob/master/46.md)
+(bunkers) y las extensiones de [NIP-07](https://github.com/nostr-protocol/nips/blob/master/07.md) mantienen la
+clave fuera de las apps. **Rotación:** un primer intento de subclaves, la delegación de
+[NIP-26](https://github.com/nostr-protocol/nips/blob/master/26.md), ahora está marcado como
+*no recomendado*, y las propuestas de migración de claves siguen en debate. Si tu clave se filtra hoy, la
+respuesta práctica es una clave nueva más una nota firmada con la antigua que diga a tus seguidores adónde te fuiste
+(algo que el ladrón también podría falsificar).
+
+</Drawer>
+
+## ¿Qué podría salir mal?
+
+Basta de teoría. Activa unos cuantos días malos y mira cómo se las arregla cada red. Después activa
+algunas precauciones de Nostr y observa cómo el rojo se vuelve verde (bueno, casi todo).
+
+<ScenarioExplorer client:visible locale="es" />
+
+¿Ves el patrón? Las grandes plataformas son geniales *recuperándote* (tienen las llaves) y pésimas
+*no expulsándote* (tienen las llaves). Nostr es exactamente su imagen en el espejo. Cuál prefieras depende
+de qué día malo te asuste más.
+
+## La gran comparativa
+
+Nostr no es el único proyecto que intenta arreglar las redes sociales. **Mastodon** (parte del
+"fediverso" <Term id="federation" locale="es">federado</Term>) reparte las cuentas entre miles
+de servidores independientes. **Bluesky** usa el AT Protocol: cuentas portables, pero la mayoría de la gente usa
+infraestructura gestionada por la propia Bluesky. Y **X** es la plataforma clásica de una sola empresa.
+
+No hay ganador, solo ventajas y desventajas. Marca lo que te importa y mira cómo cambia el ranking:
+
+<ComparisonMatrix client:visible locale="es" />
+
+<Callout locale="es" tone="info" title="Estas notas son opiniones">
+Las puntuaciones son nuestro juicio honesto y simplificado a 2026, y todas las redes siguen cambiando
+rápido. Toca una celda para ver el razonamiento, ¡y siéntete libre de discrepar!
+</Callout>
+
+## Comprobación rápida
+
+<ChapterQuiz client:visible locale="es" />
+
+## ¡Lo lograste!
+
+Desde "¿para qué molestarse?" hasta "¿dónde está la trampa?". Ya puedes explicar claves, eventos,
+relays, filtros, kinds, el grafo social, los mensajes privados, los zaps, los firmantes, el ecosistema *y* sus
+ventajas y desventajas. Eso es mucho conocimiento de nostrich.
+
+<CourseComplete client:visible locale="es" />

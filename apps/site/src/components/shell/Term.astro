@@ -1,0 +1,19 @@
+---
+/**
+ * Owner: shell agent. MDX-friendly wrapper: `<Term id="relay" locale="en">relays</Term>`.
+ * Builds the glossary link (base path + locale) and hydrates the Svelte hover-card lazily.
+ */
+import type { GlossaryId, Locale } from "@nostrschool/i18n";
+import { Term as TermCard } from "@nostrschool/ui";
+import { href } from "~/lib/href";
+
+interface Props {
+  readonly id: GlossaryId;
+  readonly locale: Locale;
+}
+const { id, locale } = Astro.props;
+---
+
+<TermCard client:visible id={id} locale={locale} glossaryHref={href(locale, `glossary#${id}`)}
+  ><slot /></TermCard
+>

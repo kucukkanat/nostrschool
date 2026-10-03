@@ -1,0 +1,259 @@
+---
+order: 4
+slug: relays
+title: "Los relays y el protocolo"
+summary: "Mira cómo REQ, EVENT, EOSE y compañía viajan entre clientes y relays."
+estimatedMinutes: 14
+nips: ["01", "11", "42", "65"]
+takeaways:
+  - "Un relay es un servidor sencillo que guarda eventos firmados y los entrega cuando se los piden. Los relays no hablan entre sí."
+  - "El trabajo inteligente lo hacen los clientes: eligen relays, combinan y deduplican las respuestas, y verifican cada firma por su cuenta."
+  - "Toda la conversación es un puñado de arrays JSON sobre un WebSocket: REQ, EVENT, EOSE, CLOSE, OK, NOTICE, CLOSED y AUTH."
+  - "Publicar el mismo evento en varios relays hace que se pueda seguir encontrando cuando un relay se cae o te echa."
+  - "Un relay puede rechazar u olvidar tus eventos, pero nunca puede modificarlos ni inventar eventos nuevos en tu nombre."
+mascotIntro: "¡Llegan paquetes! Ponte cómodo, vamos a espiar a un relay. Totalmente legal, ya lo comprobé."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import WireTheater from "~/components/chapters/04-relays/WireTheater.svelte";
+import RedundancyLab from "~/components/chapters/04-relays/RedundancyLab.svelte";
+import LiveWire from "~/components/chapters/04-relays/LiveWire.svelte";
+
+Ya tienes un <Term id="keypair" locale="es">par de claves</Term> y sabes firmar un
+<Term id="event" locale="es">evento</Term>. Pero una nota firmada que se queda en tu computadora portátil es un diario,
+no una red social. Para llegar a otras personas tiene que viajar a algún lugar. En Nostr, ese lugar
+es un <Term id="relay" locale="es">relay</Term>.
+
+## Los relays son tontos (y es un cumplido)
+
+Imagina un relay como el **tablón de anuncios** de una cafetería. Cualquiera puede clavar una tarjeta,
+cualquiera puede acercarse a leer las tarjetas, y el dueño del café pone las reglas de la casa: nada de
+publicidad, solo socios, las tarjetas se retiran al mes. Eso es todo. El tablón no conoce a tus amigos,
+no ordena tu feed y no habla con el tablón de la cafetería de enfrente.
+
+Tu <Term id="client" locale="es">cliente</Term> (la app que usas) es lo contrario: es tu
+**asistente personal**. Sabe qué tablones usan tus amigos, va a varios de ellos, recoge las tarjetas,
+descarta las repetidas, comprueba cada <Term id="signature" locale="es">firma</Term>
+y te lo presenta todo bien ordenado.
+
+Esta división es intencional:
+
+- **Los relays siguen siendo simples**, así que son baratos de mantener. Miles de personas operan uno,
+  desde grandes relays públicos hasta uno diminuto en el armario de alguien.
+- **La inteligencia está en los clientes**, así que *tú* eliges el algoritmo, no una empresa.
+- **Nada depende de un solo relay.** Si un tablón desaparece, tu asistente simplemente lee otro.
+  De ahí viene la <Term id="censorship-resistance" locale="es">resistencia a la censura</Term> de Nostr.
+
+<Callout tone="tip" locale="es" title="Los relays no pueden mentir sobre lo que dijiste">
+Un relay puede rechazar tu nota, perderla u ocultarla. Lo que no puede hacer es *editarla* ni publicar
+en tu nombre: cada evento lleva tu firma, y los clientes la verifican en su propio dispositivo (capítulo 3).
+Lo peor que puede hacer un relay es quedarse callado, y por eso usamos más de uno.
+</Callout>
+
+## Escuchando la línea
+
+Clientes y relays hablan a través de un <Term id="websocket" locale="es">WebSocket</Term>: una línea
+telefónica que se queda abierta, para que ambos lados puedan hablar cuando quieran. Cada mensaje en esa
+línea es un pequeño array JSON cuyo primer elemento es una palabra en mayúsculas, como si gritara: el **verbo**.
+
+Elige una conversación abajo y luego dale a reproducir, avanza paso a paso con las flechas o arrastra la
+barra de progreso. Haz clic en cualquier tipo de paquete de la leyenda para saltar directamente a él.
+No pierdas de vista la libreta del cliente: es toda la contabilidad que los relays *no* hacen.
+
+<WireTheater client:visible locale="es" />
+
+## Todo el vocabulario cabe en un pósit
+
+[NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) define el lenguaje básico. Tu
+cliente dice tres cosas:
+
+| El cliente dice | Significado |
+|---|---|
+| `REQ` | "Envíame los eventos que coincidan con estos <Term id="filter" locale="es">filtros</Term>, y mantenme al tanto." Abre una <Term id="subscription" locale="es">suscripción</Term> con un nombre que tú eliges. |
+| `EVENT` | "Por favor, guarda este evento firmado." (Publicar.) |
+| `CLOSE` | "Ya terminé con esa suscripción." |
+
+El relay responde con cinco:
+
+| El relay dice | Significado |
+|---|---|
+| `EVENT` | "Aquí tienes un evento para tu suscripción llamada *feed*." |
+| `EOSE` | "Eso es todo lo que tenía guardado." <Term id="eose" locale="es">End Of Stored Events</Term> (fin de los eventos guardados): ya puedes quitar el indicador de carga. La suscripción sigue abierta para eventos nuevos. |
+| `OK` | "Sobre ese evento que enviaste: guardado (`true`) o rechazado (`false`), y este es el motivo." |
+| `CLOSED` | "Voy a cerrar tu suscripción", con un motivo. |
+| `NOTICE` | Un mensaje legible para humanos, como una nota pegada en la puerta. |
+
+Y hay un par extra para iniciar sesión, de <Term id="nip42" locale="es">NIP-42</Term>: `AUTH`.
+El relay envía un desafío aleatorio; tu cliente lo firma con tu clave y lo devuelve. Ninguna
+contraseña viaja por la línea, solo una firma. (También existe `COUNT`, de
+[NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md), para preguntas del tipo "¿cuántos hay?",
+pero casi nunca lo verás.)
+
+<Drawer client:visible testid="ch04-uth-frames" locale="es" title="Bajo el capó: los mensajes exactos">
+
+Cada mensaje es un array JSON enviado como un único mensaje de texto del WebSocket.
+
+```json
+["REQ", "feed", {"authors": ["e550c6e9…"], "kinds": [1], "limit": 2}]
+["EVENT", "feed", {"id": "…", "pubkey": "…", "created_at": 1735686600, "kind": 1, "tags": [], "content": "…", "sig": "…"}]
+["EOSE", "feed"]
+["CLOSE", "feed"]
+
+["EVENT", {"id": "…", "kind": 1, "…": "…"}]
+["OK", "<event id>", true, ""]
+["OK", "<event id>", false, "pow: difficulty 16 or more is required"]
+["CLOSED", "feed", "rate-limited: slow down, too many requests"]
+["NOTICE", "heads up: this relay restarts at 03:00 UTC"]
+```
+
+Reglas que vale la pena conocer, directamente de [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md):
+
+- El **id de suscripción** es cualquier cadena no vacía de hasta 64 caracteres, elegida por el cliente
+  y válida solo dentro de una conexión. Enviar un nuevo `REQ` con un id que ya está abierto **reemplaza**
+  esa suscripción.
+- Un `REQ` puede llevar varios filtros; se combinan con OR. `limit` solo se aplica al primer lote,
+  el de eventos guardados. Con `limit: 0` el relay se salta los eventos guardados y solo transmite los nuevos.
+- Después de `EOSE`, el relay sigue enviando en tiempo real los eventos que coincidan hasta que envíes
+  `CLOSE`, él envíe `CLOSED` o se caiga la conexión.
+- Un relay **debe** responder con `OK` a cada `EVENT` publicado, y debe enviar `CLOSED` cuando rechaza
+  un `REQ`.
+- Los mensajes `OK` y `CLOSED` empiezan con un prefijo legible por máquinas: `duplicate:`, `pow:`, `blocked:`,
+  `rate-limited:`, `invalid:`, `restricted:`, `mute:` o `error:`. NIP-42 añade `auth-required:`.
+  Ojo: `["OK", id, true, "duplicate: …"]` es un éxito: el relay ya lo tenía.
+
+</Drawer>
+
+<Drawer client:visible testid="ch04-uth-auth" locale="es" title="Bajo el capó: iniciar sesión con AUTH (NIP-42)">
+
+El relay puede enviar un desafío en cualquier momento, normalmente justo después de conectarte o justo
+antes de rechazar algo:
+
+```json
+["AUTH", "ostrich-7f3a9c2e"]
+["CLOSED", "dms", "auth-required: gift wraps are only served to their recipient"]
+```
+
+El cliente responde con un evento firmado de kind `22242` que **nunca se publica**, con tags para la URL
+del relay y el desafío. Los relays comprueban la firma, el desafío, la URL y que `created_at` sea
+reciente (aproximadamente de los últimos 10 minutos):
+
+```json
+["AUTH", {"kind": 22242, "tags": [["relay", "wss://relay.delta.example"], ["challenge", "ostrich-7f3a9c2e"]], "content": "", "…": "id, pubkey, created_at, sig"}]
+["OK", "<auth event id>", true, ""]
+```
+
+Si ya iniciaste sesión pero tu clave sigue sin tener permiso, el relay usa el prefijo `restricted:`.
+Los relays de pago y los que sirven <Term id="gift-wrap" locale="es">gift wraps</Term> privados
+(capítulo 8) dependen de esto. Especificación: [NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md).
+
+</Drawer>
+
+<Drawer client:visible testid="ch04-uth-code" locale="es" title="Bajo el capó: hablar con relays usando nostr-tools">
+
+`SimplePool` gestiona un WebSocket por relay y reparte tus peticiones entre todos ellos, deduplicando
+los eventos por id por ti:
+
+```ts
+import { SimplePool } from "nostr-tools/pool";
+import { finalizeEvent, generateSecretKey } from "nostr-tools/pure";
+
+const relays = ["wss://relay.damus.io", "wss://nos.lol", "wss://relay.primal.net"];
+const pool = new SimplePool();
+
+// REQ a cada relay; onevent se dispara una vez por evento único, oneose cuando todos enviaron EOSE.
+const sub = pool.subscribeMany(relays, { kinds: [1], limit: 3 }, {
+  onevent: (event) => console.log(event.pubkey.slice(0, 8), event.content),
+  oneose: () => sub.close(), // envía CLOSE a cada relay
+});
+
+// Publicar = un EVENT por relay; cada promesa se resuelve con el OK de ese relay.
+const event = finalizeEvent(
+  { kind: 1, created_at: Math.floor(Date.now() / 1000), tags: [], content: "hola relays" },
+  generateSecretKey(),
+);
+const results = await Promise.allSettled(pool.publish(relays, event));
+console.log(results.map((r) => r.status)); // p. ej. ["fulfilled", "fulfilled", "rejected"]
+```
+
+Para una sola conexión está `Relay.connect(url)` de `nostr-tools/relay`, con `relay.subscribe`,
+`relay.publish` y `relay.auth(sign)` para NIP-42. Por debajo son exactamente los mensajes que viste arriba.
+
+Extra: un relay puede describirse a sí mismo. Pide su URL por HTTPS con la cabecera
+`Accept: application/nostr+json` y obtendrás un documento JSON con su nombre, contacto, NIPs soportados
+y límites (<Term id="nip11" locale="es">NIP-11</Term>, [especificación](https://github.com/nostr-protocol/nips/blob/master/11.md)).
+
+</Drawer>
+
+## No pongas todas tus notas en un solo relay
+
+Como los relays no copian eventos entre sí, tu cliente suele enviar cada nota a **varios** relays a la vez.
+Si uno se desconecta, se satura o decide que no le caes bien, tus seguidores aún pueden encontrar tu nota
+en los demás. Algunos relays son gratuitos, otros son <Term id="paid-relay" locale="es">de pago</Term>
+(una pequeña cuota es un gran filtro contra el <Term id="spam" locale="es">spam</Term>), y cada uno tiene
+sus propias reglas. Combínalos a tu gusto.
+
+Pruébalo: elige dónde publicar y luego empieza a tumbar relays.
+
+<RedundancyLab client:visible locale="es" />
+
+¿Cómo sabe el cliente de Bob *qué* relays revisar para encontrar tus notas? Publicas una pequeña lista de
+relays "donde escribo", y su cliente va allí. Eso es el
+<Term id="outbox-model" locale="es">modelo outbox</Term>
+([NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md)), y lo veremos en el capítulo 7.
+
+<Callout tone="info" locale="es" title="Los relays tienen reglas, y está bien">
+`OK false` no es un error del protocolo: es un relay ejerciendo su derecho a elegir. Un relay puede
+exigir <Term id="proof-of-work" locale="es">prueba de trabajo</Term>, otro solo acepta socios, y un
+tercero borra todo después de una semana. Como ningún relay es especial, simplemente eliges los que
+tengan reglas que te gusten.
+</Callout>
+
+## Escucha la versión real
+
+Todo lo anterior estaba guionizado. Este panel envía un `REQ` real y muestra cada mensaje exactamente
+como llega. Por defecto habla con nuestros relays de práctica; activa el **Modo en vivo** en la cabecera y
+hablará con relays públicos reales. Tranquilo: solo *lee*. Nunca publicamos nada.
+
+<LiveWire client:visible locale="es" />
+
+Fíjate en los mensajes `CLOSE` del final: en cuanto todos los relays han dicho `EOSE`, el panel cuelga
+amablemente. Un cliente real a menudo mantendría la suscripción abierta para recibir notas nuevas a medida
+que se publican.
+
+## Comprobación rápida
+
+<Quiz
+  client:visible
+  testid="ch04-quiz-eose"
+  locale="es"
+  question={'Tu cliente recibe ["EOSE", "feed"]. ¿Qué significa?'}
+  options={[
+    { id: "a", label: "El relay ya envió todos los eventos guardados que coinciden; aún pueden llegar nuevos.", correct: true, explanation: "End Of Stored Events (fin de los eventos guardados). La suscripción sigue abierta hasta que alguien la cierre." },
+    { id: "b", label: "El relay cerró la suscripción para siempre.", correct: false, explanation: "Eso es CLOSED (del relay) o CLOSE (tuyo). EOSE mantiene la suscripción abierta." },
+    { id: "c", label: "Hubo un error al leer la base de datos.", correct: false, explanation: "Los errores llegan como CLOSED o NOTICE con un motivo. EOSE es una buena noticia." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch04-quiz-relay"
+  locale="es"
+  question="El relay Beta se vuelve malicioso. ¿Cuál de estas cosas puede hacerles a las notas de Alice?"
+  options={[
+    { id: "a", label: "Cambiar en secreto una palabra de una de ellas.", correct: false, explanation: "El id y la firma dejarían de coincidir. Todos los clientes rechazarían la copia editada." },
+    { id: "b", label: "Negarse a guardarlas o a servirlas.", correct: true, explanation: "Correcto: los relays eligen qué conservar. Por eso Alice publica en varios." },
+    { id: "c", label: "Copiar sus notas a otros relays en su nombre, como un favor.", correct: false, explanation: "Los relays no se sincronizan entre sí. (Cualquiera podría volver a publicar un evento firmado, pero eso es decisión de un cliente, no magia de los relays.)" },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch04-quiz-publish"
+  locale="es"
+  question={'Alice publica en tres relays y recibe OK true, OK true y OK false "pow: …". ¿Qué debería concluir su cliente?'}
+  options={[
+    { id: "a", label: "La firma de la nota no es válida.", correct: false, explanation: "Una firma no válida recibiría el prefijo invalid:, y de todos los relays, no solo de uno." },
+    { id: "b", label: "La publicación falló y hay que reintentarla en todos.", correct: false, explanation: "Nostr no es todo o nada. Los relays son independientes; un rechazo no deshace los demás." },
+    { id: "c", label: "La nota está publicada: dos relays la guardaron y uno pidió prueba de trabajo.", correct: true, explanation: "Cada relay responde por sí mismo. Tener dos copias circulando es un éxito." },
+  ]}
+/>

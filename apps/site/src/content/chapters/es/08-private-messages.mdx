@@ -1,0 +1,275 @@
+---
+order: 8
+slug: private-messages
+title: "Mensajes privados"
+summary: "Sobres dentro de sobres: cómo NIP-17 oculta quién habla con quién."
+estimatedMinutes: 14
+nips: ["04", "44", "17", "59"]
+takeaways:
+  - "Cifrar el texto no basta: quién, cuándo y cuánto ocupa pueden decir tanto como el qué."
+  - "NIP-04 está obsoleto: oculta las palabras, pero deja a la vista remitente, destinatario, hora y tamaño."
+  - "NIP-44 es el candado moderno (ChaCha20 + HMAC + relleno), pero por sí solo no oculta los metadatos."
+  - "NIP-17 mete un rumor kind 14 dentro de un sello kind 13 dentro de un gift wrap kind 1059 firmado por una clave desechable."
+  - "El relay sigue sabiendo quién es el destinatario, por eso los relays de DM solo deberían entregar los wraps a su dueño después de AUTH."
+mascotIntro: "¡Psst! Acércate. Este capítulo va de secretos, así que traje sobres. Muchos sobres."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer } from "@nostrschool/ui";
+import EnvelopeLab from "~/components/chapters/08-private-messages/EnvelopeLab.svelte";
+import PaddingMeter from "~/components/chapters/08-private-messages/PaddingMeter.svelte";
+import PrivateMessagesQuiz from "~/components/chapters/08-private-messages/PrivateMessagesQuiz.svelte";
+
+Todo lo que has visto hasta ahora es público a propósito: notas, likes, listas de seguidos. Pero a
+veces Alice solo quiere decirle a Bob dónde verse. Nostr no tiene servidores privados donde
+esconderse. Cada <Term id="direct-message" locale="es">mensaje directo</Term> sigue siendo un
+<Term id="event" locale="es">evento</Term> guardado en un <Term id="relay" locale="es">relay</Term>
+que cualquiera podría leer. Así que la privacidad tiene que vivir **dentro del propio evento**.
+
+Es más difícil de lo que parece, porque un secreto tiene dos partes:
+
+- **Qué** dijiste: las palabras.
+- **Todo lo que lo rodea**: quién lo envió, para quién es, cuándo y más o menos cuánto ocupaba.
+
+Esa segunda parte se llama **<Term id="metadata" locale="es">metadatos</Term>**, y puede revelar lo mismo o más. Si un relay ve que Alice
+escribe a un abogado de divorcios a las 2 de la madrugada todas las noches, no necesita leer ni una
+sola palabra.
+
+## Tres generaciones de notas secretas
+
+Los mensajes privados de Nostr evolucionaron en tres pasos. Piénsalos así:
+
+1. **NIP-04**: una postal con un candado sobre el texto. Cualquiera puede seguir leyendo la
+   dirección, el remitente y el matasellos.
+2. **NIP-44**: un candado mucho mejor. Sigue siendo una postal.
+3. **NIP-17**: la postal va dentro de un sobre firmado, y ese sobre va dentro de un paquete marrón
+   sin marcas enviado por un desconocido.
+
+Aquí tienes el mismo mensaje enviado de las tres formas, con
+<Term id="encryption" locale="es">cifrado</Term> real ejecutándose en tu navegador. Fíjate en lo
+que puede ver el relay y luego intenta abrir cada uno como Bob, como Carol la entrometida y como el
+propio relay.
+
+<EnvelopeLab client:visible locale="es" />
+
+Cosas que puedes probar:
+
+- Compara las etiquetas **rojas** en la vista del relay al pasar de NIP-04 a NIP-17.
+- Elige a **Carol** e intenta abrir el sobre. Su clave es perfectamente válida, solo que no es la correcta.
+- En NIP-17, presiona **Enviar de nuevo** varias veces y mira cómo cambia el remitente exterior cada vez.
+
+## Paso 1: NIP-04, la postal con fugas
+
+<Term id="nip04" locale="es">NIP-04</Term> fue el primer intento de Nostr. Alice y Bob combinan cada
+uno su propia clave secreta con la clave pública del otro y llegan al **mismo secreto compartido**
+sin enviarlo nunca. Ese truco se llama <Term id="ecdh" locale="es">ECDH</Term> y es la base de todos
+los esquemas de este capítulo.
+
+Después Alice revuelve su texto con ese secreto y publica un evento kind 4. Las palabras quedan
+ocultas, pero mira lo que queda por fuera:
+
+- `pubkey`: la <Term id="pubkey" locale="es">clave pública</Term> real de Alice.
+- una <Term id="tag" locale="es">etiqueta</Term> `p`: la clave pública de Bob, para que el relay sepa a quién entregarlo.
+- `created_at`: el segundo exacto en que presionó enviar.
+- la longitud del texto cifrado, que sigue la longitud del mensaje con un margen de 16 bytes.
+
+Cualquiera puede dibujar un mapa de quién habla con quién, cuándo y cuánto. Por eso NIP-04 está
+oficialmente **obsoleto**: la propia especificación advierte que filtra metadatos y que está muy
+lejos del estado del arte.
+
+<Callout tone="warning" locale="es" title="Clave equivocada, sin alarma">
+NIP-04 no tiene comprobación de integridad. Si Carol prueba su clave, normalmente obtiene un error,
+pero a veces obtiene basura aleatoria que *parece* un descifrado correcto. Un buen esquema siempre
+debería decir "esto no es para ti".
+</Callout>
+
+<Drawer client:visible testid="ch08-uth-nip04" locale="es" title="Bajo el capó: un evento NIP-04">
+
+Un evento kind 4. Solo `content` va cifrado; todo lo demás es público:
+
+```json
+{
+  "kind": 4,
+  "pubkey": "<pubkey de alice>",
+  "created_at": 1735689600,
+  "tags": [["p", "<pubkey de bob>"]],
+  "content": "J7d9…texto cifrado en base64…==?iv=AQEBAQEBAQEBAQEBAQEBAQ==",
+  "id": "…",
+  "sig": "…"
+}
+```
+
+- Clave: la coordenada x en bruto del punto compartido ECDH, usada directamente como clave AES-256 (sin hash ni derivación de claves).
+- Cifrado: AES-256-CBC con un IV aleatorio de 16 bytes y **sin MAC**, así que las manipulaciones y las claves equivocadas no se detectan de forma fiable.
+- Formato: `base64(ciphertext) + "?iv=" + base64(iv)`.
+
+Especificación: [NIP-04](https://github.com/nostr-protocol/nips/blob/master/04.md) (obsoleto en favor de
+[NIP-17](https://github.com/nostr-protocol/nips/blob/master/17.md)).
+
+```ts
+import * as nip04 from "nostr-tools/nip04";
+
+// Solo para lo antiguo: lee DMs viejos, no envíes nuevos.
+const content = nip04.encrypt(aliceSecretKey, bobPubkey, "Nos vemos a las 9");
+const text = nip04.decrypt(bobSecretKey, alicePubkey, content);
+```
+
+</Drawer>
+
+## Paso 2: NIP-44, un candado de confianza
+
+<Term id="nip44" locale="es">NIP-44</Term> sustituye el candado por un diseño moderno y auditado. No
+define ningún tipo de mensaje: es solo una forma de convertir texto en un bloque sellado que solo
+tú y la otra persona pueden abrir. Importan tres mejoras:
+
+- **A prueba de manipulaciones**: cada bloque lleva un código de autenticación. Cambia un solo bit,
+  o usa la clave equivocada, y el descifrado se niega rotundamente en vez de devolverte basura.
+- **Claves nuevas en cada mensaje**: un nonce aleatorio hace que cada mensaje use su propio material
+  de claves, así que enviar el mismo texto dos veces nunca da el mismo bloque.
+- **Relleno**: los mensajes se redondean hacia arriba en tramos de tamaño, así que "sí" y "¡ni hablar!" parecen idénticos.
+
+Pruébalo: escribe algo corto, luego algo un poco más largo, y mira qué tamaños se mantienen iguales.
+
+<PaddingMeter client:visible locale="es" />
+
+Pero fíjate en lo que *no* cambió en el laboratorio al pasar de NIP-04 a NIP-44: si metes un bloque
+NIP-44 en el mismo tipo de evento, la clave de Alice, la etiqueta de Bob y la marca de tiempo siguen
+por fuera. Un candado mejor no arregla un sobre transparente.
+
+<Drawer client:visible testid="ch08-uth-nip44" locale="es" title="Bajo el capó: NIP-44 v2, paso a paso">
+
+1. **Secreto compartido**: ECDH entre la clave secreta de Alice y la clave pública de Bob (solo la coordenada x).
+2. **Clave de conversación**: `HKDF-extract(SHA-256, ikm = shared_x, salt = "nip44-v2")`. Es la misma en ambas direcciones.
+3. **Claves del mensaje**: elige un nonce aleatorio de 32 bytes, luego `HKDF-expand(conversation_key, info = nonce, 76)`
+   y divídelo en una clave ChaCha20 (32 bytes), un nonce ChaCha20 (12) y una clave HMAC (32).
+4. **Relleno**: antepón al texto UTF-8 su longitud (u16 big-endian) y rellena con ceros hasta el tamaño del tramo
+   (mínimo 32 bytes, luego potencias de dos divididas en fragmentos).
+5. **Cifra** los bytes rellenados con ChaCha20.
+6. **Autentica**: `HMAC-SHA256(hmac_key, nonce ‖ ciphertext)`.
+7. **Payload**: `base64(0x02 ‖ nonce ‖ ciphertext ‖ mac)`; el `0x02` inicial es la versión.
+
+Lo que **no** te da: secreto hacia adelante (forward secrecy; una clave secreta robada abre todos
+los mensajes pasados) ni ninguna protección de metadatos. Especificación:
+[NIP-44](https://github.com/nostr-protocol/nips/blob/master/44.md).
+
+```ts
+import * as nip44 from "nostr-tools/nip44";
+
+const conversationKey = nip44.getConversationKey(aliceSecretKey, bobPubkey);
+const payload = nip44.encrypt("Nos vemos a las 9", conversationKey);
+// Bob deriva exactamente la misma clave desde su lado:
+const text = nip44.decrypt(payload, nip44.getConversationKey(bobSecretKey, alicePubkey));
+```
+
+</Drawer>
+
+## Paso 3: NIP-17, sobres hasta el fondo
+
+<Term id="nip17" locale="es">NIP-17</Term> es la forma recomendada hoy para enviar mensajes
+privados. Toma el candado de NIP-44 y le añade un embalaje ingenioso de
+<Term id="nip59" locale="es">NIP-59</Term>, llamado <Term id="gift-wrap" locale="es">gift wrap</Term>
+(envoltorio de regalo). Imagina tres capas, de dentro hacia fuera:
+
+1. **El rumor** (kind 14): el mensaje de chat real, escrito por Alice. Es un evento normal con id,
+   pero **sin firma**. Es a propósito: si alguna vez se filtra, nadie puede demostrar que lo
+   escribió Alice. Un <Term id="rumor" locale="es">rumor</Term>, literalmente.
+2. **El sello** (kind 13): el rumor, cifrado para Bob y **firmado por Alice**. Así es como Bob sabe
+   que de verdad es ella. El <Term id="seal" locale="es">sello</Term> no tiene ninguna etiqueta, así
+   que no dice para quién es.
+3. **El gift wrap** (kind 1059): el sello, cifrado otra vez y firmado por una **clave aleatoria
+   recién creada** que se usa una vez y se descarta. Lleva una única etiqueta `p` para que el relay
+   pueda entregárselo a Bob.
+
+El relay solo ve la capa 3. El remitente es un desconocido que nunca volverá a publicar, la marca de
+tiempo está alterada a propósito (hasta dos días en el pasado), el kind real está oculto y el tamaño
+va rellenado.
+
+Vuelve al laboratorio, elige **NIP-17** y ábrelo capa a capa como Bob: wrap, luego sello, luego
+rumor. Cuando se abre el sello, tu navegador comprueba que quien firma el sello es la misma clave
+que el autor del rumor; si no, cualquiera podría falsificar un mensaje "de Alice".
+
+<Callout tone="info" locale="es" title="Lo que todavía se filtra">
+El wrap tiene que decir para quién es, así que el relay se entera de que **Bob recibió algo**.
+NIP-17 pide a los relays que solo entreguen los gift wraps a la persona a la que van dirigidos,
+después de que Bob demuestre quién es con la autenticación
+<Term id="nip42" locale="es">NIP-42</Term>. Además, los clientes publican una lista kind 10050
+indicando en qué relays quieren recibir DMs.
+</Callout>
+
+<Drawer client:visible testid="ch08-uth-nip17" locale="es" title="Bajo el capó: las tres capas en JSON">
+
+**Rumor**, kind 14, sin firmar (sin `sig`):
+
+```json
+{
+  "id": "…",
+  "pubkey": "<pubkey de alice>",
+  "created_at": 1735689600,
+  "kind": 14,
+  "tags": [["p", "<pubkey de bob>"]],
+  "content": "Nos vemos a las 9"
+}
+```
+
+**Sello**, kind 13, firmado por Alice, las etiquetas **deben** estar vacías:
+
+```json
+{
+  "kind": 13,
+  "pubkey": "<pubkey de alice>",
+  "created_at": 1735601234,
+  "tags": [],
+  "content": "<NIP-44(JSON del rumor), Alice → Bob>",
+  "id": "…",
+  "sig": "…"
+}
+```
+
+**Gift wrap**, kind 1059, firmado por una clave aleatoria de un solo uso:
+
+```json
+{
+  "kind": 1059,
+  "pubkey": "<pubkey desechable aleatoria>",
+  "created_at": 1735555555,
+  "tags": [["p", "<pubkey de bob>"]],
+  "content": "<NIP-44(JSON del sello), clave desechable → Bob>",
+  "id": "…",
+  "sig": "…"
+}
+```
+
+Reglas que conviene conocer:
+
+- Los receptores **deben** comprobar que la `pubkey` del sello es igual a la `pubkey` del rumor.
+- El `created_at` del sello y del wrap debería aleatorizarse hasta dos días en el pasado.
+- El remitente también envuelve una copia **para sí mismo**, para poder recuperar sus propios
+  mensajes enviados en cualquier dispositivo. Los chats de grupo envuelven una copia por participante.
+- El kind 15 es el hermano del kind 14 para mensajes con archivos; las etiquetas `subject` dan nombre a una conversación.
+- Los DMs van a los relays de la lista kind 10050 del destinatario.
+
+Especificaciones: [NIP-17](https://github.com/nostr-protocol/nips/blob/master/17.md) (DMs privados) y
+[NIP-59](https://github.com/nostr-protocol/nips/blob/master/59.md) (gift wrap).
+
+```ts
+import * as nip17 from "nostr-tools/nip17";
+
+// Una sola llamada construye rumor → sello → wrap con una clave desechable nueva.
+const wrap = nip17.wrapEvent(aliceSecretKey, { publicKey: bobPubkey }, "Nos vemos a las 9");
+
+// Bob abre ambas capas y recupera el rumor kind 14.
+const rumor = nip17.unwrapEvent(wrap, bobSecretKey);
+console.log(rumor.kind, rumor.content); // 14 "Nos vemos a las 9"
+```
+
+</Drawer>
+
+<Callout tone="safety" locale="es" title="Privado, no perfecto">
+NIP-17 oculta mucho, pero no es un mensajero seguro completo: no hay secreto hacia adelante, así que
+si tu <Term id="nsec" locale="es">nsec</Term> se filtra, también se filtran tus mensajes antiguos.
+Guarda tu clave secreta en un <Term id="signer" locale="es">firmante</Term> adecuado y usa un
+mensajero dedicado para los secretos de vida o muerte.
+</Callout>
+
+## Comprobación rápida
+
+<PrivateMessagesQuiz client:visible locale="es" />

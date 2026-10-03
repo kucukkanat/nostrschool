@@ -1,0 +1,267 @@
+---
+order: 1
+slug: why-nostr
+title: "¿Por qué Nostr?"
+summary: "Qué sale mal cuando una sola empresa es dueña del servidor, y cómo los relays cambian las reglas del juego."
+estimatedMinutes: 12
+nips: ["01", "65"]
+takeaways:
+  - "En una plataforma centralizada, la empresa tiene tu cuenta, tu audiencia y el interruptor de apagado."
+  - "La federación reparte los servidores, pero tu cuenta sigue viviendo en (y muriendo con) una sola instancia."
+  - "En Nostr tu identidad es un par de claves que tú guardas, y publicas las mismas notas firmadas en varios relays a la vez."
+  - "Los relays son simples y reemplazables: perder uno, o que uno te banee, no te cuesta la voz."
+  - "Nostr es resistente a la censura, no libre de moderación: cada relay y cada cliente sigue eligiendo qué guarda y qué muestra."
+mascotIntro: "¡Hola, soy Nos! Antes de tocar ninguna clave, vamos a romper algunos servidores. Por la ciencia."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import TopologySandbox from "~/components/chapters/01-why-nostr/TopologySandbox.svelte";
+import ResilienceChart from "~/components/chapters/01-why-nostr/ResilienceChart.svelte";
+
+## La mañana en que Alice desapareció
+
+Alice hornea los mejores rollos de canela del barrio. En cinco años reunió una audiencia de
+20.000 personas en una gran red social. Ahí es donde sus clientes ven el menú del día, donde
+ella avisa cuando se agota todo y donde sus clientes de siempre la saludan.
+
+Un martes abre la app y ve un recuadro gris: *"Tu cuenta ha sido suspendida."*
+No hay ningún humano a quien llamar. No hay forma de exportar la lista de sus seguidores. Un
+filtro automático decidió algo, y cinco años de relaciones se quedaron en silencio con un solo clic.
+
+Nadie tuvo que hackear a Alice. Nadie tuvo que discutir con ella. La empresa simplemente
+**era dueña de la sala** en la que ella hablaba, y le apagó el micrófono.
+
+<Callout locale="es" tone="info" testid="ch01-callout-not-just-bans" title="No se trata solo de baneos">
+Ese mismo punto único de control también decide **qué ves** (el algoritmo), **cuánto
+cuesta** (comisiones, anuncios) y **si el lugar sigue existiendo** (cierres, adquisiciones,
+caídas). Un baneo es solo la versión más dramática del problema.
+</Callout>
+
+## Cuatro formas de armar una red social
+
+Tomemos a los mismos cinco amigos (Alice, Bob, Carol, Dave y Erin) y conectémoslos de cuatro
+formas distintas. Tu trabajo es ser el mono del caos: tumba servidores y luego pulsa
+**Banear a Alice** para ver a quién se le sigue escuchando.
+
+- **Centralizada**: una empresa, un servidor, todo el mundo vive ahí.
+- **Federada**: muchos servidores independientes que se reenvían publicaciones entre sí. Es el
+  modelo de <Term id="federation" locale="es">federación</Term> de Mastodon y del correo electrónico.
+- **Nostr**: <Term id="relay" locale="es">relays</Term> sencillos que guardan y reenvían
+  notas, y personas que publican en *varios* relays a la vez.
+- **Bluesky**: un diseño más nuevo en el que tus datos viven en un servidor de datos personal (PDS),
+  y grandes agregadores cosen las publicaciones de todos en líneas de tiempo.
+
+<TopologySandbox client:visible locale="es" />
+
+Prueba este orden: tumba **BigCo** en la red Centralizada, **tea.social** en la Federada, **alpha** en
+Nostr y el **AppView** en Bluesky. Después vuelve a cada una y pulsa **Banear a Alice**.
+¿Notas el patrón?
+
+## ¿Qué acaba de pasar?
+
+La red **Centralizada** es un solo tronco: córtalo y cae el árbol entero. Si banean a Alice,
+simplemente desaparece, porque la empresa *es* la red.
+
+La red **Federada** es mucho mejor. Perder una instancia solo afecta a quienes viven en ella.
+Pero mira la fila de Alice en el marcador: *"Cuenta perdida junto con tea.social."* En un mundo
+federado tu nombre se ve como `@alice@tea.social`, y esa segunda mitad es el casero. Si la
+instancia cierra, o el administrador te banea, tu cuenta y tu lista de seguidores se van con
+ella. Puedes mudarte, pero solo mientras el antiguo casero siga abriendo la puerta.
+
+**Nostr** ni se inmuta. La identidad de Alice no es una cuenta en el servidor de nadie: es un
+<Term id="keypair" locale="es">par de claves</Term> que vive en su propio dispositivo. Cada nota
+que escribe está <Term id="signature" locale="es">firmada</Term> con su clave secreta, así que
+*cualquier* relay puede guardarla y *cualquier* lector puede comprobar que de verdad la escribió
+ella. Envía cada nota a dos relays. Si uno muere, o la banea, el otro todavía la tiene.
+
+**Bluesky** queda en un punto intermedio. Las cuentas pueden moverse entre servidores de datos,
+lo cual es genial. Pero en la práctica la mayoría lee a través de un gran relay y un gran
+AppView, así que tumbar cualquiera de los dos todavía deja a oscuras casi todo hoy en día.
+
+<ResilienceChart client:visible locale="es" />
+
+## Por qué los relays son tontos a propósito
+
+Este es el truco que hace funcionar a Nostr: los relays **no hablan entre sí** y **no son
+dueños de nadie**. Un relay es un pequeño servidor que acepta notas firmadas (llamadas
+<Term id="event" locale="es">eventos</Term>) a través de un <Term id="websocket" locale="es">WebSocket</Term>
+y se las entrega a quien las pida.
+
+Piensa en los relays como **apartados de correos** más que como una plaza pública. Alice alquila
+un apartado en dos oficinas de correos y deja una copia de cada carta en ambos. Los carteros de
+sus amigos (sus <Term id="client" locale="es">clientes</Term>) saben qué oficinas usa y van a
+recoger sus cartas allí. Si una oficina se incendia o se niega a atenderla, las cartas siguen
+esperando en la otra, y mañana Alice puede abrir un tercer apartado sin pedirle permiso a nadie.
+
+Esa es toda la receta:
+
+1. **Tú eres tus claves.** Sin registro, sin nombre de usuario que te puedan confiscar. Tu clave
+   pública (<Term id="npub" locale="es">npub</Term>) es tu nombre.
+2. **Cada nota va firmada.** Los relays no pueden falsificar ni editar en secreto lo que dijiste.
+3. **Publica en todas partes.** Eliges varios relays y puedes cambiarlos cuando quieras.
+4. **Los lectores te siguen a ti.** Los clientes usan tu lista de relays publicada para encontrar
+   tus notas: ese es el <Term id="outbox-model" locale="es">modelo outbox</Term>.
+
+<Drawer client:visible testid="ch01-uth-event" locale="es" title="Bajo el capó: lo que realmente recibe un relay">
+
+Todo en Nostr tiene una única forma de datos, definida en [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md).
+Un cliente se la envía a un relay dentro de un mensaje `EVENT` a través de un WebSocket:
+
+```json
+["EVENT", {
+  "id": "<sha256 de 32 bytes del evento serializado, en hex>",
+  "pubkey": "<clave pública de Alice de 32 bytes, en hex>",
+  "created_at": 1735689600,
+  "kind": 1,
+  "tags": [],
+  "content": "¡Los rollos de canela vuelven a las 8!",
+  "sig": "<firma Schnorr de 64 bytes del id, en hex>"
+}]
+```
+
+El relay responde con `["OK", "<event id>", true, ""]` si guardó la nota, o con `false`
+más un motivo (por ejemplo `"blocked: ..."` o `"rate-limited: ..."`) si la rechaza. Fíjate en
+lo que *falta*: no hay id de cuenta, ni contraseña, ni nombre de servidor en la identidad de
+Alice. El `pubkey` y la `sig` son todo lo que un relay (o un lector) necesita para saber quién la escribió.
+
+</Drawer>
+
+<Drawer client:visible testid="ch01-uth-publish" locale="es" title="Bajo el capó: publicar en varios relays con nostr-tools">
+
+La redundancia es solo un bucle. Con [nostr-tools](https://github.com/nbd-wtf/nostr-tools):
+
+```ts
+import { finalizeEvent, generateSecretKey } from "nostr-tools/pure";
+import { SimplePool } from "nostr-tools/pool";
+
+const sk = generateSecretKey(); // tu identidad: 32 bytes aleatorios que nunca salen del dispositivo
+const note = finalizeEvent(
+  { kind: 1, created_at: Math.floor(Date.now() / 1000), tags: [], content: "¡hola, relays!" },
+  sk, // calcula el pubkey, el id y la firma
+);
+
+const pool = new SimplePool();
+const relays = ["wss://relay.alpha.example", "wss://relay.beta.example"];
+// Una promesa por relay: basta con que *algún* relay acepte la nota.
+await Promise.any(pool.publish(relays, note));
+```
+
+Un relay que rechaza la nota no puede modificarla ni hacerla pasar por suya; lo único que
+puede hacer es negarse a guardarla.
+
+</Drawer>
+
+<Drawer client:visible testid="ch01-uth-outbox" locale="es" title="Bajo el capó: el modelo outbox (NIP-65)">
+
+¿Cómo se encuentran el cliente de Bob y los relays de Alice? Alice publica un pequeño
+evento reemplazable de kind `10002` con la lista de sus relays, tal como describe
+[NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md):
+
+```json
+{
+  "kind": 10002,
+  "tags": [
+    ["r", "wss://relay.alpha.example"],
+    ["r", "wss://relay.beta.example", "write"],
+    ["r", "wss://relay.gamma.example", "read"]
+  ],
+  "content": "",
+  "...": "pubkey, created_at, id y sig como siempre"
+}
+```
+
+Una etiqueta `r` sin marcador significa "lectura *y* escritura". Para mostrar las notas de Alice,
+el cliente de Bob obtiene su kind `10002` y abre suscripciones en sus relays de **escritura**
+(`write`); para llegar a Alice (respuestas, menciones), publica en sus relays de **lectura**
+(`read`). Por eso el arenero deja que cualquier lector consulte cualquier relay en el que Alice
+escribe: el cliente va hacia el autor, y no al revés.
+
+</Drawer>
+
+<Drawer client:visible testid="ch01-uth-compare" locale="es" title="Bajo el capó: Mastodon y Bluesky, con un poco más de precisión">
+
+- **Mastodon / ActivityPub.** Tu identidad es `@nombre@instancia`, que se resuelve a través del
+  endpoint WebFinger de la instancia, y tus publicaciones se firman con claves **que guarda la
+  instancia**. La migración de cuentas existe (una actividad `Move` redirige a los seguidores),
+  pero necesita que la instancia antigua siga en línea y colabore.
+- **Bluesky / AT Protocol.** Tu identidad es un DID (normalmente `did:plc`) que apunta a tu
+  PDS actual, y tus publicaciones viven ahí en un repositorio firmado. Las cuentas pueden migrar
+  entre PDS, lo que es portabilidad real. Las líneas de tiempo, sin embargo, salen de relays que
+  rastrean todos los PDS y de AppViews que los indexan; cualquiera puede montar uno, pero hoy la
+  mayor parte del tráfico pasa por unos pocos muy grandes.
+- **Nostr.** La identidad *es* la clave de firma y cada evento lleva su propia firma, así que
+  no hay nada que migrar: simplemente apuntas a otros relays.
+
+La puntuación del arenero (mira `sandbox.ts` en los componentes de este capítulo) considera que
+una conversación sigue viva cuando la publicación de un autor puede llegar a un lector a través
+de infraestructura en línea que no lo banea, y las personas nunca hacen de relay entre sí.
+
+</Drawer>
+
+## ¿Esto es simplemente "cero moderación"?
+
+No, y es un matiz importante. Cada relay es libre de poner sus propias reglas: bloquear spam,
+cobrar por el acceso (un <Term id="paid-relay" locale="es">relay de pago</Term>) o aceptar solo
+a los miembros de una comunidad. Cada cliente puede filtrar lo que ves, por ejemplo usando tu
+<Term id="web-of-trust" locale="es">red de confianza</Term>.
+
+Lo que Nostr elimina es el **único** cuello de botella. La moderación pasa a ser una decisión de
+muchos relays y muchas apps, en lugar del veredicto de una sola empresa que además tiene tu
+identidad. Esa propiedad tiene nombre:
+<Term id="censorship-resistance" locale="es">resistencia a la censura</Term>.
+
+<Callout locale="es" tone="warning" testid="ch01-callout-tradeoff" title="Nada es gratis">
+Ser dueño de tu identidad significa ser dueño del riesgo: si pierdes tu clave secreta no hay
+botón de "olvidé mi contraseña" (más adelante veremos la <Term id="key-loss" locale="es">pérdida de claves</Term>
+y cómo protegerte). Y con muchos relays independientes no hay una búsqueda global ni un único
+"contador de visitas" que consultar. El capítulo 12 está dedicado por completo a estas concesiones.
+</Callout>
+
+## ¿De dónde salió Nostr?
+
+Nostr significa **"Notes and Other Stuff Transmitted by Relays"** (notas y otras cosas transmitidas
+por relays). Lo propuso en 2020 un desarrollador conocido como fiatjaf, como un protocolo
+deliberadamente diminuto: un formato de eventos en JSON, un puñado de mensajes por WebSocket y
+firmas de clave pública. Todo lo demás se añade mediante propuestas opcionales y numeradas llamadas
+<Term id="nip" locale="es">NIPs</Term> (Nostr Implementation Possibilities), que se mantienen de forma
+abierta en [github.com/nostr-protocol/nips](https://github.com/nostr-protocol/nips).
+
+El resto de este curso es un recorrido por esa receta. Lo siguiente: el par de claves que *eres* tú.
+
+## Comprobación rápida
+
+<Quiz
+  client:visible
+  testid="ch01-quiz-1"
+  locale="es"
+  question="En una red federada como Mastodon, ¿qué le pasa a la cuenta de Alice si su instancia cierra para siempre?"
+  options={[
+    { id: "a", label: "Desaparece, junto con su lista de seguidores.", correct: true, explanation: "Su cuenta vive en esa instancia. Migrar requiere que el servidor antiguo siga en línea." },
+    { id: "b", label: "Otras instancias se hacen cargo de ella automáticamente.", correct: false, explanation: "Las otras instancias solo tenían copias de sus publicaciones, no su cuenta." },
+    { id: "c", label: "Nada, porque ella es dueña de sus claves.", correct: false, explanation: "En Mastodon las claves de firma las guarda la instancia, no Alice." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch01-quiz-2"
+  locale="es"
+  question="El relay alpha banea a Alice en Nostr. ¿Por qué Bob todavía puede leer sus notas?"
+  options={[
+    { id: "a", label: "Los relays se reenvían los baneos en secreto y los anulan.", correct: false, explanation: "Los relays no se coordinan para nada." },
+    { id: "b", label: "Alice también publica en otros relays, y el cliente de Bob las obtiene de ahí.", correct: true, explanation: "Ese es el modelo outbox: los lectores van adonde escribe el autor." },
+    { id: "c", label: "El cliente de Bob ignora los baneos.", correct: false, explanation: "Alpha no servirá las notas de Alice; Bob las consigue en otro lugar." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch01-quiz-3"
+  locale="es"
+  question="¿Cuál de estas afirmaciones sobre los relays de Nostr es verdadera?"
+  options={[
+    { id: "a", label: "Son dueños de las cuentas y contraseñas de los usuarios.", correct: false, explanation: "No hay cuentas: tu identidad es tu par de claves." },
+    { id: "b", label: "Pueden falsificar notas en tu nombre.", correct: false, explanation: "Cada evento va firmado; uno falsificado no pasa la verificación." },
+    { id: "c", label: "Pueden negarse a guardar tus notas, pero no pueden impedir que otros relays las guarden.", correct: true, explanation: "Cada relay solo se modera a sí mismo." },
+  ]}
+/>

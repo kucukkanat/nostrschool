@@ -1,0 +1,49 @@
+---
+/** Owner: chapter 02 agent. Standalone key tool (generate + NIP-19 convert/build), reusing chapter 02 components. */
+import { getDictionary } from "@nostrschool/i18n";
+import KeyTool from "~/components/chapters/02-keys/KeyTool.svelte";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { href } from "~/lib/href";
+import { assertLocale, localeStaticPaths } from "~/lib/locale";
+
+export const getStaticPaths = localeStaticPaths;
+const locale = assertLocale(Astro.params.locale);
+const dict = getDictionary(locale);
+const title = dict.common.tools.keys;
+---
+
+<BaseLayout locale={locale} title={title} description={dict.chapters.ch02.tool.intro}>
+  <div class="page">
+    <h1 data-testid="tool-title">{title}</h1>
+    <KeyTool client:load locale={locale} />
+    <p class="learn">
+      <a href={href(locale, "learn/keys")} data-testid="ch02-tool-chapter-link">
+        {dict.chapters.ch02.title}
+        →
+      </a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    display: grid;
+    gap: var(--space-lg);
+    max-inline-size: var(--size-content);
+    margin-inline: auto;
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-4xl);
+    color: var(--color-text-primary);
+  }
+  .learn a {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+  }
+  .learn a:focus-visible {
+    outline: var(--border-width-thick) solid var(--color-focus-ring);
+    outline-offset: var(--space-3xs);
+  }
+</style>

@@ -1,0 +1,82 @@
+---
+/** Site footer: safety reminder, read-only promise, quick links. */
+import { getDictionary, type Locale } from "@nostrschool/i18n";
+import { href } from "~/lib/href";
+import Logo from "./Logo.astro";
+
+interface Props {
+  readonly locale: Locale;
+}
+const { locale } = Astro.props;
+const t = getDictionary(locale).common;
+const links = [
+  { id: "home", label: t.nav.home, path: "" },
+  { id: "learn", label: t.nav.learn, path: "learn" },
+  { id: "tools", label: t.nav.tools, path: "tools" },
+  { id: "glossary", label: t.nav.glossary, path: "glossary" },
+] as const;
+---
+
+<footer class="site-footer" data-testid="site-footer">
+  <div class="inner">
+    <div class="brand">
+      <Logo locale={locale} testid="footer-logo" />
+      <p class="tagline">{t.site.tagline}</p>
+    </div>
+    <nav aria-label={t.shell.footerNav} data-testid="footer-nav">
+      <ul>
+        {links.map((l) => (
+          <li>
+            <a href={href(locale, l.path)} data-testid={`footer-${l.id}`}>
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div class="notes">
+      <p data-testid="footer-safety"><span aria-hidden="true">🔐 </span>{t.safety.demoKeys}</p>
+      <p data-testid="footer-read-only">{t.shell.readOnly}</p>
+      <p class="small">{t.footer.builtWith}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-block-start: var(--space-4xl);
+    background: var(--color-surface-sunken);
+    border-block-start: var(--border-width-medium) solid var(--color-text);
+  }
+  .inner {
+    display: grid;
+    gap: var(--space-xl);
+    max-inline-size: var(--size-wide);
+    margin-inline: auto;
+    padding: var(--space-2xl) var(--space-md);
+  }
+  .tagline,
+  .small {
+    color: var(--color-text-muted);
+  }
+  ul {
+    display: grid;
+    gap: var(--space-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  a:not(:global(.logo)) {
+    color: var(--color-text);
+    font-weight: var(--font-weight-semibold);
+  }
+  .notes p {
+    margin: 0 0 var(--space-xs);
+  }
+  /* >= tokens.breakpoint.md */
+  @media (min-width: 768px) {
+    .inner {
+      grid-template-columns: 2fr 1fr 3fr;
+    }
+  }
+</style>

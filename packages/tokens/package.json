@@ -1,0 +1,24 @@
+{
+  "name": "@nostrschool/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Design tokens (DTCG) compiled to CSS custom properties and typed TS",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./tokens.css": "./src/generated/tokens.css",
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test",
+    "build": "bun run build.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "style-dictionary": "^5.5.5"
+  }
+}

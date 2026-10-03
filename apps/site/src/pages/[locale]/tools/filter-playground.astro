@@ -1,0 +1,48 @@
+---
+/** Owner: chapter 05 agent. Standalone filter playground: the chapter 05 builder + JSON editor + REQ runner. */
+import { getDictionary } from "@nostrschool/i18n";
+import FilterPlayground from "~/components/chapters/05-filters/FilterPlayground.svelte";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { href } from "~/lib/href";
+import { assertLocale, localeStaticPaths } from "~/lib/locale";
+
+export const getStaticPaths = localeStaticPaths;
+const locale = assertLocale(Astro.params.locale);
+const dict = getDictionary(locale);
+const title = dict.common.tools.filterPlayground;
+const t = dict.chapters.ch05;
+---
+
+<BaseLayout locale={locale} title={title} description={t.tool.intro}>
+  <div class="tool">
+    <h1 data-testid="tool-title">{title}</h1>
+    <p class="lede" data-testid="tool-lede">{t.tool.intro}</p>
+    <FilterPlayground client:load locale={locale} />
+    <p class="more">
+      <a data-testid="tool-chapter-link" href={href(locale, "learn/filters")}>{t.title} →</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .tool {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-4xl);
+    color: var(--color-text-primary);
+  }
+  .lede {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-text-muted);
+  }
+  .more a {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-bold);
+  }
+</style>

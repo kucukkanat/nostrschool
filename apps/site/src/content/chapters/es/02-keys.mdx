@@ -1,0 +1,242 @@
+---
+order: 2
+slug: keys
+title: "Tu identidad es un par de claves"
+summary: "Sin cuentas ni contraseñas: eres una clave secreta y su clave pública."
+estimatedMinutes: 14
+nips: ["01", "06", "19", "49"]
+takeaways:
+  - "Tu identidad en Nostr es un par de claves secp256k1: una clave secreta que guardas y una clave pública que compartes."
+  - "La clave pública se calcula a partir de la secreta, pero esa cuenta no se puede hacer al revés."
+  - "npub y nsec son los mismos bytes que las claves en hex, reescritos en bech32 con un checksum que detecta errores de tipeo (NIP-19)."
+  - "Firmar prueba que un evento salió de tu clave; cualquiera puede verificarlo solo con tu clave pública."
+  - "Nunca compartas tu nsec. No hay forma de restablecerla: si la pierdes o se filtra, esa identidad se acabó."
+mascotIntro: "Sin formulario de registro, sin contraseña, sin policía de nombres de usuario. ¡Vamos a forjarte una identidad con un clic!"
+---
+import Term from "~/components/shell/Term.astro";
+import { href } from "~/lib/href";
+import { Callout, Drawer } from "@nostrschool/ui";
+import KeyForge from "~/components/chapters/02-keys/KeyForge.svelte";
+import OneWayClock from "~/components/chapters/02-keys/OneWayClock.svelte";
+import SignatureStamp from "~/components/chapters/02-keys/SignatureStamp.svelte";
+import NsecGuard from "~/components/chapters/02-keys/NsecGuard.svelte";
+import ChapterQuiz from "~/components/chapters/02-keys/ChapterQuiz.svelte";
+
+## Sin formulario de registro. Nunca.
+
+Todas las apps que has usado empiezan igual: elige un nombre de usuario, inventa una contraseña,
+confirma tu correo. Por detrás, una empresa te anota en **su** base de datos. Tu cuenta vive ahí,
+y existe solo mientras ellos lo digan.
+
+Nostr se salta todo eso. Tu identidad no es una fila en la base de datos de nadie: es un
+<Term id="keypair" locale="es">par de claves</Term>, dos números grandes que van juntos:
+
+- una **clave secreta** (<Term id="privkey" locale="es">clave privada</Term>): 32 bytes aleatorios que solo tú conoces, y
+- una **clave pública** (<Term id="pubkey" locale="es">pubkey</Term>): se calcula a partir de la secreta y puedes enseñársela al mundo sin miedo.
+
+Piensa en un buzón con ranura. La **clave pública** es la dirección pintada en el frente: la pones
+en tus tarjetas para que la gente te encuentre. La **clave secreta** es la única llave que abre el
+buzón, y aquí hace algo todavía mejor: te deja sellar cartas con un sello que nadie más puede
+falsificar.
+
+Ningún servidor las reparte. Las creas tú, en tu propio dispositivo, en una fracción de segundo.
+Hagámoslo ahora mismo.
+
+<KeyForge client:visible locale="es" />
+
+Pulsa el botón unas cuantas veces. Cada par de claves es completamente nuevo: hay unas
+2<sup>256</sup> claves secretas posibles, así que la probabilidad de que dos personas saquen la
+misma es, en la práctica, cero. No hace falta ningún registro central para que las claves sean
+únicas: las matemáticas lo hacen gratis.
+
+<Callout locale="es" tone="safety" testid="ch02-demo-keys-callout">
+  Las claves forjadas en esta página son **claves de prueba**. Se generan en tu navegador y nunca se
+  guardan ni se envían a ningún lado, pero trátalas como desechables: no las uses para una identidad
+  real.
+</Callout>
+
+## ¿Por qué nadie puede adivinar mi secreto?
+
+La clave pública se calcula *a partir de* la secreta usando una curva elíptica llamada
+<Term id="secp256k1" locale="es">secp256k1</Term> (la misma que usa Bitcoin). Su propiedad mágica es
+que ese cálculo es una **calle de un solo sentido**: hacia adelante tarda microsegundos, hacia atrás
+es imposible.
+
+Aquí tienes una versión de juguete que sí puedes ver. Tu secreto es un número de saltos; la clave
+pública es el punto del reloj donde caes. Pruébalo y luego intenta ir hacia atrás.
+
+<OneWayClock client:visible locale="es" />
+
+En un reloj de 61 puntos, adivinar hacia atrás lleva un parpadeo. En la curva real hay unos
+10<sup>77</sup> puntos. Todas las computadoras del planeta adivinando durante toda la vida del
+universo no harían ni un rasguño. Por eso puedes publicar tu clave pública en todas partes y dormir
+tranquilo.
+
+<Drawer client:visible testid="ch02-uth-curve" locale="es" title="Bajo el capó: secp256k1 y claves x-only">
+
+La operación real es una **multiplicación escalar sobre una curva elíptica**: `P = k · G`, donde `k`
+es tu clave secreta (un entero de 256 bits entre 1 y el orden de la curva *n* − 1), `G` es el punto
+generador fijo de la curva y `P` es el punto público. Recuperar `k` a partir de `P` es el *problema
+del logaritmo discreto en curvas elípticas*, para el que no se conoce ninguna solución eficiente.
+
+[NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) dice que las claves y las firmas
+siguen [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki) (firmas Schnorr
+sobre secp256k1). BIP-340 usa claves públicas **x-only**: solo se guarda la coordenada x de 32
+bytes, y se asume que la coordenada y es par. Por eso una `pubkey` de Nostr tiene exactamente 64
+caracteres hex en minúscula, y no los 66 de las claves "comprimidas" que quizá conozcas de otros
+lados.
+
+```ts
+import { generateSecretKey, getPublicKey } from "nostr-tools/pure";
+
+const sk = generateSecretKey(); // Uint8Array(32), de un CSPRNG
+const pk = getPublicKey(sk); // 64 caracteres hex en minúscula (x-only)
+console.log(pk);
+```
+
+No cualquier valor de 32 bytes es una clave válida: la secreta tiene que ser menor que *n*
+(≈ 1,158 × 10<sup>77</sup>), y una clave pública tiene que ser una coordenada x que esté realmente
+sobre la curva.
+
+</Drawer>
+
+## npub y nsec: las mismas claves, escritas de forma más amigable
+
+Las claves en bruto se escriben en **hex**: 64 caracteres de `0–9` y `a–f`. A las computadoras les
+encanta el hex. A los humanos copiándolo y pegándolo en un chat… no tanto. Confunde un solo carácter
+y, sin darte cuenta, estarás apuntando a otra persona (o a nadie).
+
+Por eso <Term id="nip19" locale="es">NIP-19</Term> reescribe las claves usando <Term id="bech32" locale="es">bech32</Term>:
+
+- tu clave pública se convierte en una <Term id="npub" locale="es">npub</Term>: `npub1…`
+- tu clave secreta se convierte en una <Term id="nsec" locale="es">nsec</Term>: `nsec1…`
+
+El prefijo te dice **qué** tienes entre manos (así notas cuándo estás a punto de pegar un secreto),
+el alfabeto se salta caracteres que se confunden como `1`, `b`, `i` y `o`, y los últimos seis
+caracteres son un **checksum**: si cambias cualquier carácter, el software lo rechazará en vez de
+usar en silencio la clave equivocada. Vuelve a la forja de más arriba y recorre la codificación paso
+a paso: los bytes se reagrupan de 5 en 5 bits, y cada número de 5 bits elige una letra de un
+alfabeto de 32.
+
+<Drawer client:visible testid="ch02-uth-bech32" locale="es" title="Bajo el capó: la codificación NIP-19">
+
+1. Toma los 32 bytes de datos (256 bits).
+2. Reagrúpalos en **palabras de 5 bits**: 256 / 5 = 51,2, así que salen 52 palabras, y la última se rellena con bits en cero.
+3. Calcula un **checksum BCH** de 6 palabras sobre el prefijo (la *parte legible por humanos*, `npub`) y las palabras.
+4. Pasa las 58 palabras por el alfabeto `qpzry9x8gf2tvdw0s3jn54khce6mua7l` y únelo todo:
+   `hrp + "1" + chars`. Resultado: 63 caracteres para toda npub y toda nsec.
+
+Las cadenas bech32 son **solo para humanos**. [NIP-19](https://github.com/nostr-protocol/nips/blob/master/19.md)
+lo deja claro: no deben usarse dentro de eventos ni de mensajes de relay. En la red siempre va en
+hex (evento recortado al campo que nos interesa):
+
+```json
+{
+  "kind": 1,
+  "pubkey": "7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e",
+  "content": "gm"
+}
+```
+
+```ts
+import * as nip19 from "nostr-tools/nip19";
+
+const npub = nip19.npubEncode(pk); // "npub1…"
+const nsec = nip19.nsecEncode(sk); // "nsec1…" (sk es un Uint8Array)
+const { type, data } = nip19.decode(npub); // type === "npub", data === pk (hex)
+```
+
+NIP-19 también define `note` (un id de evento), además de "identificadores compartibles" que
+empaquetan pistas extra como registros **TLV** (tipo-longitud-valor):
+<Term id="nprofile" locale="es">nprofile</Term> (pubkey + relays),
+<Term id="nevent" locale="es">nevent</Term> (id de evento + relays, y opcionalmente autor y kind) y
+<Term id="naddr" locale="es">naddr</Term> (kind + autor + etiqueta `d` de un evento direccionable).
+Pruébalos todos en la <a href={href("es", "tools/keys")} data-testid="ch02-tool-link">herramienta de claves</a>.
+
+Dos NIPs relacionados: [NIP-49](https://github.com/nostr-protocol/nips/blob/master/49.md) define
+<Term id="ncryptsec" locale="es">`ncryptsec`</Term>, una clave secreta cifrada con contraseña y el formato de respaldo recomendado, y
+[NIP-06](https://github.com/nostr-protocol/nips/blob/master/06.md) deriva claves a partir de una frase
+semilla BIP-39 (ruta `m/44'/1237'/<account>'/0/0`). El índice de NIPs ahora marca NIP-06 como
+*no recomendado* en favor de una sola nsec, así que trátalo como algo heredado que puedes encontrar en
+wallets antiguas.
+
+</Drawer>
+
+## Tu clave es tu bolígrafo
+
+Tener una clave secreta no solo sirve para *ser* alguien: sirve para *demostrarlo*. Cada publicación
+que haces es un pequeño <Term id="event" locale="es">evento</Term> JSON que lleva tu clave pública y
+una <Term id="signature" locale="es">firma</Term>, hecha con tu clave secreta usando el esquema
+<Term id="schnorr" locale="es">Schnorr</Term>. Cualquiera (cualquier <Term id="relay" locale="es">relay</Term>,
+cualquier app, cualquier desconocido) puede comprobar esa firma sin más que tu clave pública. Nadie
+puede falsificarla sin tu secreto.
+
+Pruébalo con la clave que forjaste arriba. Luego cambia una sola letra.
+
+<SignatureStamp client:visible locale="es" />
+
+Por eso Nostr no necesita un servidor de confianza: la prueba viaja *con* el mensaje. En el próximo
+capítulo vamos a desarmar un evento firmado byte a byte.
+
+<Drawer client:visible testid="ch02-uth-schnorr" locale="es" title="Bajo el capó: qué se firma en realidad">
+
+Nostr nunca firma tu texto tal cual. El evento se serializa como
+`[0, pubkey, created_at, kind, tags, content]`, se le aplica el hash <Term id="sha256" locale="es">SHA-256</Term>
+para obtener el `id` de 32 bytes, y lo que se firma con Schnorr BIP-340 es **el id**, lo que produce
+una `sig` de 64 bytes (128 caracteres hex). Si cambias el contenido, cambia el id, y la firma vieja
+ya no coincide.
+
+```ts
+import { finalizeEvent, verifyEvent } from "nostr-tools/pure";
+
+const event = finalizeEvent(
+  { kind: 1, created_at: Math.floor(Date.now() / 1000), tags: [], content: "gm" },
+  sk,
+); // añade pubkey, id y sig
+verifyEvent(event); // true
+```
+
+</Drawer>
+
+## Cuida tu nsec con tu vida (bueno, casi)
+
+Esta es la otra cara de "ninguna empresa es dueña de tu cuenta": **ninguna empresa puede rescatarla
+tampoco**.
+
+- Quien consiga tu nsec **se convierte en** ti. Puede publicar, seguir y mandar DMs como tú, para siempre, y no
+  puedes cambiar "tu contraseña", porque no existe.
+- Si pierdes tu nsec sin copia de seguridad, la identidad desaparece. Eso es la
+  <Term id="key-loss" locale="es">pérdida de claves</Term>, y es una de las concesiones honestas de
+  Nostr (más sobre esto en el último capítulo).
+
+Tu npub, en cambio, está hecha para compartirse: en tu web, en tu bio, en una camiseta. Practiquemos
+a distinguir una de la otra.
+
+<NsecGuard client:visible locale="es" />
+
+<Callout locale="es" tone="danger" testid="ch02-never-share">
+  Las apps de verdad nunca necesitan que pegues tu nsec. Usa un <Term id="signer" locale="es">firmante</Term>
+  en su lugar: una extensión del navegador (<Term id="nip07" locale="es">NIP-07</Term>) o un
+  <Term id="bunker" locale="es">bunker</Term> remoto (<Term id="nip46" locale="es">NIP-46</Term>) guarda
+  la clave secreta en un solo lugar y solo entrega firmas. El capítulo 10 te enseña cómo.
+</Callout>
+
+<Drawer client:visible testid="ch02-uth-hygiene" locale="es" title="Bajo el capó: higiene de claves para desarrolladores">
+
+- Genera claves con un CSPRNG (`generateSecretKey()` usa `crypto.getRandomValues`), nunca con
+  `Math.random()` ni con el hash de algo adivinable.
+- Mantén las claves secretas como `Uint8Array` en memoria y no las registres en logs. Mejor aún,
+  delega en un firmante: `window.nostr.signEvent()` ([NIP-07](https://github.com/nostr-protocol/nips/blob/master/07.md))
+  o una conexión `bunker://` ([NIP-46](https://github.com/nostr-protocol/nips/blob/master/46.md)).
+- Para respaldos, ofrece `ncryptsec` ([NIP-49](https://github.com/nostr-protocol/nips/blob/master/49.md))
+  en lugar de la nsec en texto plano. No uses frases semilla NIP-06 en código nuevo: el índice de NIPs
+  las marca como no recomendadas en favor de una sola nsec.
+- Acepta entradas tanto en hex como en NIP-19, pero guarda y transmite en **hex**; decodifica las URIs
+  `nostr:` ([NIP-21](https://github.com/nostr-protocol/nips/blob/master/21.md)) con el mismo
+  decodificador de NIP-19.
+
+</Drawer>
+
+## Comprobación rápida
+
+<ChapterQuiz client:visible locale="es" />

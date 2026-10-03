@@ -1,0 +1,184 @@
+/* Owner: shell agent. Global element styles — tokens only, no raw values. */
+@import "@nostrschool/tokens/tokens.css";
+@import "@fontsource-variable/fredoka";
+@import "@fontsource-variable/nunito";
+@import "@fontsource-variable/jetbrains-mono";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Height of the sticky one-row site header (row + bottom border). Anything that scrolls to an
+     anchor or sticks below the header offsets by this. */
+  --size-header: calc(var(--size-control-md) + var(--space-md) + var(--border-width-medium));
+}
+
+html {
+  /* Keeps anchor targets and keyboard-focused elements out from under the sticky header. */
+  scroll-padding-block-start: calc(var(--size-header) + var(--space-sm));
+  font-family: var(--font-family-body);
+  font-size: 100%;
+  line-height: var(--font-line-height-normal);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-family-display);
+  line-height: var(--font-line-height-tight);
+  font-weight: var(--font-weight-bold);
+}
+
+a {
+  color: var(--color-text-primary);
+}
+
+code,
+pre,
+kbd {
+  font-family: var(--font-family-mono);
+}
+
+::selection {
+  background: var(--color-selection);
+}
+
+:focus-visible {
+  outline: var(--border-width-thick) solid var(--color-focus-ring);
+  outline-offset: var(--space-3xs);
+}
+
+/* The one screen-reader-only rule for the site (ui's <VisuallyHidden> mirrors it): chapter
+   components use this class directly so <legend>, <label> and <ul> can be hidden too. */
+.visually-hidden {
+  position: absolute;
+  inline-size: var(--border-width-thin);
+  block-size: var(--border-width-thin);
+  margin: calc(var(--border-width-thin) * -1);
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Page transitions ────────────────────────────────────────────────────────────────────────
+ * Native cross-document view transitions instead of Astro's ClientRouter: zero JS, islands and
+ * the pre-paint theme script keep working as on a normal page load, and browsers without
+ * support simply navigate. Opt-in only when the user hasn't asked for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(root) {
+    animation: var(--motion-duration-fast) var(--motion-easing-accelerate) both page-out;
+  }
+  ::view-transition-new(root) {
+    animation: var(--motion-duration-normal) var(--motion-easing-decelerate) both page-in;
+  }
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    translate: 0 calc(var(--space-xs) * -1);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--space-sm);
+  }
+}
+
+/* ── Live mode signpost: a stripe in the live colour across the top of every page. */
+html[data-live="on"] body {
+  box-shadow: inset 0 var(--space-2xs) 0 var(--color-live);
+}
+
+main {
+  flex: 1;
+  inline-size: 100%;
+}
+
+img,
+svg {
+  max-inline-size: 100%;
+}
+
+/* ── Chapter prose (MDX output is not scoped, so it is styled here). */
+.prose {
+  font-size: var(--font-size-lg);
+  line-height: var(--font-line-height-relaxed);
+}
+
+.prose > * + * {
+  margin-block-start: var(--space-md);
+}
+
+.prose h2 {
+  margin-block-start: var(--space-2xl);
+  font-size: var(--font-size-3xl);
+}
+
+.prose h3 {
+  margin-block-start: var(--space-xl);
+  font-size: var(--font-size-2xl);
+}
+
+.prose :not(pre) > code {
+  padding: 0 var(--space-3xs);
+  border-radius: var(--radius-sm);
+  background: var(--color-code-bg);
+  color: var(--color-code-text);
+  font-size: var(--font-size-md);
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding-inline-start: var(--space-md);
+  border-inline-start: var(--border-width-thick) solid var(--color-primary);
+  color: var(--color-text-muted);
+}
+
+.prose a {
+  text-decoration-thickness: var(--border-width-thin);
+  text-underline-offset: var(--space-3xs);
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: var(--space-lg);
+}
+
+.prose li + li {
+  margin-block-start: var(--space-2xs);
+}

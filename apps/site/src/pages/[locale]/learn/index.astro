@@ -1,0 +1,39 @@
+---
+/** Owner: shell agent. Course index: every chapter as a card, with the learner's progress. */
+import { getDictionary } from "@nostrschool/i18n";
+import ChapterGrid from "~/components/shell/ChapterGrid.svelte";
+import ContinueLink from "~/components/shell/ContinueLink.svelte";
+import { chapterLinks } from "~/components/shell/lib/links";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { assertLocale, localeStaticPaths } from "~/lib/locale";
+
+export const getStaticPaths = localeStaticPaths;
+const locale = assertLocale(Astro.params.locale);
+const t = getDictionary(locale).common;
+const chapters = chapterLinks(locale);
+---
+
+<BaseLayout locale={locale} title={t.learn.title}>
+  <header class="page-head">
+    <h1 data-testid="learn-title">{t.learn.title}</h1>
+    <p class="intro">{t.learn.intro}</p>
+    <ContinueLink client:idle locale={locale} chapters={chapters} testid="learn-continue" />
+  </header>
+  <ChapterGrid client:idle locale={locale} chapters={chapters} />
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-block-end: var(--space-xl);
+  }
+  h1 {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-black);
+  }
+  .intro {
+    margin: 0 0 var(--space-lg);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-muted);
+  }
+</style>

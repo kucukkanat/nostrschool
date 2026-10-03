@@ -1,0 +1,261 @@
+---
+order: 7
+slug: social-graph
+title: "El grafo social"
+summary: "Las listas de seguidos y cómo los clientes encuentran dónde publican tus amigos."
+estimatedMinutes: 14
+nips: ["01", "02", "10", "65"]
+takeaways:
+  - "Seguir a alguien es una etiqueta p dentro del propio evento kind 3 firmado por quien sigue. No hay una base de datos central de seguidores."
+  - "El kind 3 es reemplazable: cada lista nueva reemplaza entera a la anterior, así que siempre obtén la más reciente antes de editarla."
+  - "Con NIP-65, cada persona publica una lista de relays kind 10002: sus relays de escritura son su outbox y sus relays de lectura, su inbox."
+  - "Para leer a alguien, ve a sus relays de escritura. Para llegarle a alguien, envía también a sus relays de lectura."
+  - "Suponer que todos están en un mismo relay esconde en silencio a quien escribe en otro lado. El modelo outbox mantiene los relays intercambiables."
+mascotIntro: "¿Quién sigue a quién? Agarra a un amigo y arrástralo por ahí. No le molesta, solo es un círculo."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer } from "@nostrschool/ui";
+import FollowGraphExplorer from "~/components/chapters/07-social-graph/FollowGraphExplorer.svelte";
+import OutboxRouter from "~/components/chapters/07-social-graph/OutboxRouter.svelte";
+import ReplaceableTrap from "~/components/chapters/07-social-graph/ReplaceableTrap.svelte";
+import ChapterQuiz from "~/components/chapters/07-social-graph/ChapterQuiz.svelte";
+
+## Tu lista de amigos es una nota que tú firmas
+
+En una plataforma grande, "quién sigue a quién" es una tabla gigante dentro de la base de datos
+de la empresa. Puedes ver tu fila, pero no es tuya y no te la puedes llevar.
+
+Nostr no tiene esa tabla. En su lugar, cada persona publica su propia
+<Term id="follow-list" locale="es">lista de seguidos</Term>: un pequeño
+<Term id="event" locale="es">evento</Term> firmado de <Term id="kind" locale="es">kind</Term> `3`
+que dice "estas son las personas a las que sigo". Cada seguimiento es una línea: una
+<Term id="tag" locale="es">etiqueta</Term> `p` con la
+<Term id="pubkey" locale="es">clave pública</Term> de la otra persona.
+
+Piénsalo como la **página de contactos de tu propia libreta**. Nadie más escribe en ella.
+Puedes fotocopiarla y dejar copias en varios <Term id="relay" locale="es">relays</Term>, y
+cualquier app que abras después puede leerla y reconstruir tu timeline. ¿Teléfono nuevo? ¿App
+nueva? Tus amigos se vienen contigo, porque la lista nunca fue de la app.
+
+Pon las páginas de todas las libretas una al lado de la otra y obtienes un **grafo social**.
+Aquí están nuestros siete amigos de ejemplo, dibujados a partir de sus eventos kind 3 reales
+(¡y firmados!):
+
+<FollowGraphExplorer client:visible locale="es" />
+
+Prueba esto: pasa el cursor sobre **Grace** con la lente "Quién lo sigue" activada. Solo Carol
+y Erin la siguen. Ahora selecciona a **Alice**: la siguen seis personas. Las flechas dobles más
+gruesas indican un seguimiento **mutuo** (cada lista menciona a la otra persona). Arrastra a
+algunas personas; el grafo vuelve a su forma tambaleándose como una gelatina.
+
+<Callout locale="es" tone="tip" testid="ch07-callout-followers" title="Un momento, ¿dónde están las listas de seguidores?">
+¡No existen! Tu kind 3 dice a quién sigues **tú**. "Quién me sigue" es una pregunta que una app
+responde *buscando* en los relays eventos kind 3 que contengan tu pubkey. Apps distintas,
+preguntando a relays distintos, pueden obtener números de seguidores distintos. Eso es normal en
+Nostr, y por eso el número de seguidores es una estimación, no un hecho.
+</Callout>
+
+<Drawer client:visible testid="ch07-uth-kind3" locale="es" title="Bajo el capó: un evento kind 3 (NIP-02)">
+
+[NIP-02](https://github.com/nostr-protocol/nips/blob/master/02.md) define la lista de seguidos.
+Cada seguimiento es una etiqueta `p`: `["p", <pubkey hex>, <pista de relay>, <apodo>]`. La pista
+de relay y el apodo (un sobrenombre local, el "petname") son opcionales y pueden ser cadenas
+vacías. El `content` no se usa.
+
+```json
+{
+  "kind": 3,
+  "pubkey": "<Grace's pubkey>",
+  "created_at": 1735682400,
+  "tags": [
+    ["p", "e550c6e9…44cc", "wss://relay.alpha.example", "alice"],
+    ["p", "a7388391…e183", "wss://relay.beta.example", "bob"],
+    ["p", "c7175000…5deb", "wss://relay.alpha.example", "erin"]
+  ],
+  "content": "",
+  "id": "…",
+  "sig": "…"
+}
+```
+
+Construir el grafo es solo leer etiquetas. Con [nostr-tools](https://github.com/nbd-wtf/nostr-tools):
+
+```ts
+import { SimplePool } from "nostr-tools/pool";
+
+const pool = new SimplePool();
+const relays = ["wss://relay.alpha.example"];
+
+// ¿A quién sigue Grace? Su kind 3 más reciente.
+const list = await pool.get(relays, { kinds: [3], authors: [gracePubkey] });
+const follows = (list?.tags ?? []).filter((t) => t[0] === "p").map((t) => t[1]);
+
+// ¿Quién sigue a Grace? Busca eventos kind 3 que la etiqueten (¡es una estimación!).
+const followers = await pool.querySync(relays, { kinds: [3], "#p": [gracePubkey] });
+```
+
+Los clientes añaden los nuevos seguidos **al final** de la lista, así que el orden de las
+etiquetas registra, más o menos, cuándo empezaste a seguir a cada persona.
+
+</Drawer>
+
+## Reemplazable significa "gana la copia más nueva"
+
+El kind 3 es un <Term id="replaceable-event" locale="es">evento reemplazable</Term>. Un relay
+guarda solo la lista de seguidos **más nueva** de cada persona y descarta las anteriores. Eso
+mantiene todo ordenado, pero tiene un filo peligroso: una lista nueva no se suma a la anterior,
+la **reemplaza entera**.
+
+Entonces, ¿qué pasa si una app que no se ha sincronizado en un mes publica tu lista? Vamos a
+averiguarlo. Eres Grace. Sigue a algunas personas, publica desde tu teléfono y luego deja que
+esa tablet vieja y polvorienta publique su propia idea (desactualizada) de tu lista:
+
+<ReplaceableTrap client:visible locale="es" />
+
+Auch. Esto no es un error teórico: hay gente que ha perdido toda su lista de seguidos así. Las
+buenas apps siempre **obtienen tu kind 3 más reciente justo antes de editarlo**, que es
+exactamente lo que hace el botón "Sincronizar el teléfono desde el relay".
+
+<Drawer client:visible testid="ch07-uth-replaceable" locale="es" title="Bajo el capó: cómo eligen los relays al ganador (NIP-01)">
+
+[NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) define los kinds `0`, `3` y
+`10000`–`19999` como reemplazables: para cada `pubkey` + `kind`, se espera que un relay guarde
+solo el evento más reciente. "Más reciente" significa el `created_at` más alto; si dos eventos
+tienen la misma marca de tiempo, se guarda el de **`id` más bajo** (el primero en orden
+lexicográfico). La demo usa exactamente esa regla:
+
+```ts
+const newest = (events: NostrEvent[]) =>
+  events.reduce((best, e) =>
+    e.created_at > best.created_at ||
+    (e.created_at === best.created_at && e.id < best.id) ? e : best);
+```
+
+Los eventos de la demo están firmados de verdad con la clave de ejemplo de Grace (es pública a
+propósito), así que podrías pegar uno en el Inspector de eventos y se verificaría.
+
+</Drawer>
+
+## Pero ¿dónde encuentro las notas de mis amigos?
+
+Aquí va un acertijo. Erin sigue a Alice, Carol, Frank y Grace. Su app quiere mostrar sus notas
+más recientes. Pero hay miles de relays y nadie está en todos. ¿A cuáles debería preguntar la
+app?
+
+La respuesta ingenua es "todos están en el relay grande, pregúntale a ese". Funciona... hasta
+que alguien no está. La mejor respuesta es el <Term id="outbox-model" locale="es">modelo outbox</Term>,
+descrito en <Term id="nip65" locale="es">NIP-65</Term>.
+
+Cada persona publica un pequeño evento más, de kind `10002`, con la lista de sus relays, cada
+uno marcado como:
+
+- **write** (escritura): "Aquí publico mis notas". Es su **outbox**. Ve aquí para *leerla*.
+- **read** (lectura): "Aquí reviso respuestas y menciones". Es su **inbox**. Ve aquí para
+  *llegarle*.
+- sin marca: ambas cosas.
+
+Es como si un amigo te dijera "envío mis cartas desde las oficinas de correo Alpha y Beta, y
+recojo mi correo en Gamma". Para leer sus cartas vas a Alpha o a Beta. Para escribirle, dejas tu
+carta en Gamma.
+
+Pulsa play y mira cómo el <Term id="client" locale="es">cliente</Term> de Erin lo resuelve.
+Luego cambia a **Todos en un solo relay** y compara. Y prueba **Responder a un amigo** para ver
+el lado del inbox.
+
+<OutboxRouter client:visible locale="es" />
+
+Fíjate en dos cosas:
+
+1. En el modelo outbox la app abre una <Term id="subscription" locale="es">suscripción</Term>
+   en cada relay pidiendo **solo** a los autores que escriben ahí. No falta nadie, ni siquiera
+   Grace, que solo usa el pequeño Gamma.
+2. Con un solo relay, Frank y Grace desaparecen en silencio. Nadie recibe un error; Erin
+   simplemente nunca ve sus notas. Ese es el verdadero peligro: la red *parece* estar bien.
+
+<Callout locale="es" tone="info" testid="ch07-callout-why" title="Por qué esto importa para la libertad">
+Si todas las apps supusieran un único relay grande, ese relay se convertiría en silencio en la
+nueva plataforma central: a quien banee, desaparece para todos. El modelo outbox es lo que te
+permite elegir relays pequeños, de pago o autoalojados sin volverte invisible. Es una parte
+importante de la <Term id="censorship-resistance" locale="es">resistencia a la censura</Term>
+de Nostr.
+</Callout>
+
+<Drawer client:visible testid="ch07-uth-nip65" locale="es" title="Bajo el capó: el kind 10002 y las reglas de NIP-65">
+
+[NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md) define el kind `10002`, un
+evento reemplazable cuyas etiquetas `r` listan relays. Una marca `read` o `write` limita un relay
+a una sola dirección; sin marca significa ambas. La lista de Carol en nuestros datos de ejemplo:
+
+```json
+{
+  "kind": 10002,
+  "tags": [
+    ["r", "wss://relay.gamma.example"],
+    ["r", "wss://relay.alpha.example", "write"]
+  ],
+  "content": ""
+}
+```
+
+Las reglas, en resumen:
+
+- Para descargar eventos **de** un usuario, usa los relays de **escritura** de ese usuario.
+- Para descargar eventos **sobre** un usuario (donde lo etiquetan), usa los relays de
+  **lectura** de ese usuario.
+- Al publicar, envía el evento a los **relays de escritura del autor** y a los **relays de
+  lectura de cada usuario etiquetado**.
+- Difunde tu propio kind `10002` ampliamente, incluidos relays "indexadores" conocidos a los que
+  las apps piden listas de relays, y mantenlo corto: 2–4 relays por dirección.
+
+La demo arma un `REQ` por relay con solo los autores que escriben ahí:
+
+```ts
+import { SimplePool } from "nostr-tools/pool";
+
+const pool = new SimplePool();
+const INDEXERS = ["wss://relay.alpha.example"];
+
+// 1. ¿Dónde escribe cada persona seguida?
+const lists = await pool.querySync(INDEXERS, { kinds: [10002], authors: follows });
+const writeRelaysOf = new Map(
+  lists.map((e) => [
+    e.pubkey,
+    e.tags.filter((t) => t[0] === "r" && t[2] !== "read").map((t) => t[1]),
+  ]),
+);
+
+// 2. Agrupa autores por relay y suscríbete en cada relay solo con esos autores.
+const byRelay = new Map<string, string[]>();
+for (const [author, relays] of writeRelaysOf)
+  for (const url of relays) byRelay.set(url, [...(byRelay.get(url) ?? []), author]);
+
+for (const [url, authors] of byRelay)
+  pool.subscribeMany([url], { kinds: [1], authors, limit: 20 }, { onevent: show });
+```
+
+Los clientes reales añaden salvaguardas: limitan las conexiones por autor (dos o tres relays
+bastan), guardan en caché las listas de relays y eligen un conjunto pequeño que aun así cubra a
+todos. El contador de "mínimo de relays" de la demo resuelve ese problema de cobertura de forma
+exacta; con cientos de relays, las apps lo aproximan.
+
+En las respuestas, una etiqueta `p` (y la etiqueta `e` de la nota a la que se responde, según
+[NIP-10](https://github.com/nostr-protocol/nips/blob/master/10.md)) indica a quién hay que
+notificar, y las reglas del outbox le dicen a la app *dónde* entregarla.
+
+</Drawer>
+
+## Más allá de los seguidos
+
+El grafo de seguidos sirve para mucho más que tu timeline. Las apps lo usan como una
+<Term id="web-of-trust" locale="es">red de confianza</Term>: "muestra respuestas de gente a la
+que siguen mis amigos y oculta a los desconocidos" es un filtro de spam sorprendentemente bueno,
+y nadie tuvo que construir una base de datos central de reputación para lograrlo. Tu kind 3
+también sirve como copia de seguridad portátil y como lista de pistas de relays para las
+personas que sigues.
+
+Ese es el truco de este capítulo: una red social construida enteramente con notas pequeñas que
+cada persona firma, guarda donde quiere y puede llevarse a cualquier parte.
+
+## Comprobación rápida
+
+<ChapterQuiz client:visible locale="es" />

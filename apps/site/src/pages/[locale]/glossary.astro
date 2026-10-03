@@ -1,0 +1,549 @@
+---
+/**
+ * Owner: glossary agent. Every term with an anchor `#<id>` (Term hover-cards link here),
+ * a search box, chapter filter chips and an A–Z jump nav. Static HTML first: the inline
+ * script only adds filtering, so the page is complete without JavaScript.
+ */
+import {
+  format,
+  GLOSSARY_CHAPTERS,
+  GLOSSARY_IDS,
+  type GlossaryEntry,
+  type GlossaryId,
+  getDictionary,
+  getGlossary,
+  LOCALE_TAGS,
+} from "@nostrschool/i18n";
+import { nipUrl } from "@nostrschool/protocol";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { CHAPTERS } from "~/lib/chapters";
+import { href } from "~/lib/href";
+import { assertLocale, localeStaticPaths } from "~/lib/locale";
+
+export const getStaticPaths = localeStaticPaths;
+const locale = assertLocale(Astro.params.locale);
+const dict = getDictionary(locale);
+const t = dict.common.glossary;
+const english = getGlossary("en");
+const localized = getGlossary(locale);
+
+// Untranslated entries fall back to English rather than rendering blank definitions.
+const entryFor = (id: GlossaryId): GlossaryEntry => {
+  const entry = localized[id];
+  return entry.short === "" || entry.long === "" ? english[id] : entry;
+};
+
+// Fail the build loudly on broken content instead of shipping empty cards or dead links.
+for (const id of GLOSSARY_IDS) {
+  const e = english[id];
+  if (e.short === "" || e.long === "") throw new Error(`glossary: "${id}" has no English text`);
+  if (e.seeAlso?.includes(id)) throw new Error(`glossary: "${id}" lists itself in seeAlso`);
+}
+
+const chapterOf = (id: GlossaryId) => {
+  const chapter = CHAPTERS.find((c) => c.key === GLOSSARY_CHAPTERS[id]);
+  if (chapter === undefined) throw new Error(`glossary: "${id}" has no chapter`);
+  return chapter;
+};
+
+const letterOf = (term: string): string => {
+  const first = term.normalize("NFD").replace(/\p{M}/gu, "").charAt(0).toUpperCase();
+  return /[A-Z]/.test(first) ? first : "#";
+};
+
+// Lowercase, accent-free haystack so "senal" finds "señal"; the script normalizes queries the same way.
+const searchable = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+
+const collator = new Intl.Collator(LOCALE_TAGS[locale], { sensitivity: "base", numeric: true });
+const terms = GLOSSARY_IDS.map((id) => {
+  const entry = entryFor(id);
+  const nips = entry.nips ?? [];
+  return {
+    id,
+    entry,
+    chapter: chapterOf(id),
+    letter: letterOf(entry.term),
+    paragraphs: entry.long.split(/\n\s*\n/),
+    haystack: searchable(
+      [id, entry.term, entry.short, entry.long, ...nips.map((n) => `nip-${n} nip${n}`)].join(" "),
+    ),
+  };
+}).sort((a, b) => collator.compare(a.entry.term, b.entry.term));
+
+const letters = [...new Set(terms.map((x) => x.letter))];
+// "#" groups terms that start with a digit or symbol; it is not a valid fragment, so ids use "other".
+const slug = (l: string) => (l === "#" ? "other" : l);
+const alphabet = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
+const chapterLabel = (c: (typeof CHAPTERS)[number]) =>
+  `${format(dict.common.chapter.chapter, { n: c.order })}: ${dict.chapters[c.key].title}`;
+---
+
+<BaseLayout locale={locale} title={t.title} description={t.intro}>
+  <div class="glossary" data-glossary data-testid="glossary" data-no-results={t.noResults}>
+    <header class="intro">
+      <h1 data-testid="glossary-title">{t.title}</h1>
+      <p>{t.intro}</p>
+    </header>
+
+    <div class="controls" data-testid="glossary-controls">
+      <label class="search-label" for="glossary-search">{t.search}</label>
+      <input
+        id="glossary-search"
+        class="search"
+        type="search"
+        autocomplete="off"
+        spellcheck="false"
+        data-testid="glossary-search"
+      >
+      <fieldset class="chips" data-testid="glossary-chapter-filter">
+        <legend class="visually-hidden">{t.filterByChapter}</legend>
+        {CHAPTERS.map((c) => (
+          <button
+            type="button"
+            class="chip"
+            aria-pressed="false"
+            aria-label={chapterLabel(c)}
+            title={dict.chapters[c.key].title}
+            data-chapter={c.key}
+            data-testid={`glossary-filter-${c.key}`}
+          >
+            {format(dict.common.chapter.chapter, { n: c.order })}
+          </button>
+        ))}
+      </fieldset>
+    </div>
+
+    <nav class="az" aria-label={t.jumpTo} data-testid="glossary-az">
+      <ul>
+        {[...alphabet, ...(letters.includes("#") ? ["#"] : [])].map((l) => (
+          <li>
+            {letters.includes(l) ? (
+              <a
+                href={href(locale, `glossary#letter-${slug(l)}`)}
+                data-az={slug(l)}
+                data-testid={`glossary-az-${slug(l)}`}
+              >
+                {l}
+              </a>
+            ) : (
+              <span class="az-empty" aria-hidden="true" data-testid={`glossary-az-${slug(l)}`}>
+                {l}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <p class="status" role="status" aria-live="polite" data-testid="glossary-status"></p>
+
+    <div data-testid="glossary-list">
+      {letters.map((l) => (
+        <section
+          class="letter"
+          aria-labelledby={`letter-${slug(l)}`}
+          data-letter={slug(l)}
+          data-testid={`glossary-letter-${slug(l)}`}
+        >
+          <h2 id={`letter-${slug(l)}`} class="letter-heading">
+            {l}
+          </h2>
+          {terms
+            .filter((x) => x.letter === l)
+            .map(({ id, entry, chapter, paragraphs, haystack }) => (
+              <article
+                id={id}
+                class="term"
+                tabindex="-1"
+                aria-labelledby={`${id}-name`}
+                data-term
+                data-chapter={chapter.key}
+                data-search={haystack}
+                data-testid={`glossary-term-${id}`}
+              >
+                <h3 class="term-name" id={`${id}-name`}>
+                  <a
+                    class="permalink"
+                    href={href(locale, `glossary#${id}`)}
+                    data-testid={`glossary-term-${id}-link`}
+                  >
+                    {entry.term}
+                  </a>
+                </h3>
+                <p class="short" data-testid={`glossary-term-${id}-short`}>
+                  {entry.short}
+                </p>
+                <div class="long" data-testid={`glossary-term-${id}-long`}>
+                  {paragraphs.map((p) => (
+                    <p>{p}</p>
+                  ))}
+                </div>
+                <dl class="meta">
+                  <dt>{t.taughtIn}</dt>
+                  <dd>
+                    <a
+                      href={href(locale, `learn/${chapter.slug}`)}
+                      data-testid={`glossary-term-${id}-chapter`}
+                    >
+                      {chapterLabel(chapter)}
+                    </a>
+                  </dd>
+                  {entry.nips !== undefined && entry.nips.length > 0 && (
+                    <>
+                      <dt>{dict.common.chapter.nips}</dt>
+                      <dd class="pills">
+                        {entry.nips.map((n) => (
+                          <a
+                            class="pill"
+                            href={nipUrl(n)}
+                            rel="external noopener"
+                            data-testid={`glossary-term-${id}-nip-${n}`}
+                          >
+                            NIP-{n}
+                          </a>
+                        ))}
+                      </dd>
+                    </>
+                  )}
+                  {entry.seeAlso !== undefined && entry.seeAlso.length > 0 && (
+                    <>
+                      <dt>{t.seeAlso}</dt>
+                      <dd class="pills">
+                        {entry.seeAlso.map((other) => (
+                          <a
+                            class="pill see"
+                            href={href(locale, `glossary#${other}`)}
+                            data-testid={`glossary-term-${id}-see-${other}`}
+                          >
+                            {entryFor(other).term}
+                          </a>
+                        ))}
+                      </dd>
+                    </>
+                  )}
+                </dl>
+              </article>
+            ))}
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Progressive enhancement: filter the server-rendered list in place.
+  const normalize = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim();
+
+  const root = document.querySelector<HTMLElement>("[data-glossary]");
+  const search = root?.querySelector<HTMLInputElement>("#glossary-search");
+  const status = root?.querySelector<HTMLElement>("[data-testid='glossary-status']");
+
+  if (root && search && status) {
+    const chips = [...root.querySelectorAll<HTMLButtonElement>("button[data-chapter]")];
+    const articles = [...root.querySelectorAll<HTMLElement>("[data-term]")];
+    const sections = [...root.querySelectorAll<HTMLElement>("section[data-letter]")];
+    const azLinks = [...root.querySelectorAll<HTMLAnchorElement>("a[data-az]")];
+    let chapter: string | null = null;
+
+    const apply = () => {
+      // Every whitespace-separated word must appear somewhere in the entry (AND search).
+      const words = normalize(search.value)
+        .split(/\s+/)
+        .filter((w) => w !== "");
+      let shown = 0;
+      for (const a of articles) {
+        const hay = a.dataset["search"] ?? "";
+        const visible =
+          (chapter === null || a.dataset["chapter"] === chapter) &&
+          words.every((w) => hay.includes(w));
+        a.hidden = !visible;
+        if (visible) shown += 1;
+      }
+      for (const s of sections) s.hidden = s.querySelector("[data-term]:not([hidden])") === null;
+      for (const link of azLinks) {
+        const section = sections.find((s) => s.dataset["letter"] === link.dataset["az"]);
+        if (section?.hidden ?? true) link.setAttribute("aria-disabled", "true");
+        else link.removeAttribute("aria-disabled");
+      }
+      for (const c of chips)
+        c.setAttribute("aria-pressed", String(c.dataset["chapter"] === chapter));
+      status.textContent = shown === 0 ? (root.dataset["noResults"] ?? "") : "";
+    };
+
+    const reset = () => {
+      search.value = "";
+      chapter = null;
+      apply();
+    };
+
+    // A hash link (e.g. from a Term hover-card) must always reveal its target, even if filtered out.
+    const revealHash = () => {
+      const id = decodeURIComponent(location.hash.slice(1));
+      if (id === "") return;
+      const target = document.getElementById(id);
+      if (target === null || !root.contains(target)) return;
+      if (target.closest("[hidden]") !== null) reset();
+      target.scrollIntoView({ block: "start" });
+      if (target.matches("[data-term]")) target.focus({ preventScroll: true });
+    };
+
+    search.addEventListener("input", apply);
+    search.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") reset();
+    });
+    for (const c of chips) {
+      c.addEventListener("click", () => {
+        chapter = chapter === c.dataset["chapter"] ? null : (c.dataset["chapter"] ?? null);
+        apply();
+      });
+    }
+    window.addEventListener("hashchange", revealHash);
+    apply();
+    revealHash();
+  }
+</script>
+
+<style>
+  .glossary {
+    max-width: var(--size-content);
+    margin-inline: auto;
+    padding: var(--space-lg) var(--space-md) var(--space-3xl);
+  }
+
+  .intro h1 {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-4xl);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs);
+  }
+
+  .intro p {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-lg);
+    margin: 0 0 var(--space-lg);
+  }
+
+  .controls {
+    display: grid;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .search-label {
+    font-weight: var(--font-weight-bold);
+  }
+
+  .search {
+    font: inherit;
+    min-height: var(--size-control-lg);
+    padding-inline: var(--space-md);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: var(--shadow-pop-sm);
+    transition: border-color var(--motion-duration-fast) var(--motion-easing-standard);
+  }
+
+  .search:focus-visible,
+  .chip:focus-visible,
+  .glossary a:focus-visible,
+  .term:focus-visible {
+    outline: var(--border-width-thick) solid var(--color-focus-ring);
+    outline-offset: var(--space-3xs);
+  }
+
+  .chips {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .chip {
+    font: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    min-height: var(--size-touch-target);
+    padding-inline: var(--space-sm);
+    border: var(--border-width-medium) solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    transition:
+      transform var(--motion-duration-fast) var(--motion-easing-bounce),
+      background-color var(--motion-duration-fast) var(--motion-easing-standard);
+  }
+
+  .chip:hover {
+    transform: translateY(calc(-1 * var(--space-3xs)));
+  }
+
+  .chip:active {
+    transform: scale(0.95);
+  }
+
+  .chip[aria-pressed="true"] {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .az ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-md);
+  }
+
+  .az a,
+  .az-empty {
+    display: inline-grid;
+    place-items: center;
+    min-width: var(--size-touch-target);
+    min-height: var(--size-touch-target);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .az a {
+    color: var(--color-text-primary);
+    background: var(--color-primary-subtle);
+    text-decoration: none;
+  }
+
+  .az a:hover {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .az a[aria-disabled] {
+    opacity: var(--opacity-disabled);
+  }
+
+  .az-empty {
+    color: var(--color-text-subtle);
+  }
+
+  .status:empty {
+    display: none;
+  }
+
+  .status {
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-sunken);
+    color: var(--color-text-muted);
+  }
+
+  .letter-heading {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-3xl);
+    color: var(--color-text-accent);
+    border-bottom: var(--border-width-thick) solid var(--color-accent-subtle);
+    margin: var(--space-xl) 0 var(--space-sm);
+  }
+
+  .term {
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-md);
+    border: var(--border-width-medium) solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface-raised);
+    transition: box-shadow var(--motion-duration-normal) var(--motion-easing-standard);
+  }
+
+  .term:target {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-pop);
+  }
+
+  .term-name {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-xl);
+    margin: 0 0 var(--space-xs);
+  }
+
+  .permalink {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .permalink:hover {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+  }
+
+  .short {
+    font-weight: var(--font-weight-semibold);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .long p {
+    color: var(--color-text-muted);
+    line-height: var(--font-line-height-relaxed);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2xs) var(--space-md);
+    margin: var(--space-sm) 0 0;
+    font-size: var(--font-size-sm);
+  }
+
+  /* tokens.breakpoint.md = 768px */
+  @media (min-width: 768px) {
+    .meta {
+      grid-template-columns: max-content 1fr;
+    }
+  }
+
+  .meta dt {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-muted);
+  }
+
+  .meta dd {
+    margin: 0;
+  }
+
+  .meta a {
+    color: var(--color-text-primary);
+  }
+
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+  }
+
+  .pill {
+    padding: var(--space-3xs) var(--space-xs);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-sunken);
+    font-family: var(--font-family-mono);
+    text-decoration: none;
+  }
+
+  .pill.see {
+    font-family: var(--font-family-body);
+    background: var(--color-primary-subtle);
+  }
+
+  .pill:hover {
+    text-decoration: underline;
+  }
+
+  [hidden] {
+    display: none;
+  }
+</style>

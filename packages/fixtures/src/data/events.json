@@ -1,0 +1,1535 @@
+{
+  "fixtureNow": 1735689600,
+  "events": [
+    {
+      "kind": 7,
+      "created_at": 1735687200,
+      "tags": [
+        [
+          "e",
+          "a1bd51f63b58261b774eb882ba099a2bec2f7021f73a0fea48025091cfe40f0f",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "a",
+          "30023:922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8:protocols-not-platforms",
+          "wss://relay.beta.example"
+        ],
+        [
+          "p",
+          "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8"
+        ],
+        [
+          "k",
+          "30023"
+        ]
+      ],
+      "content": "+",
+      "pubkey": "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+      "id": "c5d212c63ce3e84b1411c6f49e05c0069fbfd461eaa92c810a199784cfad586a",
+      "sig": "e105687ab164fa71cb787a221709026678c42a06ed957c28a82bcfdfc964d8ccfd342191b2dda55147c0fd6d207a5170479a8b2d498285b9d379353c3b894589"
+    },
+    {
+      "kind": 5,
+      "created_at": 1735686720,
+      "tags": [
+        [
+          "e",
+          "ea2e3eb8fe5e6cfbc202da21df546f68c6673e9a00c0aed61cffbac7aed9faf7"
+        ],
+        [
+          "k",
+          "1"
+        ]
+      ],
+      "content": "posted by accident",
+      "pubkey": "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+      "id": "07a48417f1abfb029a8b70a75bb48159aaf755c37d5c788ae2b7a2b536c38179",
+      "sig": "9f111c965a619646d24df9dc38e5ef4a3f19be99bd40213cb903a03607cc035cb08c8e05d1a68531190a93c6bf0b9481c233a24976b3757f264b36b0d81e55be"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735686600,
+      "tags": [],
+      "content": "testing testing is this thing on",
+      "pubkey": "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+      "id": "ea2e3eb8fe5e6cfbc202da21df546f68c6673e9a00c0aed61cffbac7aed9faf7",
+      "sig": "82bc74fdbd5b113f257f4c8b2a6db64410ae897362bd42839fe9a34737d5ecb518a99f8517058ef8c2beadc222142e4d68f034e829edc9dd1b6bd13d2a139a7d"
+    },
+    {
+      "kind": 6,
+      "created_at": 1735686300,
+      "tags": [
+        [
+          "e",
+          "814d487f9a9591bde04009eff371facb26e82f3a41cec1bcdcdab310075053be",
+          "wss://relay.beta.example"
+        ],
+        [
+          "p",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+          "wss://relay.beta.example"
+        ]
+      ],
+      "content": "{\"kind\":1,\"created_at\":1735685100,\"tags\":[[\"t\",\"nostr\"]],\"content\":\"Hot take: the best feature of #nostr is that your identity is just a keypair. No email, no phone number.\",\"pubkey\":\"a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183\",\"id\":\"814d487f9a9591bde04009eff371facb26e82f3a41cec1bcdcdab310075053be\",\"sig\":\"76049ab11e742fe3bbbd8f997e08f7bb3e505706f579b4805c55283c8e83a5a5c564f2baf488429ff3392a4cf18e45d04c6bc3b8949ee5a4ba58ba2048e051d8\"}",
+      "pubkey": "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+      "id": "52bed8e452af02e7896a329e7621925bd581a617633b7b826feb1b660684db22",
+      "sig": "d1590364da8ecdddc6b3de48edf1dbf8528d751cb4d1e96f62d78302eacacd800f91d808f6189e35240b87bd45f9956ac01577430a035d34c448f09fc13fc8c4"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735686000,
+      "tags": [
+        [
+          "q",
+          "814d487f9a9591bde04009eff371facb26e82f3a41cec1bcdcdab310075053be",
+          "wss://relay.beta.example",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183"
+        ],
+        [
+          "p",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+          "wss://relay.beta.example"
+        ]
+      ],
+      "content": "This! 👇\nnostr:note1s9x5slu6jkgmmczqp8hlxu06evnwste6g88vr0xum2e3qp6s2wlqz09zra",
+      "pubkey": "9445888d3235f73f8b627df1fb1d498f2eb3fa76337679c1176965a73d3b68b4",
+      "id": "6639e66fdcb9537f1ef90678c8f627e8d6be496613a226d28b89e6ebd687c119",
+      "sig": "2ecc6ef3d6de43868c4d8db042a17b5654b830bbba84be841ce3dd6380972d270e66ea87d67a5c72aa2c07d501245928027409e5924a8fb89fe83babae3ea5f4"
+    },
+    {
+      "kind": 7,
+      "created_at": 1735685400,
+      "tags": [
+        [
+          "e",
+          "814d487f9a9591bde04009eff371facb26e82f3a41cec1bcdcdab310075053be",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "p",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183"
+        ],
+        [
+          "k",
+          "1"
+        ]
+      ],
+      "content": "-",
+      "pubkey": "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148",
+      "id": "0bcb0ea12d01adff2edf55c70e7c7289d4603e32b17f291c991fe0a143268d3b",
+      "sig": "230fcc42c9f7610b019c0ebf7bcc7e70c8dae0f2a8439941adf87208a3db1711c9528eff9c187855149d49f79eee4f5e12f141d05eeb2959bdbd258fac17c8cd"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735685100,
+      "tags": [
+        [
+          "t",
+          "nostr"
+        ]
+      ],
+      "content": "Hot take: the best feature of #nostr is that your identity is just a keypair. No email, no phone number.",
+      "pubkey": "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+      "id": "814d487f9a9591bde04009eff371facb26e82f3a41cec1bcdcdab310075053be",
+      "sig": "76049ab11e742fe3bbbd8f997e08f7bb3e505706f579b4805c55283c8e83a5a5c564f2baf488429ff3392a4cf18e45d04c6bc3b8949ee5a4ba58ba2048e051d8"
+    },
+    {
+      "kind": 9735,
+      "created_at": 1735684802,
+      "tags": [
+        [
+          "p",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb"
+        ],
+        [
+          "P",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ],
+        [
+          "e",
+          "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356"
+        ],
+        [
+          "bolt11",
+          "lnbc21000n1puxwn89p777k06hrw33k6jxfrmwydd6h90xravlene785nlnnvd3pzgv6gqkj8k6h"
+        ],
+        [
+          "description",
+          "{\"kind\":9734,\"created_at\":1735684800,\"tags\":[[\"relays\",\"wss://relay.alpha.example\",\"wss://relay.gamma.example\"],[\"amount\",\"2100000\"],[\"p\",\"c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb\"],[\"e\",\"def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356\"]],\"content\":\"Love the ostrich! ⚡\",\"pubkey\":\"e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc\",\"id\":\"24539a56da112a91ea3fe9d50a2035de5adae837ad34b400c356fd9698070156\",\"sig\":\"ede28dd77e905b31235635119d54498b553b49b37b27aad91e8543dd58d88082dd1580fa739d810ca95b07bc2f593b08417a7615b2dfa9994d148ade55c9d314\"}"
+        ],
+        [
+          "preimage",
+          "0e03fe78b29d4ddf2634beb04cb13cfea703598aba002992434f345fadf54794"
+        ]
+      ],
+      "content": "",
+      "pubkey": "044b2cc412cc89149bc4f38a5067db6034dbaafe20321721a5414bb7237176f4",
+      "id": "3e7b4396d8f84f25d96cc02f2f299e3fe0616983f5d08d4cba94e64d60e4b0d9",
+      "sig": "8c09408f2e0d741d12c81f592e3b4c51ce6c6e7da4fbc5d353232395fc597d575cc445871fc9afd533b23a6d74239202f10dbac191dd7840ea397d3f7de766e6"
+    },
+    {
+      "kind": 9734,
+      "created_at": 1735684800,
+      "tags": [
+        [
+          "relays",
+          "wss://relay.alpha.example",
+          "wss://relay.gamma.example"
+        ],
+        [
+          "amount",
+          "2100000"
+        ],
+        [
+          "p",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb"
+        ],
+        [
+          "e",
+          "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356"
+        ]
+      ],
+      "content": "Love the ostrich! ⚡",
+      "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+      "id": "24539a56da112a91ea3fe9d50a2035de5adae837ad34b400c356fd9698070156",
+      "sig": "ede28dd77e905b31235635119d54498b553b49b37b27aad91e8543dd58d88082dd1580fa739d810ca95b07bc2f593b08417a7615b2dfa9994d148ade55c9d314"
+    },
+    {
+      "kind": 7,
+      "created_at": 1735684500,
+      "tags": [
+        [
+          "e",
+          "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "p",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb"
+        ],
+        [
+          "k",
+          "1"
+        ]
+      ],
+      "content": "⚡",
+      "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+      "id": "e6286a91ee732b9f937fb14c8e63b7644b405f7739e6e0a642607523dd278406",
+      "sig": "79bc8ba3d42d0373c649cff535aa4e6a74ff8c9ca00bebf00bc507556cbf280c9836cb15236c841ca21776296efbf8a63fa0720b45285a9a39e87d93a501af3e"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735684200,
+      "tags": [
+        [
+          "t",
+          "art"
+        ],
+        [
+          "t",
+          "zaps"
+        ]
+      ],
+      "content": "Today's weird animal: a purple ostrich riding a lightning bolt ⚡ #art #zaps",
+      "pubkey": "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+      "id": "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356",
+      "sig": "3b6ce43dabd4b7fae9986de02cc36067ced7343f29e1b1a81a1199d6ef18c2d5e87f8076ddf20cf24e0061596d9081e1561db5675b073c5cb2c1a6dedbe5f7d8"
+    },
+    {
+      "kind": 9735,
+      "created_at": 1735682402,
+      "tags": [
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ],
+        [
+          "P",
+          "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812"
+        ],
+        [
+          "e",
+          "31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301"
+        ],
+        [
+          "bolt11",
+          "lnbc210n1phqmm0qdprur0e6us34s85h6awwky4hffjykptxq9w06dg29xdtmrdsj3uj382mkx"
+        ],
+        [
+          "description",
+          "{\"kind\":9734,\"created_at\":1735682400,\"tags\":[[\"relays\",\"wss://relay.alpha.example\",\"wss://relay.beta.example\"],[\"amount\",\"21000\"],[\"p\",\"e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc\"],[\"e\",\"31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301\"]],\"content\":\"Thanks for the warm welcome!\",\"pubkey\":\"5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812\",\"id\":\"0c0c283bedd6d38164ba053c22c3c8315cc9f1ce66f2fd776711df2cc524bff9\",\"sig\":\"34669de664f949106a052d8c335c622c27c8baa79ef9e6fb62c88fc48304da14f13f33823052f719d3560f576ae905f222bb441052bb21b99819487e102c77b3\"}"
+        ],
+        [
+          "preimage",
+          "5bd46342bd518ca262cddf015a0a9901d7af95824d087674471ef22e82c4b2f7"
+        ]
+      ],
+      "content": "",
+      "pubkey": "044b2cc412cc89149bc4f38a5067db6034dbaafe20321721a5414bb7237176f4",
+      "id": "015063ba58b63cca9aea80bb637891288f7353bae16778e9faa161d053902f17",
+      "sig": "71cd7256565f0f270408f7839be359dbc15d14bceb79268f8fe01790aaa6a108e12513bb7e598805ea63c196d9a023647911f609a890667e24620a2629782bd0"
+    },
+    {
+      "kind": 9734,
+      "created_at": 1735682400,
+      "tags": [
+        [
+          "relays",
+          "wss://relay.alpha.example",
+          "wss://relay.beta.example"
+        ],
+        [
+          "amount",
+          "21000"
+        ],
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ],
+        [
+          "e",
+          "31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301"
+        ]
+      ],
+      "content": "Thanks for the warm welcome!",
+      "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+      "id": "0c0c283bedd6d38164ba053c22c3c8315cc9f1ce66f2fd776711df2cc524bff9",
+      "sig": "34669de664f949106a052d8c335c622c27c8baa79ef9e6fb62c88fc48304da14f13f33823052f719d3560f576ae905f222bb441052bb21b99819487e102c77b3"
+    },
+    {
+      "kind": 3,
+      "created_at": 1735682400,
+      "tags": [
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+          "wss://relay.alpha.example",
+          "alice"
+        ],
+        [
+          "p",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+          "wss://relay.beta.example",
+          "bob"
+        ],
+        [
+          "p",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+          "wss://relay.alpha.example",
+          "erin"
+        ]
+      ],
+      "content": "",
+      "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+      "id": "4e78ff8c30e1df537fc58830c141cbe5f16e8cccda3f7d41d333b045c1754503",
+      "sig": "e14788049a608742ab6d5be77efe0589c0bbe1a5129fd8f6a01b62a3be5d3a9abf69a21d344fb091bb113df8a5fdb0fd4e68674bcbf33fb3a81ccbecb6f43274"
+    },
+    {
+      "kind": 7,
+      "created_at": 1735682100,
+      "tags": [
+        [
+          "e",
+          "31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ],
+        [
+          "k",
+          "1"
+        ]
+      ],
+      "content": "❤️",
+      "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+      "id": "7fd96a62d8b2854f127dc294ed283039382670c68e4db5d4e4bad17acfeb8287",
+      "sig": "83294e49dda32a22310437ba8cf6a8359d216278381380856590d961696c4c0632a1aa2db24abe421adccd5fd6f9396ce767ce13a398f9618208febd27ffb9ac"
+    },
+    {
+      "kind": 6,
+      "created_at": 1735681800,
+      "tags": [
+        [
+          "e",
+          "91a74c40d508831576cca43d0d0c58793bb60df736783b40ddfbc68deed5ab06",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+          "wss://relay.alpha.example"
+        ]
+      ],
+      "content": "{\"kind\":1,\"created_at\":1735668000,\"tags\":[[\"t\",\"nostr\"],[\"t\",\"introductions\"]],\"content\":\"GM #nostr! Thread on how relays work: they are simple servers that store and forward signed events. They can't forge your notes, because only your key can sign them. #introductions\",\"pubkey\":\"e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc\",\"id\":\"91a74c40d508831576cca43d0d0c58793bb60df736783b40ddfbc68deed5ab06\",\"sig\":\"732003f459d8a4aaa5e533334965f07e9453780f4eea1e0efd3fcf0a1270beb27147bea54378ca37346d3af85a58194382dde38ae44fda446ed8b951ea33c55b\"}",
+      "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+      "id": "feff1b40bc0296d51dcade2d3031bb1a436defcd786ebb7ad50df4032a15c6dc",
+      "sig": "8be13be4e14941bc7a2936a1a0d74c458a2c4e89f7a690248e0727366c638eb23af4f3936b0f1d8f138b8ddaeea8d9cbe0c20ee373e5a8b45527f693953c80ee"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735681500,
+      "tags": [
+        [
+          "e",
+          "6f47e4a1cf4f3150c04a95555549f9f6b3039baf67788587c64e62a8c2edc3c3",
+          "wss://relay.gamma.example",
+          "root",
+          "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812"
+        ],
+        [
+          "p",
+          "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+          "wss://relay.gamma.example"
+        ],
+        [
+          "p",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "p",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+          "wss://relay.beta.example"
+        ]
+      ],
+      "content": "Welcome Grace! 💜 Try following nostr:npub1cut4qqr7gfzruh9gc84qpw476n5v0z5uk3wadkehx0v33c94th4sp5w043 for art and nostr:npub15uug8yf2frp428q4fr752jrk64m3y6npca44fpkgq7l7ckrfuxpsj5l3x6 for good questions.",
+      "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+      "id": "31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301",
+      "sig": "c73eda5aa524d3db194c50725897e15b5aed57dfcb6995c4b59c9e6af702aef259b340682323770ee724f2ef9f9163fadb06912572d6d93ec5d247860c35c174"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735680600,
+      "tags": [
+        [
+          "t",
+          "introductions"
+        ],
+        [
+          "t",
+          "newhere"
+        ]
+      ],
+      "content": "Hello world! My first note ever. Who should I follow? #introductions #newhere",
+      "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+      "id": "6f47e4a1cf4f3150c04a95555549f9f6b3039baf67788587c64e62a8c2edc3c3",
+      "sig": "1a47d9a0e4c4d5fe738f070ee950ba53c9f41276179fa63f6f31a98480f243374bedd18a13ba9a3b2a26b69b1753df84068e041c3f6fa8ca01af473c96ee3baa"
+    },
+    {
+      "kind": 9735,
+      "created_at": 1735679702,
+      "tags": [
+        [
+          "p",
+          "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148"
+        ],
+        [
+          "P",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183"
+        ],
+        [
+          "bolt11",
+          "lnbc10000n1ppu9psnwvtjlzfyu4tuw7hearjqm66e2a996z5nx7sna9yt64kvez0t9vrzgn28e5"
+        ],
+        [
+          "description",
+          "{\"kind\":9734,\"created_at\":1735679700,\"tags\":[[\"relays\",\"wss://relay.alpha.example\"],[\"amount\",\"1000000\"],[\"p\",\"1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148\"]],\"content\":\"For the relay bills\",\"pubkey\":\"a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183\",\"id\":\"5c43c02bbb95c9a62adab3acf095f26f615c910ce7cdff530cb182998884b40c\",\"sig\":\"15f1445875d10f19829d516d4d486f7c347da170c0fcec3cf848fbc712c9e177e294f6d2beb6f6f004a63cba664e42ef9d173b48d2f5fb845dd23fa063670089\"}"
+        ],
+        [
+          "preimage",
+          "4acc32ab68a5a0c9e7ad2b7a767f05583e99ebd672d3f4dd89122d8304d051b5"
+        ]
+      ],
+      "content": "",
+      "pubkey": "8939d414eef0e0acafc0713ef53602160e5271170479e2a9a1b26773e2bb040b",
+      "id": "74681da380b29f60b0b24a078a07d539fb45b1d9f5f5f79851277d1b3f456572",
+      "sig": "f6555948e793d065ffb71c94ac18461227105a3cb07fc9408a4eb81fb272f56c70701e51ef8b4c4e87b81b258104b3e5964dc1e487615fb0dc9e876dec510f53"
+    },
+    {
+      "kind": 9734,
+      "created_at": 1735679700,
+      "tags": [
+        [
+          "relays",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "amount",
+          "1000000"
+        ],
+        [
+          "p",
+          "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148"
+        ]
+      ],
+      "content": "For the relay bills",
+      "pubkey": "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+      "id": "5c43c02bbb95c9a62adab3acf095f26f615c910ce7cdff530cb182998884b40c",
+      "sig": "15f1445875d10f19829d516d4d486f7c347da170c0fcec3cf848fbc712c9e177e294f6d2beb6f6f004a63cba664e42ef9d173b48d2f5fb845dd23fa063670089"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735678800,
+      "tags": [
+        [
+          "e",
+          "34be34fe31acbe35ce4ebaf2f237faafc64bb0d98f655d8b459f2f53f0de017c",
+          "wss://relay.delta.example",
+          "root",
+          "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148"
+        ],
+        [
+          "e",
+          "37313ae0d5c983e7d908ccaf0834690809e442f28e3b5089f3dc56fbb440c5a5",
+          "wss://relay.alpha.example",
+          "reply",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb"
+        ],
+        [
+          "p",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+          "wss://relay.alpha.example"
+        ]
+      ],
+      "content": "Less than you'd think: mostly small JSON events. Images live elsewhere, relays only store links.",
+      "pubkey": "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148",
+      "id": "9087ae03c891833feb8494694913d30afa64b8a2f6130e91ba7fb01688a16554",
+      "sig": "96c1f189e48ee017fd08d50c6e734fcd62ac75af4f828a9c64e0e5e01b27c70558fbb69ac48921b703a5df7c298951c99b366f6c0c4d202c4896c47ed14a40d1"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735677000,
+      "tags": [
+        [
+          "e",
+          "34be34fe31acbe35ce4ebaf2f237faafc64bb0d98f655d8b459f2f53f0de017c",
+          "wss://relay.delta.example",
+          "root",
+          "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148"
+        ],
+        [
+          "p",
+          "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148",
+          "wss://relay.delta.example"
+        ]
+      ],
+      "content": "How much bandwidth does a small relay use, nostr:npub1rspgkw087v3gg39nyc0ykuvwl2f2j9rspp45fjd89m6n2l5hq9yqyz4r28?",
+      "pubkey": "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+      "id": "37313ae0d5c983e7d908ccaf0834690809e442f28e3b5089f3dc56fbb440c5a5",
+      "sig": "ebf9eac3c5a707b07e2e815efad138f5016373ab8a237f6d64e6202a5f6821913a9d4aef26f29930ca7e9f50fc40852f06234f8738b702afa5ab9c503e054590"
+    },
+    {
+      "kind": 7,
+      "created_at": 1735676100,
+      "tags": [
+        [
+          "e",
+          "34be34fe31acbe35ce4ebaf2f237faafc64bb0d98f655d8b459f2f53f0de017c",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "p",
+          "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148"
+        ],
+        [
+          "k",
+          "1"
+        ]
+      ],
+      "content": "+",
+      "pubkey": "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8",
+      "id": "d8934f56ed4eddf19eb3d7951ff7bb448e25ebf1c08630d0c1f47605cec938d2",
+      "sig": "0bde82d0156e159adf7e62969872962793f1a2e8cf046694cbe81a89880387c8f6bd142dfec699a7a41321a8d1ded872a35a605637f8b8797aca6f8c66c4ce03"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735675200,
+      "tags": [
+        [
+          "t",
+          "relays"
+        ],
+        [
+          "t",
+          "nostr"
+        ]
+      ],
+      "content": "relay.delta.example is live: paid, members-only writes, zero spam so far. AMA about running a relay! #relays #nostr",
+      "pubkey": "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148",
+      "id": "34be34fe31acbe35ce4ebaf2f237faafc64bb0d98f655d8b459f2f53f0de017c",
+      "sig": "4da525ac7b792ad5e85f702b6b72de20af70c1de8ee640dbdf45145465a6589728909d5b8ab187b50de23a9afdc0c1a36386134f8278c54c05f12d2a7ee54f36"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735671600,
+      "tags": [
+        [
+          "e",
+          "91a74c40d508831576cca43d0d0c58793bb60df736783b40ddfbc68deed5ab06",
+          "wss://relay.alpha.example",
+          "root",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ],
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "t",
+          "photography"
+        ]
+      ],
+      "content": "Great thread. Saving it for my film-camera friends who keep asking what Nostr is. #photography",
+      "pubkey": "9445888d3235f73f8b627df1fb1d498f2eb3fa76337679c1176965a73d3b68b4",
+      "id": "c5a5ac459c05a31ed65e13617cc09bcf049a79316eca0203d247ab40400776af",
+      "sig": "a8a6c8d0d55bad5a3c84aab5b2cee75fc0cae6ede199f60ef2c83ef9d89be804080d754698a1c41799b4c8144e0e0df9622c4df8eb3392a7a6b91212bc540d1d"
+    },
+    {
+      "kind": 7,
+      "created_at": 1735671300,
+      "tags": [
+        [
+          "e",
+          "91a74c40d508831576cca43d0d0c58793bb60df736783b40ddfbc68deed5ab06",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ],
+        [
+          "k",
+          "1"
+        ]
+      ],
+      "content": "🤙",
+      "pubkey": "9445888d3235f73f8b627df1fb1d498f2eb3fa76337679c1176965a73d3b68b4",
+      "id": "0f534dfe2d319a41ec9694c5f8cf4710341865f86d01e91405197c33adcd097f",
+      "sig": "b42997112bf800e439dbaa7979e75ee9408bc02953700da61ae12ce78b3894737423353c8e363a82b50d6eead53f7835bd397b7f2ffc88eedc7498375414856a"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735670400,
+      "tags": [
+        [
+          "e",
+          "91a74c40d508831576cca43d0d0c58793bb60df736783b40ddfbc68deed5ab06",
+          "wss://relay.alpha.example",
+          "root",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ],
+        [
+          "e",
+          "d7f62aebaf95214e4260a13d058a660655ff76dacff54dcc0481d091e2103479",
+          "wss://relay.beta.example",
+          "reply",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183"
+        ],
+        [
+          "p",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+          "wss://relay.beta.example"
+        ]
+      ],
+      "content": "Exactly, Bob! Publish to a few relays and no single server can make you disappear.",
+      "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+      "id": "15cffdead80167df7f424161663d3ac3fbd30723303ba0e9a97ef16d3e405911",
+      "sig": "8b7acc06d8b2ecc42fafd9286ece10fb175491e6d839b224b81b2d6eddb8c467d969f0b46c13de1c9a8371686105c9ea8e09180606c1cef922cf221887f49e1d"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735669200,
+      "tags": [
+        [
+          "e",
+          "91a74c40d508831576cca43d0d0c58793bb60df736783b40ddfbc68deed5ab06",
+          "wss://relay.alpha.example",
+          "root",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ],
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+          "wss://relay.alpha.example"
+        ]
+      ],
+      "content": "nostr:npub1u4gvd6fgpre4swpt0wxpgdzngn67lx3fj55cxnguym2hk6kwgnxqta308g so if one relay goes down, my notes still live on the others? 🤯",
+      "pubkey": "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+      "id": "d7f62aebaf95214e4260a13d058a660655ff76dacff54dcc0481d091e2103479",
+      "sig": "103a58c23696a3c4fbbbee285034c31fc59c8e5c12eec9b9689a02a7ba9db6697795498c3ba39f1a264500bdc84373f7c3791a025aa6d5e269cfe2262604bae2"
+    },
+    {
+      "kind": 7,
+      "created_at": 1735668600,
+      "tags": [
+        [
+          "e",
+          "91a74c40d508831576cca43d0d0c58793bb60df736783b40ddfbc68deed5ab06",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ],
+        [
+          "k",
+          "1"
+        ]
+      ],
+      "content": "+",
+      "pubkey": "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+      "id": "1cbf511dc7ba91cbc839c415aa30c1f32a7430040fe2e51eb2b00efd676d5fd6",
+      "sig": "df0a4d262c1dce099859557f5847905f666e7e666ba6e4482d462ec7446bdb61580fffcd8daa2bc613ccb9cd4510479d9edf1de598143fad0985869e7373a059"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735668000,
+      "tags": [
+        [
+          "t",
+          "nostr"
+        ],
+        [
+          "t",
+          "introductions"
+        ]
+      ],
+      "content": "GM #nostr! Thread on how relays work: they are simple servers that store and forward signed events. They can't forge your notes, because only your key can sign them. #introductions",
+      "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+      "id": "91a74c40d508831576cca43d0d0c58793bb60df736783b40ddfbc68deed5ab06",
+      "sig": "732003f459d8a4aaa5e533334965f07e9453780f4eea1e0efd3fcf0a1270beb27147bea54378ca37346d3af85a58194382dde38ae44fda446ed8b951ea33c55b"
+    },
+    {
+      "kind": 1,
+      "created_at": 1735664400,
+      "tags": [
+        [
+          "q",
+          "30023:922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8:protocols-not-platforms",
+          "wss://relay.beta.example"
+        ],
+        [
+          "t",
+          "essay"
+        ]
+      ],
+      "content": "New essay: \"Protocols, not platforms\" nostr:naddr1qqthqun0w3hkxmmvwvkkumm594cxcct5vehhymtnqyv8wumn8ghj7un9d3shjtnzv46xztn90psk6urvv5pzpy3wgw6s4mqk450f68kxs4xqtzqk629egjhzl6daec7eysdl4tacqvzqqqr4guhvmfqn #essay",
+      "pubkey": "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8",
+      "id": "493eda901c79256aa415cc9e23a76bf6455f82a8937e2ef29ae7a2a2f3d3b1aa",
+      "sig": "82f956ea99eab9b2a00aa3cbc3e3da96d1c3abeec590b9178e8cc0b4065b5f2a14151626f0268f4da16f1c4e0dafc24f9d8cd3e564fbf7877b000b0805305d8a"
+    },
+    {
+      "kind": 30023,
+      "created_at": 1735660800,
+      "tags": [
+        [
+          "d",
+          "protocols-not-platforms"
+        ],
+        [
+          "title",
+          "Protocols, not platforms"
+        ],
+        [
+          "summary",
+          "Why open protocols outlive the apps built on them."
+        ],
+        [
+          "published_at",
+          "1735516800"
+        ],
+        [
+          "t",
+          "essay"
+        ],
+        [
+          "t",
+          "nostr"
+        ]
+      ],
+      "content": "# Protocols, not platforms\n\nEmail outlived every email company. The web outlived every browser war.\n\nNostr is a bet that social media can work the same way: **your keys, your followers, any app**.\n\n## What changes\n\n- You can switch clients without losing anyone.\n- Relays compete on service, not on lock-in.\n- Moderation becomes a choice, not a verdict.",
+      "pubkey": "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8",
+      "id": "a1bd51f63b58261b774eb882ba099a2bec2f7021f73a0fea48025091cfe40f0f",
+      "sig": "e5d8142cc3ca9cf77d16f8a21c2068f5e20f9c701091ea9754bef328ddb100dfec5e6993cb6b97d6161493a541c6fed5be3fcac20327da685e1ac548adf2a3bc"
+    },
+    {
+      "kind": 1059,
+      "created_at": 1735642142,
+      "tags": [
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ]
+      ],
+      "content": "AmdcaG5U7Ord+GCLomL610TP51TRZfIcKRnZHdKISaJTeDa03b0RE9+gAAPgafMXRkSq53pfiWeXOxTW5Ri3RVg5xCrpPgu+oco8DeC+Pg0eNJpVqoJKSQEEaymisH25MijkxeeWnZGRiGm/dS5NWMXYfj7foUocQQ2nSUe/rZIckC4rpwMO8G/iCLfoPhA3x6g6ZzzyWKlO7l6+2yFE+qZs9lIXCFSUmVD+uaXWm6Lkw94HupiPJCSRPjuwyNnQNkDKRhTe9UuDTm6GuwGQoBNVtty/0unSrOkoIyfgpqhIXpFL3fGqeSEUZsnSbGm+Bb/olyyDQ3xLDZOQ4w1XFJpgVhwW7j7ae5xQ6z/9pOb+1QjoS7E2GiPYVC9OGKDn0Fi7F9zJLTJ7vT8bTXyulASeiVbH7g1grg7Y/7Wt7rHIWCFa9WQenL74TkuxbpxgHJm71U/tS/XAGW5SslfqHrB4RPbuFDxLk8fzQYrMfgmgzRp5gl5HLk07MMM0zDrVoHEcTJ/aqoTT83vdnNHQ+pusOdDOY3VaOKU/so2ICrhd7BlqhtqjRuPna9PBCy52NiruvjN1079Sn4MXLpUf5YzACGyKyqZmafYS5VatUd+s80BXA/GcuTVyS13Gm00ynWg6GWCNbjQo3jMc61BFqHFznpm+735B/sD2+UuvsrMwTLx4IMSrum2M7fwtYSMtAwz0kZRv97qEMXq55WVlPUuMYb+8QiHCsX8PvlcS/nlQFTTZBSEQj7yq8cFMMrxWXXN1raQ+Z4Rz3xXlklVfiWwAUWdepy18TSKzAnVZCqW8t7Ll2FZyXCj2vqO6N308v+EwqjbyqRxHWUATKbUqIjWHZC2h01+F/GyeHUjh+73ERSOAmUODcMFr6QrHT7oVlLLAP84MP7KUxA078a8Xy0daHWtHHRfELcWV0IezuQ2FoEFr8PoS+7bPJ1oda1No/fUtIErnBEHYEY12njNpODsUwB4CYiPl02EAph0wLw4oojI6BfMgu4IHxIL5QEwmOr4ReLugm29Zx+8LElaxXxZ5+Z+XAyYUiaKl1KcZdNHoJNQdtb+roWqGyCSz2TU989C6uYuVhj3cWkauQ/OKWEgJicubT/axMLVhiV6DKTwyXURgNgCaN415zuLJLHniy/36wvkirTiNquvpp1EWWf7QBMAVJNy7rQo2S5Sgi8B7OMyZ/xOiuDHL3uT0PZAx/2wkwauZIZRbQpLjohbT83QpjP8fCJPjK62m8C6bQYpsQNyvQVmSgn73S4ZFWK3kP1hl5bhJBACmX/S8P6c7Gbgzum/fSdroqRAIfW/sOXu9S2o0sl0BiLWYeiDQlL88EcKXt2wTRjvWFLDiTICnuEwi49JW/1IkYV6O+uhEvRED5LcWOXbFOUROxCfFJBFOAOyclxv7CgxrL6s8bT/qW0y1IoaENGhREt1oge6xqAwkO3J54ZiKH/BAGO09T76GNLRuyn7LUOqdH/Ijaw2Z8qaHDFQiC983FUgXxwr47DWTEVfIHzI8rblTRRtQ0TELUDba4dZU5SpErsu3xsCA4+e2K2HGL/RAPKZW+CHFdFdpvaB8a/8ljOG6d9+SKGtdALS+tu31qss8PovETWb2V/uL/XJvk7Tvjw6XAJ97f6duWho+2gI6wkL6/fx1dy9qqIVoBPwEkj0hhzqaSGfOFHFQ5g/pSIAG1kmAtCvXppExDoPlnDsdK1ciyXXZhnfIpV7RQUo5A3OLuiVlDLP6zm/pScZh7HIev4lh1fRWLDZt/QvP/eCnVJixGa2SlLnJrd5y",
+      "pubkey": "9875a9450cd08ef91ad725ab84d8906e048165aee38e88a6ac92f51fbf4c66c5",
+      "id": "8b93cbb23595512258f261e2415ad3319835e041f877b9c15e673d6876b5bf5c",
+      "sig": "f7e1e7e7d0614cfae9a241829f58d66519eec2914dfd43c611d308ec4bd3a41653558cbb8ca0880f45bf135eaa4a6835af6999ec79ab1799e581f0c152195d4f"
+    },
+    {
+      "kind": 1059,
+      "created_at": 1735609084,
+      "tags": [
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ]
+      ],
+      "content": "AjTm/1eEX3dzSPi839fGOoTsKZsLVrMuPSzxJocnpAUtHMvw0jZfLW9RuHGu6ggBxiR2UoWzR+PJGLlvHkKhVmFRTB121ZBqw4t+GfSEqTg80wyYgrCUbfggiHlwkc6DL4ybMlzldDk03fal+xlLGXKShKj66vQK0lkFvGwi2+GUT6gDzW3d99IKQsPFgyRIYjBkiG7L8w/Z/nOdwFUctZM7ppfAFJjnmHcgX+6STlmh/MZg3Eq/4Cb8uofmPmkn657XIs92WLIcMAH8EV8T7zNOZMjKN+KDx7lsokXJtZFdf11QEpkCi2hwHGWwbju+NO5Z/E3fb5zyRv6sq8H774QXNbnhWqor2X8dSWRZAxk/+gYy8PZBUUiVJPYjQ18MQU0JVjGWDqi5DwwyDw2sQSBwJo9wQMheZWNUwyoSdBJam7+F0MhwhZa82lSqtV2FMCsdgvtcrv9biUygon9cosOGtqKO4SMruGelq0F+GlpPH0m5reVlt5dyM1lCJvKjjaahwtc96PSa7dZLexDLI/h/eWzbCBsGZ2zNGDIs2HQ3AFM3FxoQeW1a07TxrwSJUrgWozXQpNsx4SgPoE2tgq9hIy2NArxyOVlq38z+Zm+FmX+vEZhPmm+3/67OBHRr40NPJZyqrZQDofMr4zgldffIX8MQcWD8QPudvjeM0NuRzK4Kds8yF5e1vmFLsNJfeUeCHL/0KjsUz9Xt0MKDZ58KUAZyTN9S/1njI3tLLqrgBuWm6LLqzf/c0p6J36L5XnqdjtzxOU+3SdkZnhhba1cWwoG/WLzivY/+A/Nn1iaVo3WSpALahv2KuiFscDpjhrNsaf0/SrATaZTC0qyC0pHIKkoN8EE+fCG4GBg0V6lhj7804p2GnmFSVnV06HeFNVSeSJxA2Fdslm2rJq5Mjl0a2v+62uqB8AcmHWRzWsshVIFC17vl+wpCFiRkLoYjOMfcIB28TNFgamxAvVH15Ly0f+0ZNhk14GX7u/+PltMsWUrZTV8Exc4iaJuX/hstbZxWSv8rowrGOY/Jqj7QNtMEwKqRmtQck9hecNKqziLmsK9jbEns7E1/jpiKg4yWsdHYHv08jc0RD/BFkp38a5fjfBZk2txyEiRo68kR50lkeO5rE8juC9/IX/I0fVy88QXpyNRtAtb+4Nic+ai1nx/jcpOTzs2kNWlYyld7nFWeM/Spd58MOKMVfCOkNJdlnshvXwwqySPcHPl0YtcH8lXHHfOpyeIm0+VvnGmy2rwvp5DDDRsG639BIZK4WStDv4w0hz6jeX97bXie7Kd9G7q9pYRhSFNEPWBRsk76EyIURmcZgnuqhnKi8YYbcB2A//zZTy9ay/wXRpzfKIpDoymWGAE0o2E6ElE/TEtjjujHnptYX9l8STThumrJXKpIk8Pwu3VWTHr+vQM35t1aX1RB8hHDKtVnBaGuRsDp5E6EjZA=",
+      "pubkey": "cabf8f1e7092ea3b9aee516baba74228aef00e638e61a537a0204d1bcfa6e6f1",
+      "id": "772cad7554456948de526294a88db7669bc54431d7ac50294e95b90148af650c",
+      "sig": "3c23c7b875ace872b7cf00a4e7443e4f51d52d246e050c98c8223305d4d929ef74fa0f5d36e75487ed79072ba8ad14d41d1b534ce569aeb444d289affaa3aa34"
+    },
+    {
+      "kind": 30023,
+      "created_at": 1735603200,
+      "tags": [
+        [
+          "d",
+          "relays-explained"
+        ],
+        [
+          "title",
+          "Relays, explained"
+        ],
+        [
+          "summary",
+          "What a relay is, what it isn't, and how to pick a few."
+        ],
+        [
+          "published_at",
+          "1735516800"
+        ],
+        [
+          "t",
+          "relays"
+        ],
+        [
+          "t",
+          "nostr"
+        ]
+      ],
+      "content": "# Relays, explained\n\nA relay is a WebSocket server that accepts signed events and answers subscriptions.\n\nIt **cannot** change your notes: the signature would break.\n\nPick a couple of big relays and one small one you trust.",
+      "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+      "id": "ec3e76895bf71feea7548ea05fd586b83ef2da761062def56efd309fed6191be",
+      "sig": "2f67875d63e686932717cfae4732767df7275118cff3c961d94c74e1d23cb55e712616dfd58c4111c7ba8695cd2c9217263383fe580351e20b48049789e3e9fd"
+    },
+    {
+      "kind": 1059,
+      "created_at": 1735573471,
+      "tags": [
+        [
+          "p",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183"
+        ]
+      ],
+      "content": "AggH1Q2rgRPnaBZBl9/WtXAqEmMIoFZwSIn19RsqMfwer9Nzkfnf8to0f6MUf7XBEid1ZkgF+Adb5ThpgO2fJl0xQB/YsMz8oXJ258WUBZlezhc8RhArYqAAnyZba0mEFZprHMD4RvIrbu6eD5OZWpP1+pbRhMRQK5o/e06UOUf7JI0RuaAKms4HUBeQk+xtvjWNsFVSnhe3YiYPtyBC7dx65mn1nvGh2XqVXPerunBDxpB0jWAbkTQ8kdxKFgHtIPj8pIUIU1t8r3b+JD+pbDpjN5Q1XtGQJu/HTfJcaSmnGBbVgKw21NjfqRYujzZC1Xvgbp48l0xszXC86SlDPXalT6HkZOPrNZ/Z9QTOv4LxXDPtDt6JvqBJBMzG97etzUWGBUd5q1rVMooM2GDcDbfEnQt0js9yGUc9XhDayTsoqWMwPN/7cfVDRQ8y54FXn8V3cm9AjF5vRCmfP8vxgpR4Eq4osMZ7gRsHJRTw+vG9VIsQQBMkm74OSzOszgVeo00HHRlUPvNGYyQjnQH6u/4kSNOz4k9KPRhRRl3eXBfgE3vafkg9H7pqG0Sen1pT3ZGqHUsJW9PkvMQj4ou/A3/HVbiw5/J23c8PRR3IJ2F+MtX11gJ29IAsfhCiJ+T3inlpwadL/LBt+XVTef90K3BmkprPmRl6JgrDwgFLQ/3HDZF3Gq0nJPk2JNfUOcLzweAsy8z5MJrjGvIhLUJtjODvivYFX5mvPJZH07LYyheVvC9B89+gKyP2+3+3dD2I0syO1MJr3iSPj0M4c0koLns0BhzNQoeWexxgfiUwhvulvMfn4RRReA8FLaR+HMJ5ethOfRX706qVK7u06lsy1rTxX0+gdmNysfNTuKUWeV28WzRrF2NFzCaMH8OjrNmXv9K8isXnIHJcNHcpjdNs7EfUapvFCjy87ctawcHQntoQ/D8k5NmaMVTrYv+1ZkLlUIm06cjQqpwwCgo6wWk/57yhQfCQVaz5BTQGsVTnGykPsjfu/LGsx+2x9ais4rQj0vp0YPf9kA842C/vw1ZieG/ErxrAPoIIaSsj7MaAqCRIss9iuBU5FBdimE2KWCa/N08+oehvNyHd3cFq1fUZ0YclxhkprqK9gScorpLbMGAWWnW0Z1tA2LlSbR6UoXsKQwCcyDghGa8DKHl3UnRjymJLOhCVzkQb+bCagGjFDjc2RiPy6JwaOBmzvk0lyXqkmZbdEcDU9CfjuRudXh7AztSQR+Dz6t2Gw0jtt5fTu4Slt/qWnG7SSHx5M/XU0ApFRwCJ79sKNT2h/KJGxjRctiBnxH19T06iFTHYrOCUdc6Hchp8u3iaqdAb1v0o5gucugS0mDLZ5dNiiweDlLHDDnP2N6BBT/0pZYzOZ4cyxGxcQ5PXzsykY5X/fl+2Eln6ilLKQDuha/Dd0CPxsdLDCgylCTgTS3nbI0Tb7fmabJr7ciY=",
+      "pubkey": "26d011700799dd6f330ae8007ea3f84f490e995ec6be12579c78d4f1a7a0897d",
+      "id": "52cabbae3279fabcfbc38e6bab21c5d52743866f80d6d20d3fe5fd8a3f802159",
+      "sig": "e447376d55deff088ec55d41dbd54119ae83c8a9b176dc96e998174ec935fbd0e20873fbe4bfee30a41c81e631166ca466685a2428dd995e440859918e04a000"
+    },
+    {
+      "kind": 1059,
+      "created_at": 1735543413,
+      "tags": [
+        [
+          "p",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb"
+        ]
+      ],
+      "content": "AtdNAWE9fseKuxv3QFYj6MSqsUPP3jFH1kvg3TdFfpqEYM2lXICioKP5SPwB/dXbiqSTvw2t4D0HiP3YPdgGM3K0FUBvjNe+JbY9NDBr6oV+sdqZ6T5nNDpETtb2TVUAjh7DgsL6deD3yJSeEKHkbwoHEdNLHZyjHNenFHtXed7SO88bfVzvzWtZbYKogK2cj+tPL+Sxm2x4CyP4mL8BFLElTjLWJy2Iy4mL6ZdMX3piuzyZ7g4NAV95jeHXOcOflEyBXbn6CbTbYB5FhBglthLvSWt9JCTbw+K8hYMC02MkPDiG0bZ60NaG/ZVHFjC6Ls8U6cSkP2W3v6kfVKuDR/EiJVFCL3vAiSUiTRakIVdCXdytU1gPO6/uGGjpilFTLOZNJdhHVjcixJ+gsALCrO/fXTAIUr69+HSHXLxv7OZmrNKggJ6OrbNg9R6Yhxkk3jRr/ynIrT3ne2toFr1nqtqExlfoVIOAJvhQGSQU9Dj3xHnXliTnZztQuhLivBkjbramtuS1ub5BHz1F9/SzWdhk3e3yG5UEKJk18qLkNVT8ZDHY1JpM6BLHSjh3Adau+1mkbMQCd87GHJ8ccWK2A3pMmaR+AbdQVwoKUt887VAmoix0wRfodm6kNmF4mmXRzJW8uTeqpDTFS8uSr7LEEwJA97NkpblTimKR4IZP+Ul9BqBoE+dwdtmmelO/V8ckPKT6OefbzmuPF0BRixGwTuJwMeu0ePyxs7dxmBFaUO17L8evk47gqd01PbWpCTufHtKE0TLb9mo2Yy/ttJtUqJfM404weHtBppqG53fJcEUVSDprhiXDxA/W1RIbptt7bUB+xAI8e2RGABAhpDdSNXJzBRlH1sHBVH+TiHPbknH3UthWAbfL0DE/nStzHcZiK+s1ioevonbeznTFhl8apbgebW52STiQt2xLY8TihqSnDuSp71wdAt1cUWs3Emvheyv3dD7+0s3eB30eVuS9eJil2YTbWO75lqtZmc8MA1ISzUNOgFTB2OmjOjgnwk4ylyI3b4q3JXmRWhhZgXZ1xgajPsKWJPM8Cf5fwZ671/ZkZppzb7uS7h7iYh7I7Z1lP8Cv9r5LH0KoHWcf//7+R5w2rC1oDfQYwP2XZMsBUmd6kIXpeNUYJGO35JDkreXc8pj01Od22ZHhCi8U0y3LJh8kXs7EpJbv1Kr8NYliKOp8Ie9AAek4ptjcn3HhloPUlNJixMQheOyBI7dI9rtXLBCVLKLd9Z/wMeiS44NFi8e2EUKbfPgTD10BOyyir55nl9MaK4Xx4XRDVITk+6OaOLrXe/9mq8oSvaieX8DTnZNMDolKUGgBphtqBlGQkdb2lFBwqiwEfcmBx8AB5sN7xwQDjDKA4vTF8I4RJXjHm6+OpqOiSMG9qwrok6msCUQyL8UE+dMjKtHj2zb58p1ZUsvJ+YN90igTuK1npZTHwSo9bW4=",
+      "pubkey": "92c1ef2ef3a285644ba21a6969e857e59fd753a2a8ae80c2086c3fbb13105e7c",
+      "id": "6b0854fb3f9758187c149fd8371a76e2cab81d07cd0023015508163da784fa00",
+      "sig": "ce0f55c9e231a04ffa96c764191d2091cc241a5f7b787fedcbc5db6bce65f0a08e4775c26f394b43f826542f90b7a258dc983f1cfe6fef8843bb885f18c6c3a6"
+    },
+    {
+      "kind": 30023,
+      "created_at": 1735516800,
+      "tags": [
+        [
+          "d",
+          "protocols-not-platforms"
+        ],
+        [
+          "title",
+          "Protocols, not platforms"
+        ],
+        [
+          "summary",
+          "Why open protocols outlive the apps built on them."
+        ],
+        [
+          "published_at",
+          "1735516800"
+        ],
+        [
+          "t",
+          "essay"
+        ],
+        [
+          "t",
+          "nostr"
+        ]
+      ],
+      "content": "# Protocols, not platforms\n\nEmail outlived every email company. The web outlived every browser war.\n\nNostr is a bet that social media can work the same way.",
+      "pubkey": "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8",
+      "id": "9ebe7dca0ef646d4bfd72ab1e3d7ffd0b52d539c316e3a4f76cee73185191215",
+      "sig": "5187f2021e4c41b8ef7a1f55a1a43859763667b2a6bcae18a697c2f3ec3efe4dd29d3571aa660898d3d23b3a72882d5fe24afbf9c0e9d882a3bae5800dea24e1"
+    },
+    {
+      "kind": 3,
+      "created_at": 1735430400,
+      "tags": [
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+          "wss://relay.alpha.example",
+          "alice"
+        ]
+      ],
+      "content": "",
+      "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+      "id": "29114e92819d014d9803d8dc204c07258cf69e4e495d505df099d06f9967a5f7",
+      "sig": "6e9d8fc0f6b5e3d8378001e9e453b770a8ab34094b47dd23d27752b0c3e7506984f4208eccc1153a35cb9d2d1e9d0fb32af9ceb4a2e8497836de54161220d5a3"
+    },
+    {
+      "kind": 3,
+      "created_at": 1733979600,
+      "tags": [
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+          "wss://relay.alpha.example",
+          "alice"
+        ],
+        [
+          "p",
+          "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148",
+          "wss://relay.delta.example",
+          "dave"
+        ],
+        [
+          "p",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+          "wss://relay.alpha.example",
+          "erin"
+        ]
+      ],
+      "content": "",
+      "pubkey": "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8",
+      "id": "365c69513efb496de66611cbc0f55ca92ca541f3d9dbc5a83cff8c462a7eeb7f",
+      "sig": "7ab2c6bbc8b61d63cb8b119b98b3c43882ae835c9375085046205716b5f8baf5b6d61bd8f25e6281c30bb6c8dc6c700c050f4ac5c3aa7eaa74dcd62c1ea7d5f2"
+    },
+    {
+      "kind": 3,
+      "created_at": 1733976000,
+      "tags": [
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+          "wss://relay.alpha.example",
+          "alice"
+        ],
+        [
+          "p",
+          "9445888d3235f73f8b627df1fb1d498f2eb3fa76337679c1176965a73d3b68b4",
+          "wss://relay.gamma.example",
+          "carol"
+        ],
+        [
+          "p",
+          "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8",
+          "wss://relay.beta.example",
+          "frank"
+        ],
+        [
+          "p",
+          "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+          "wss://relay.gamma.example",
+          "grace"
+        ]
+      ],
+      "content": "",
+      "pubkey": "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+      "id": "be712098fff2b621beb94ba9514ba2331dedb02e970031320e9c0650e0930c13",
+      "sig": "a165daabd3e9294f5e53ab5b04d5b9fee864a0005e3a6c17a14c0071fd51da76504c376646aa714fc134666896afd26d51f6e4030d8f1476eab1cdcd480fc2cd"
+    },
+    {
+      "kind": 3,
+      "created_at": 1733972400,
+      "tags": [
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+          "wss://relay.alpha.example",
+          "alice"
+        ],
+        [
+          "p",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+          "wss://relay.beta.example",
+          "bob"
+        ],
+        [
+          "p",
+          "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8",
+          "wss://relay.beta.example",
+          "frank"
+        ]
+      ],
+      "content": "",
+      "pubkey": "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148",
+      "id": "e4e796b2d019afd5008a4f18c915f283f101488b489fd6eff13a75824d51e9ae",
+      "sig": "70fadcff5599bf19696fc2e9962b2a3ddfe3dc4e3d45956946c7f602e3d129a76f0278bd6e6bddfcba830bd5841e7db5d87ded07a0534e7ae205889fe4611c69"
+    },
+    {
+      "kind": 3,
+      "created_at": 1733968800,
+      "tags": [
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+          "wss://relay.alpha.example",
+          "alice"
+        ],
+        [
+          "p",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+          "wss://relay.beta.example",
+          "bob"
+        ],
+        [
+          "p",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+          "wss://relay.alpha.example",
+          "erin"
+        ],
+        [
+          "p",
+          "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+          "wss://relay.gamma.example",
+          "grace"
+        ]
+      ],
+      "content": "",
+      "pubkey": "9445888d3235f73f8b627df1fb1d498f2eb3fa76337679c1176965a73d3b68b4",
+      "id": "1bb25bc701c59fc508593b8571c2f5a2cb62fd31bd60589a9b3ab1a0d9fd9beb",
+      "sig": "d63dfcf52deb66e8a3cd619c1273ba0d494c80b70b472d66deec033602d35058df45d4859af106dbf45c4926a54ad4c031eb3a7fa6fa853d26199525ea6f9f53"
+    },
+    {
+      "kind": 3,
+      "created_at": 1733965200,
+      "tags": [
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+          "wss://relay.alpha.example",
+          "alice"
+        ],
+        [
+          "p",
+          "9445888d3235f73f8b627df1fb1d498f2eb3fa76337679c1176965a73d3b68b4",
+          "wss://relay.gamma.example",
+          "carol"
+        ],
+        [
+          "p",
+          "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148",
+          "wss://relay.delta.example",
+          "dave"
+        ]
+      ],
+      "content": "",
+      "pubkey": "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+      "id": "145cc062acdff1121faa52b443b2c186511ead44f5cde7deee71fac1338c4db4",
+      "sig": "57cbc0d03390bab70bdb49f9c49e8050b5b48590c6a856a9432ea372b3ec042a3e4cd5f54bed94b3cce10abf3694230f0c8176194f0978f06527a199bd3d2cf4"
+    },
+    {
+      "kind": 3,
+      "created_at": 1733961600,
+      "tags": [
+        [
+          "p",
+          "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+          "wss://relay.beta.example",
+          "bob"
+        ],
+        [
+          "p",
+          "9445888d3235f73f8b627df1fb1d498f2eb3fa76337679c1176965a73d3b68b4",
+          "wss://relay.gamma.example",
+          "carol"
+        ],
+        [
+          "p",
+          "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148",
+          "wss://relay.delta.example",
+          "dave"
+        ],
+        [
+          "p",
+          "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+          "wss://relay.alpha.example",
+          "erin"
+        ],
+        [
+          "p",
+          "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8",
+          "wss://relay.beta.example",
+          "frank"
+        ]
+      ],
+      "content": "",
+      "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+      "id": "7def73a46fec7bab579d27af7f83780b27d6ec635fecc1c5bb1ab4764ba085f6",
+      "sig": "5c7e2471a8f629308d79b79b275c9f536da369b93c602366041147f4d19ca3c76fa3eff30ca8d859cca7610f0aa47c9a4c384c2e5f88c099f7f1a91b9d522ea7"
+    },
+    {
+      "kind": 10002,
+      "created_at": 1733119500,
+      "tags": [
+        [
+          "r",
+          "wss://relay.gamma.example"
+        ]
+      ],
+      "content": "",
+      "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+      "id": "8ae412dbea399ec356ef585c4d923217d39d5148ed429da9cd9a7e72d728ffd6",
+      "sig": "cb58e79660f74966764d0bb67f34c5352f4ef6a4c9ac387dffec0c33a7d33f6d8a87dda39c75468d7df92527f515747f93aa33971257816a69de30a601d6a94f"
+    },
+    {
+      "kind": 0,
+      "created_at": 1733119200,
+      "tags": [],
+      "content": "{\"name\":\"grace\",\"display_name\":\"Grace\",\"about\":\"New here! Learning Nostr and loving it.\",\"nip05\":\"grace@alpha.example\",\"lud16\":\"grace@wallet.alpha.example\"}",
+      "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+      "id": "c71ccc9a56f7060fd7d22547b5351e4d6548b3e6dbbebaa156585b61063bad57",
+      "sig": "696f81195c933edc5be9a5a48038aa88e1046e947677bfe248a0dd2bf14748a357fbc14043518c04f20bd131c666305a1618e95cc0cdce80bc6c36ee480ba7d5"
+    },
+    {
+      "kind": 10002,
+      "created_at": 1733115900,
+      "tags": [
+        [
+          "r",
+          "wss://relay.beta.example"
+        ],
+        [
+          "r",
+          "wss://relay.delta.example",
+          "write"
+        ]
+      ],
+      "content": "",
+      "pubkey": "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8",
+      "id": "c5d3e2ae33d4fd6f68c621139795d36da8a1173d9915f8b03bbc82f7360a2e41",
+      "sig": "421d0073c8326ce699db0dac6cffed7b295184b1d0365879d2e6336111d851d7eec367fe5960bc64b48c1e6428a9cf29526b09067f83add4d55964b6e1b53fab"
+    },
+    {
+      "kind": 0,
+      "created_at": 1733115600,
+      "tags": [],
+      "content": "{\"name\":\"frank\",\"display_name\":\"Frank\",\"about\":\"Journalist. Long-form essays about the open web.\",\"nip05\":\"frank@beta.example\",\"lud16\":\"frank@wallet.beta.example\"}",
+      "pubkey": "922e43b50aec16ad1e9d1ec6854c058816d28b944ae2fe9bdce3d9241bfaafb8",
+      "id": "2bff2e6376c160d1a15614617237b2b2cd614783a6acccad7c258c5023d3f157",
+      "sig": "ac9f4078b7335da17ddddb6a4333aec5c20180217d0201ab79622feb771e8ed79ac140c2e78713dd218196ac43850369bf8f7043c5358fbc2955c3cfea65601a"
+    },
+    {
+      "kind": 10002,
+      "created_at": 1733112300,
+      "tags": [
+        [
+          "r",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "r",
+          "wss://relay.gamma.example"
+        ]
+      ],
+      "content": "",
+      "pubkey": "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+      "id": "67217b2544bd077af22416579921348b514a7e08348227e881ec87562a8acaa6",
+      "sig": "5d31bb251d29f83f38b30e16a0aebb37f72e580e88ff5e8ac724a8d842c38ea21fff7336eed9253cb9858ca6543c38f85ffee6f61aa48ca43c85728420fcff7a"
+    },
+    {
+      "kind": 0,
+      "created_at": 1733112000,
+      "tags": [],
+      "content": "{\"name\":\"erin\",\"display_name\":\"Erin\",\"about\":\"Artist. Drawing one weird animal per day. Zaps keep me caffeinated.\",\"nip05\":\"erin@alpha.example\",\"lud16\":\"erin@wallet.alpha.example\"}",
+      "pubkey": "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
+      "id": "f72800a694fcb655e30b2ffad0ee5bafbcfae78849faf8a70259bac2097e349d",
+      "sig": "a3cc66599488dcd605e02a30826908434aebd379bcbb988b4484db4b4a04eee50e9402e38d48cfe863a6a9be08d6ee2088b1a1b8c70a37f8a8fba2c799ea31f0"
+    },
+    {
+      "kind": 10002,
+      "created_at": 1733108700,
+      "tags": [
+        [
+          "r",
+          "wss://relay.delta.example",
+          "write"
+        ],
+        [
+          "r",
+          "wss://relay.alpha.example"
+        ]
+      ],
+      "content": "",
+      "pubkey": "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148",
+      "id": "f78cbfab34f51ad667353e2e4206d6d047b8057f32242247d13b74c4445eff6e",
+      "sig": "4281f8e4913e4c33dcce9e794e943380d01922cd12b597c40cf431723e34e1636424d2d39f3e928d9fa4fc4363b57ac3e928c540827a50593ccb896473621b0b"
+    },
+    {
+      "kind": 0,
+      "created_at": 1733108400,
+      "tags": [],
+      "content": "{\"name\":\"dave\",\"display_name\":\"Dave\",\"about\":\"I run relay.delta.example. Ask me about relays, uptime and spam.\",\"nip05\":\"dave@beta.example\",\"lud16\":\"dave@wallet.beta.example\"}",
+      "pubkey": "1c028b39e7f3228444b3261e4b718efa92a91470086b44c9a72ef5357e970148",
+      "id": "a6aa41cc0716a491f722f3ca6c591b63d3571199aba76c99f4e2ab579ff10821",
+      "sig": "85d8c28013000bfc88ef86d777fbc7cf498a949f1458fdc082c85b9f151dc4f23690f63315f8d6b3044a89660cbef2914f93730393b45b0529e6cf88ef01d4f4"
+    },
+    {
+      "kind": 10002,
+      "created_at": 1733105100,
+      "tags": [
+        [
+          "r",
+          "wss://relay.gamma.example"
+        ],
+        [
+          "r",
+          "wss://relay.alpha.example",
+          "write"
+        ]
+      ],
+      "content": "",
+      "pubkey": "9445888d3235f73f8b627df1fb1d498f2eb3fa76337679c1176965a73d3b68b4",
+      "id": "fc52d5dcc5cdca940ebfbfaa1c6c6aac23c0743d97560eb359db52134ad50498",
+      "sig": "ce3d88def25aa48cbd5b78e4420a4b73c541ce6cbf7c91af78f4284ce28abf832fa0f9278af308d040d59cf3eff599ff9f114a92f3c786d38cbe9e8841129c5c"
+    },
+    {
+      "kind": 0,
+      "created_at": 1733104800,
+      "tags": [],
+      "content": "{\"name\":\"carol\",\"display_name\":\"Carol\",\"about\":\"Photographer. Morning walks, film cameras, long threads.\",\"nip05\":\"carol@beta.example\",\"lud16\":\"carol@wallet.beta.example\"}",
+      "pubkey": "9445888d3235f73f8b627df1fb1d498f2eb3fa76337679c1176965a73d3b68b4",
+      "id": "3eaa2bebd0f85e5e760275f5d364a2651ee2277d046781147ff2807cd65c31d2",
+      "sig": "56af200af5408f3f66acd75718819acce215b47ff4235810615732dd7faaacf760a077994fc3501bf2c1585262c2054a635aec954a0abe4ad33b2ac7b4e849c0"
+    },
+    {
+      "kind": 10002,
+      "created_at": 1733101500,
+      "tags": [
+        [
+          "r",
+          "wss://relay.beta.example"
+        ],
+        [
+          "r",
+          "wss://relay.gamma.example",
+          "read"
+        ]
+      ],
+      "content": "",
+      "pubkey": "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+      "id": "764fe61caed34cebfb570fd8471e5dfebbf9a6bd2eb242b01e61d813c8f8789c",
+      "sig": "5b2af71ff598ec67b22f538c96b2aaae4b5199f05cb873cb53d3a753a5d409337fe201e084c161ec44a59aef2020e0d494284f13f4e8ea36b869d9c888251c18"
+    },
+    {
+      "kind": 0,
+      "created_at": 1733101200,
+      "tags": [],
+      "content": "{\"name\":\"bob\",\"display_name\":\"Bob\",\"about\":\"Bitcoin farmer. Asks the questions everyone is thinking.\",\"nip05\":\"bob@beta.example\",\"lud16\":\"bob@wallet.beta.example\"}",
+      "pubkey": "a73883912a48c3551c1548fd454876d577126a61c76b5486c807bfec5869e183",
+      "id": "0a7fb4abe40b8443792b6ef6f0bf7482772e58b47a7aa9665424cf196634be48",
+      "sig": "bc3672fb4fa79268b4480bbcd7bf52055843c0c1c82850d61e671942e25f82c04657406e3a4465947a0775af6f0b595bb4c841d2742cb0f79ec4e00e7d3252b6"
+    },
+    {
+      "kind": 10002,
+      "created_at": 1733097900,
+      "tags": [
+        [
+          "r",
+          "wss://relay.alpha.example"
+        ],
+        [
+          "r",
+          "wss://relay.beta.example"
+        ]
+      ],
+      "content": "",
+      "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+      "id": "06d3275250e677105024b0f7149c6e813547779514cd7302f53b9d2440a709e0",
+      "sig": "a7d8958da7922903562bff71d15d56fa290289aaba6d049bb602f20c151f184370afe2f89540bb144b0561780ccee31cc9b3b86efb1b445cb581b111c1c27dd8"
+    },
+    {
+      "kind": 0,
+      "created_at": 1733097600,
+      "tags": [],
+      "content": "{\"name\":\"alice\",\"display_name\":\"Alice\",\"about\":\"Protocol nerd. I explain Nostr one event at a time.\",\"nip05\":\"alice@alpha.example\",\"lud16\":\"alice@wallet.alpha.example\"}",
+      "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+      "id": "47d0fbe84089ff483ca68ac848a11a961d066b6a4de605643d731050eb5d245f",
+      "sig": "73c2bc2c8c4465f5a56092980a6f74df06c7bbcab13e8915f184b1bd06be12752e9ebf64dd39eb667eb984eec7ff933250a693cf55a533d72909e6333339589f"
+    },
+    {
+      "kind": 0,
+      "created_at": 1730505600,
+      "tags": [],
+      "content": "{\"name\":\"alice\",\"display_name\":\"Alice\",\"about\":\"Just trying out this Nostr thing.\",\"nip05\":\"alice@alpha.example\",\"lud16\":\"alice@wallet.alpha.example\"}",
+      "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+      "id": "5f320c67995219be5389ff3d2d1d7126d3b82d6cb257921ce0129ec7e7454f55",
+      "sig": "86487ce553e7402f4919454d3a2350c265d838da935b417e92f23f909f80605765ec78b110a1a968cc19cd88fd0c6c7090530b36febb05ea652b21acf0d1190b"
+    }
+  ],
+  "placement": {
+    "c5d212c63ce3e84b1411c6f49e05c0069fbfd461eaa92c810a199784cfad586a": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "07a48417f1abfb029a8b70a75bb48159aaf755c37d5c788ae2b7a2b536c38179": [
+      "wss://relay.beta.example"
+    ],
+    "ea2e3eb8fe5e6cfbc202da21df546f68c6673e9a00c0aed61cffbac7aed9faf7": [
+      "wss://relay.beta.example"
+    ],
+    "52bed8e452af02e7896a329e7621925bd581a617633b7b826feb1b660684db22": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "6639e66fdcb9537f1ef90678c8f627e8d6be496613a226d28b89e6ebd687c119": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "0bcb0ea12d01adff2edf55c70e7c7289d4603e32b17f291c991fe0a143268d3b": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example",
+      "wss://relay.delta.example"
+    ],
+    "814d487f9a9591bde04009eff371facb26e82f3a41cec1bcdcdab310075053be": [
+      "wss://relay.beta.example"
+    ],
+    "3e7b4396d8f84f25d96cc02f2f299e3fe0616983f5d08d4cba94e64d60e4b0d9": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "24539a56da112a91ea3fe9d50a2035de5adae837ad34b400c356fd9698070156": [],
+    "e6286a91ee732b9f937fb14c8e63b7644b405f7739e6e0a642607523dd278406": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "015063ba58b63cca9aea80bb637891288f7353bae16778e9faa161d053902f17": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "0c0c283bedd6d38164ba053c22c3c8315cc9f1ce66f2fd776711df2cc524bff9": [],
+    "4e78ff8c30e1df537fc58830c141cbe5f16e8cccda3f7d41d333b045c1754503": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "7fd96a62d8b2854f127dc294ed283039382670c68e4db5d4e4bad17acfeb8287": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "feff1b40bc0296d51dcade2d3031bb1a436defcd786ebb7ad50df4032a15c6dc": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "6f47e4a1cf4f3150c04a95555549f9f6b3039baf67788587c64e62a8c2edc3c3": [
+      "wss://relay.gamma.example"
+    ],
+    "74681da380b29f60b0b24a078a07d539fb45b1d9f5f5f79851277d1b3f456572": [
+      "wss://relay.alpha.example"
+    ],
+    "5c43c02bbb95c9a62adab3acf095f26f615c910ce7cdff530cb182998884b40c": [],
+    "9087ae03c891833feb8494694913d30afa64b8a2f6130e91ba7fb01688a16554": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example",
+      "wss://relay.delta.example"
+    ],
+    "37313ae0d5c983e7d908ccaf0834690809e442f28e3b5089f3dc56fbb440c5a5": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "d8934f56ed4eddf19eb3d7951ff7bb448e25ebf1c08630d0c1f47605cec938d2": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.delta.example"
+    ],
+    "34be34fe31acbe35ce4ebaf2f237faafc64bb0d98f655d8b459f2f53f0de017c": [
+      "wss://relay.alpha.example",
+      "wss://relay.delta.example"
+    ],
+    "c5a5ac459c05a31ed65e13617cc09bcf049a79316eca0203d247ab40400776af": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "0f534dfe2d319a41ec9694c5f8cf4710341865f86d01e91405197c33adcd097f": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "15cffdead80167df7f424161663d3ac3fbd30723303ba0e9a97ef16d3e405911": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "d7f62aebaf95214e4260a13d058a660655ff76dacff54dcc0481d091e2103479": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "1cbf511dc7ba91cbc839c415aa30c1f32a7430040fe2e51eb2b00efd676d5fd6": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "91a74c40d508831576cca43d0d0c58793bb60df736783b40ddfbc68deed5ab06": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "493eda901c79256aa415cc9e23a76bf6455f82a8937e2ef29ae7a2a2f3d3b1aa": [
+      "wss://relay.beta.example",
+      "wss://relay.delta.example"
+    ],
+    "a1bd51f63b58261b774eb882ba099a2bec2f7021f73a0fea48025091cfe40f0f": [
+      "wss://relay.beta.example",
+      "wss://relay.delta.example"
+    ],
+    "8b93cbb23595512258f261e2415ad3319835e041f877b9c15e673d6876b5bf5c": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "772cad7554456948de526294a88db7669bc54431d7ac50294e95b90148af650c": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "ec3e76895bf71feea7548ea05fd586b83ef2da761062def56efd309fed6191be": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "52cabbae3279fabcfbc38e6bab21c5d52743866f80d6d20d3fe5fd8a3f802159": [
+      "wss://relay.beta.example",
+      "wss://relay.gamma.example"
+    ],
+    "6b0854fb3f9758187c149fd8371a76e2cab81d07cd0023015508163da784fa00": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "9ebe7dca0ef646d4bfd72ab1e3d7ffd0b52d539c316e3a4f76cee73185191215": [
+      "wss://relay.beta.example",
+      "wss://relay.delta.example"
+    ],
+    "29114e92819d014d9803d8dc204c07258cf69e4e495d505df099d06f9967a5f7": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "365c69513efb496de66611cbc0f55ca92ca541f3d9dbc5a83cff8c462a7eeb7f": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.delta.example"
+    ],
+    "be712098fff2b621beb94ba9514ba2331dedb02e970031320e9c0650e0930c13": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "e4e796b2d019afd5008a4f18c915f283f101488b489fd6eff13a75824d51e9ae": [
+      "wss://relay.alpha.example",
+      "wss://relay.delta.example"
+    ],
+    "1bb25bc701c59fc508593b8571c2f5a2cb62fd31bd60589a9b3ab1a0d9fd9beb": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "145cc062acdff1121faa52b443b2c186511ead44f5cde7deee71fac1338c4db4": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "7def73a46fec7bab579d27af7f83780b27d6ec635fecc1c5bb1ab4764ba085f6": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "8ae412dbea399ec356ef585c4d923217d39d5148ed429da9cd9a7e72d728ffd6": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "c71ccc9a56f7060fd7d22547b5351e4d6548b3e6dbbebaa156585b61063bad57": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "c5d3e2ae33d4fd6f68c621139795d36da8a1173d9915f8b03bbc82f7360a2e41": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.delta.example"
+    ],
+    "2bff2e6376c160d1a15614617237b2b2cd614783a6acccad7c258c5023d3f157": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example",
+      "wss://relay.delta.example"
+    ],
+    "67217b2544bd077af22416579921348b514a7e08348227e881ec87562a8acaa6": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "f72800a694fcb655e30b2ffad0ee5bafbcfae78849faf8a70259bac2097e349d": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "f78cbfab34f51ad667353e2e4206d6d047b8057f32242247d13b74c4445eff6e": [
+      "wss://relay.alpha.example",
+      "wss://relay.delta.example"
+    ],
+    "a6aa41cc0716a491f722f3ca6c591b63d3571199aba76c99f4e2ab579ff10821": [
+      "wss://relay.alpha.example",
+      "wss://relay.delta.example"
+    ],
+    "fc52d5dcc5cdca940ebfbfaa1c6c6aac23c0743d97560eb359db52134ad50498": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "3eaa2bebd0f85e5e760275f5d364a2651ee2277d046781147ff2807cd65c31d2": [
+      "wss://relay.alpha.example",
+      "wss://relay.gamma.example"
+    ],
+    "764fe61caed34cebfb570fd8471e5dfebbf9a6bd2eb242b01e61d813c8f8789c": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "0a7fb4abe40b8443792b6ef6f0bf7482772e58b47a7aa9665424cf196634be48": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "06d3275250e677105024b0f7149c6e813547779514cd7302f53b9d2440a709e0": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "47d0fbe84089ff483ca68ac848a11a961d066b6a4de605643d731050eb5d245f": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ],
+    "5f320c67995219be5389ff3d2d1d7126d3b82d6cb257921ce0129ec7e7454f55": [
+      "wss://relay.alpha.example",
+      "wss://relay.beta.example"
+    ]
+  }
+}

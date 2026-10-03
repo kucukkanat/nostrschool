@@ -1,0 +1,349 @@
+{
+  "color": {
+    "bg": {
+      "$value": "{palette.ink.950}"
+    },
+    "surface": {
+      "$value": "{palette.ink.900}"
+    },
+    "surface-raised": {
+      "$value": "{palette.ink.850}"
+    },
+    "surface-sunken": {
+      "$value": "{palette.ink.1000}"
+    },
+    "surface-inverse": {
+      "$value": "{palette.ink.50}"
+    },
+    "text": {
+      "$value": "{palette.ink.50}"
+    },
+    "text-muted": {
+      "$value": "{palette.ink.300}"
+    },
+    "text-subtle": {
+      "$value": "{palette.ink.400}"
+    },
+    "text-inverse": {
+      "$value": "{palette.ink.900}"
+    },
+    "border": {
+      "$value": "{palette.ink.800}"
+    },
+    "border-strong": {
+      "$value": "{palette.ink.500}"
+    },
+    "focus-ring": {
+      "$value": "{palette.ink.0}",
+      "$description": "Neutral (not brand purple) so the ring stays ≥3:1 against primary fills/strokes as well as the page."
+    },
+    "selection": {
+      "$value": "{palette.purple.900}"
+    },
+    "primary": {
+      "$value": "{palette.purple.400}"
+    },
+    "primary-hover": {
+      "$value": "{palette.purple.300}"
+    },
+    "primary-active": {
+      "$value": "{palette.purple.200}"
+    },
+    "primary-subtle": {
+      "$value": "{palette.purple.950}"
+    },
+    "on-primary": {
+      "$value": "{palette.ink.1000}"
+    },
+    "text-primary": {
+      "$value": "{palette.purple.300}"
+    },
+    "secondary": {
+      "$value": "{palette.orange.400}"
+    },
+    "secondary-hover": {
+      "$value": "{palette.orange.300}"
+    },
+    "secondary-subtle": {
+      "$value": "{palette.orange.900}"
+    },
+    "on-secondary": {
+      "$value": "{palette.ink.1000}"
+    },
+    "text-secondary": {
+      "$value": "{palette.orange.300}"
+    },
+    "accent": {
+      "$value": "{palette.pink.400}"
+    },
+    "accent-hover": {
+      "$value": "{palette.pink.300}"
+    },
+    "accent-subtle": {
+      "$value": "{palette.pink.900}"
+    },
+    "on-accent": {
+      "$value": "{palette.ink.1000}"
+    },
+    "text-accent": {
+      "$value": "{palette.pink.300}"
+    },
+    "success": {
+      "$value": "{palette.green.300}"
+    },
+    "success-subtle": {
+      "$value": "{palette.green.900}"
+    },
+    "success-solid": {
+      "$value": "{palette.green.400}"
+    },
+    "on-success": {
+      "$value": "{palette.ink.1000}"
+    },
+    "warning": {
+      "$value": "{palette.yellow.300}"
+    },
+    "warning-subtle": {
+      "$value": "{palette.yellow.900}"
+    },
+    "warning-solid": {
+      "$value": "{palette.yellow.400}"
+    },
+    "on-warning": {
+      "$value": "{palette.ink.1000}"
+    },
+    "danger": {
+      "$value": "{palette.red.300}"
+    },
+    "danger-subtle": {
+      "$value": "{palette.red.900}"
+    },
+    "danger-solid": {
+      "$value": "{palette.red.400}"
+    },
+    "on-danger": {
+      "$value": "{palette.ink.1000}"
+    },
+    "info": {
+      "$value": "{palette.blue.300}"
+    },
+    "info-subtle": {
+      "$value": "{palette.blue.900}"
+    },
+    "info-solid": {
+      "$value": "{palette.blue.400}"
+    },
+    "on-info": {
+      "$value": "{palette.ink.1000}"
+    },
+    "live": {
+      "$value": "{palette.red.400}"
+    },
+    "on-live": {
+      "$value": "{palette.ink.1000}"
+    },
+    "overlay": {
+      "$value": "rgba(0, 0, 0, 0.7)"
+    },
+    "shadow": {
+      "$value": "rgba(0, 0, 0, 0.5)"
+    },
+    "shadow-pop": {
+      "$value": "{palette.purple.400}"
+    },
+    "code-bg": {
+      "$value": "{palette.ink.1000}"
+    },
+    "code-text": {
+      "$value": "{palette.ink.50}"
+    },
+    "code-key": {
+      "$value": "{palette.purple.300}"
+    },
+    "code-string": {
+      "$value": "{palette.green.300}"
+    },
+    "code-number": {
+      "$value": "{palette.blue.300}"
+    },
+    "code-boolean": {
+      "$value": "{palette.orange.300}"
+    },
+    "code-null": {
+      "$value": "{palette.pink.300}"
+    },
+    "code-punctuation": {
+      "$value": "{palette.ink.300}"
+    },
+    "code-highlight": {
+      "$value": "{palette.purple.950}"
+    },
+    "packet-req": {
+      "$value": "{palette.blue.300}"
+    },
+    "packet-event": {
+      "$value": "{palette.purple.300}"
+    },
+    "packet-eose": {
+      "$value": "{palette.teal.300}"
+    },
+    "packet-ok": {
+      "$value": "{palette.green.300}"
+    },
+    "packet-close": {
+      "$value": "{palette.ink.300}"
+    },
+    "packet-closed": {
+      "$value": "{palette.red.300}"
+    },
+    "packet-notice": {
+      "$value": "{palette.orange.300}"
+    },
+    "packet-auth": {
+      "$value": "{palette.yellow.300}"
+    },
+    "packet-count": {
+      "$value": "{palette.pink.300}"
+    },
+    "on-packet": {
+      "$value": "{palette.ink.1000}"
+    },
+    "kind-regular": {
+      "$value": "{palette.blue.300}"
+    },
+    "kind-regular-subtle": {
+      "$value": "{palette.blue.900}"
+    },
+    "kind-replaceable": {
+      "$value": "{palette.purple.300}"
+    },
+    "kind-replaceable-subtle": {
+      "$value": "{palette.purple.950}"
+    },
+    "kind-ephemeral": {
+      "$value": "{palette.orange.300}"
+    },
+    "kind-ephemeral-subtle": {
+      "$value": "{palette.orange.900}"
+    },
+    "kind-addressable": {
+      "$value": "{palette.teal.300}"
+    },
+    "kind-addressable-subtle": {
+      "$value": "{palette.teal.900}"
+    },
+    "on-kind": {
+      "$value": "{palette.ink.1000}"
+    },
+    "diagram-node": {
+      "$value": "{palette.ink.850}"
+    },
+    "diagram-node-stroke": {
+      "$value": "{palette.ink.300}"
+    },
+    "diagram-node-down": {
+      "$value": "{palette.red.900}"
+    },
+    "diagram-node-down-stroke": {
+      "$value": "{palette.red.300}"
+    },
+    "diagram-edge": {
+      "$value": "{palette.ink.400}"
+    },
+    "diagram-edge-active": {
+      "$value": "{palette.purple.300}"
+    },
+    "diagram-edge-dead": {
+      "$value": "{palette.red.400}"
+    },
+    "diagram-lane": {
+      "$value": "{palette.ink.900}"
+    },
+    "diagram-lane-alt": {
+      "$value": "{palette.ink.850}"
+    },
+    "diagram-highlight": {
+      "$value": "{palette.yellow.300}"
+    },
+    "diagram-label": {
+      "$value": "{palette.ink.50}"
+    },
+    "envelope-wrap": {
+      "$value": "{palette.purple.900}"
+    },
+    "envelope-seal": {
+      "$value": "{palette.orange.900}"
+    },
+    "envelope-rumor": {
+      "$value": "{palette.teal.900}"
+    },
+    "envelope-stroke": {
+      "$value": "{palette.ink.300}"
+    },
+    "chart-1": {
+      "$value": "{palette.purple.300}"
+    },
+    "chart-2": {
+      "$value": "{palette.orange.300}"
+    },
+    "chart-3": {
+      "$value": "{palette.teal.300}"
+    },
+    "chart-4": {
+      "$value": "{palette.pink.300}"
+    },
+    "chart-5": {
+      "$value": "{palette.blue.300}"
+    },
+    "chart-6": {
+      "$value": "{palette.yellow.300}"
+    },
+    "chart-7": {
+      "$value": "{palette.green.300}"
+    },
+    "chart-8": {
+      "$value": "{palette.ink.300}"
+    },
+    "chart-grid": {
+      "$value": "{palette.ink.800}"
+    },
+    "chart-axis": {
+      "$value": "{palette.ink.300}"
+    },
+    "mascot-body": {
+      "$value": "{palette.ink.700}"
+    },
+    "mascot-belly": {
+      "$value": "{palette.ink.100}"
+    },
+    "mascot-beak": {
+      "$value": "{palette.orange.400}"
+    },
+    "mascot-legs": {
+      "$value": "{palette.orange.400}"
+    },
+    "mascot-accent": {
+      "$value": "{palette.purple.300}"
+    },
+    "$type": "color"
+  },
+  "shadow": {
+    "$type": "shadow",
+    "sm": {
+      "$value": "0 1px 2px {color.shadow}"
+    },
+    "md": {
+      "$value": "0 4px 12px {color.shadow}"
+    },
+    "lg": {
+      "$value": "0 12px 32px {color.shadow}"
+    },
+    "pop": {
+      "$value": "4px 4px 0 0 {color.shadow-pop}",
+      "$description": "Playful hard offset shadow for cards and buttons."
+    },
+    "pop-sm": {
+      "$value": "2px 2px 0 0 {color.shadow-pop}"
+    }
+  }
+}

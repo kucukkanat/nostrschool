@@ -1,0 +1,255 @@
+---
+order: 7
+slug: social-graph
+title: "The social graph"
+summary: "Follow lists, and how clients find where your friends publish."
+estimatedMinutes: 14
+nips: ["01", "02", "10", "65"]
+takeaways:
+  - "A follow is a p tag inside the follower's own signed kind 3 event. There is no central follower database."
+  - "Kind 3 is replaceable: each new list replaces the old one whole, so always fetch the latest before editing."
+  - "With NIP-65, everyone publishes a kind 10002 relay list: write relays are their outbox, read relays their inbox."
+  - "To read someone, go to their write relays. To reach someone, also send to their read relays."
+  - "Assuming everyone is on one relay quietly hides anyone who writes elsewhere. The outbox model keeps relays swappable."
+mascotIntro: "Who follows whom? Grab a friend and drag them around. They won't mind, they're just circles."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer } from "@nostrschool/ui";
+import FollowGraphExplorer from "~/components/chapters/07-social-graph/FollowGraphExplorer.svelte";
+import OutboxRouter from "~/components/chapters/07-social-graph/OutboxRouter.svelte";
+import ReplaceableTrap from "~/components/chapters/07-social-graph/ReplaceableTrap.svelte";
+import ChapterQuiz from "~/components/chapters/07-social-graph/ChapterQuiz.svelte";
+
+## Your friends list is a note you sign
+
+On a big platform, "who follows whom" is a giant table inside the company's database. You
+can look at your row, but you don't own it, and you can't take it with you.
+
+Nostr has no such table. Instead, each person publishes their own
+<Term id="follow-list" locale="en">follow list</Term>: a small, signed
+<Term id="event" locale="en">event</Term> of <Term id="kind" locale="en">kind</Term> `3` that
+says "these are the people I follow." Each follow is one line, a `p`
+<Term id="tag" locale="en">tag</Term> holding the other person's
+<Term id="pubkey" locale="en">public key</Term>.
+
+Think of it like the **contacts page in your own notebook**. Nobody else writes in it. You
+can photocopy it and leave copies at several <Term id="relay" locale="en">relays</Term>, and
+any app you open later can read it and rebuild your timeline. New phone? New app? Your
+friends come with you, because the list was never the app's in the first place.
+
+Put everyone's notebook pages side by side and you get a **social graph**. Here are our
+seven fixture friends, drawn from their real (signed!) kind 3 events:
+
+<FollowGraphExplorer client:visible locale="en" />
+
+Try this: hover **Grace** with the "Who follows them" lens on. Only Carol and Erin follow
+her. Now select **Alice**: six people follow her. Thicker double arrows mean a **mutual**
+follow (both lists mention each other). Drag a few people around; the graph wobbles back
+into shape like a jelly.
+
+<Callout locale="en" tone="tip" testid="ch07-callout-followers" title="Wait, where are the follower lists?">
+There aren't any! Your kind 3 lists who **you** follow. "Who follows me" is a question an
+app answers by *searching* relays for kind 3 events that contain your pubkey. Different
+apps, asking different relays, can come up with different follower counts. That's normal on
+Nostr, and why a follower count is an estimate, not a fact.
+</Callout>
+
+<Drawer client:visible testid="ch07-uth-kind3" locale="en" title="Under the hood: a kind 3 event (NIP-02)">
+
+[NIP-02](https://github.com/nostr-protocol/nips/blob/master/02.md) defines the follow list.
+Every follow is a `p` tag: `["p", <pubkey hex>, <relay hint>, <petname>]`. The relay hint and
+the petname (a local nickname) are optional and can be empty strings. `content` is not used.
+
+```json
+{
+  "kind": 3,
+  "pubkey": "<Grace's pubkey>",
+  "created_at": 1735682400,
+  "tags": [
+    ["p", "e550c6e9…44cc", "wss://relay.alpha.example", "alice"],
+    ["p", "a7388391…e183", "wss://relay.beta.example", "bob"],
+    ["p", "c7175000…5deb", "wss://relay.alpha.example", "erin"]
+  ],
+  "content": "",
+  "id": "…",
+  "sig": "…"
+}
+```
+
+Building the graph is just reading tags. With [nostr-tools](https://github.com/nbd-wtf/nostr-tools):
+
+```ts
+import { SimplePool } from "nostr-tools/pool";
+
+const pool = new SimplePool();
+const relays = ["wss://relay.alpha.example"];
+
+// Who does Grace follow? Her newest kind 3.
+const list = await pool.get(relays, { kinds: [3], authors: [gracePubkey] });
+const follows = (list?.tags ?? []).filter((t) => t[0] === "p").map((t) => t[1]);
+
+// Who follows Grace? Search for kind 3 events that tag her (an estimate!).
+const followers = await pool.querySync(relays, { kinds: [3], "#p": [gracePubkey] });
+```
+
+Clients append new follows **to the end** of the list, so the tag order roughly records
+when you followed each person.
+
+</Drawer>
+
+## Replaceable means "the newest copy wins"
+
+Kind 3 is a <Term id="replaceable-event" locale="en">replaceable event</Term>. A relay keeps
+only the **newest** follow list per person and throws older ones away. That keeps things
+tidy, but it has a sharp edge: a new list doesn't add to the old one, it **replaces it
+whole**.
+
+So what happens if an app that hasn't synced in a month publishes your list? Let's find out.
+You're Grace. Follow a few people, publish from your phone, then let that dusty old tablet
+publish its own (outdated) idea of your list:
+
+<ReplaceableTrap client:visible locale="en" />
+
+Ouch. This isn't a theoretical bug: people have lost their whole follow list this way. Good
+apps always **fetch your newest kind 3 right before editing it**, which is exactly what the
+"Sync phone from relay" button does.
+
+<Drawer client:visible testid="ch07-uth-replaceable" locale="en" title="Under the hood: how relays pick the winner (NIP-01)">
+
+[NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) defines kinds `0`, `3` and
+`10000`–`19999` as replaceable: for each `pubkey` + `kind`, a relay is only expected to keep
+the latest event. "Latest" means the highest `created_at`; if two events share the same
+timestamp, the one with the **lowest `id`** (first in lexical order) is kept. The demo uses
+exactly that rule:
+
+```ts
+const newest = (events: NostrEvent[]) =>
+  events.reduce((best, e) =>
+    e.created_at > best.created_at ||
+    (e.created_at === best.created_at && e.id < best.id) ? e : best);
+```
+
+The events in the demo are really signed with Grace's fixture key (it's public on purpose),
+so you could paste one into the Event inspector and it would verify.
+
+</Drawer>
+
+## But where do I find my friends' notes?
+
+Here's a puzzle. Erin follows Alice, Carol, Frank and Grace. Her app wants to show their
+latest notes. But there are thousands of relays, and nobody is on all of them. Which ones
+should the app ask?
+
+The naive answer is "everyone's on the big relay, just ask that one." That works... until
+someone isn't. The better answer is the <Term id="outbox-model" locale="en">outbox model</Term>,
+described in <Term id="nip65" locale="en">NIP-65</Term>.
+
+Every person publishes one more small event, kind `10002`, listing their relays, each one
+marked as:
+
+- **write**: "I publish my notes here." This is their **outbox**. Go here to *read* them.
+- **read**: "I check here for replies and mentions." This is their **inbox**. Go here to
+  *reach* them.
+- no marker: both.
+
+It's like a friend telling you "I post my letters from the Alpha and Beta post offices, and
+I collect my mail at Gamma." To read their letters you visit Alpha or Beta. To write to them,
+you drop your letter at Gamma.
+
+Press play and watch Erin's <Term id="client" locale="en">client</Term> work it out. Then
+switch to **Everyone on one relay** and compare. And try **Reply to a friend** to see the
+inbox side.
+
+<OutboxRouter client:visible locale="en" />
+
+Notice two things:
+
+1. In the outbox model the app opens a <Term id="subscription" locale="en">subscription</Term>
+   on each relay asking **only** for the authors who write there. Nobody goes missing, even
+   Grace, who only uses tiny Gamma.
+2. With one relay, Frank and Grace silently vanish. Nobody gets an error; Erin just never
+   sees their notes. That's the real danger: the network *looks* fine.
+
+<Callout locale="en" tone="info" testid="ch07-callout-why" title="Why this matters for freedom">
+If every app assumed one big relay, that relay would quietly become the new central
+platform: whoever it bans disappears for everyone. The outbox model is what lets you pick
+small, paid, or self-hosted relays without becoming invisible. It's a big part of Nostr's
+<Term id="censorship-resistance" locale="en">censorship resistance</Term>.
+</Callout>
+
+<Drawer client:visible testid="ch07-uth-nip65" locale="en" title="Under the hood: kind 10002 and the NIP-65 rules">
+
+[NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md) defines kind `10002`, a
+replaceable event whose `r` tags list relays. A marker of `read` or `write` narrows a relay to
+one direction; no marker means both. Carol's list from our fixtures:
+
+```json
+{
+  "kind": 10002,
+  "tags": [
+    ["r", "wss://relay.gamma.example"],
+    ["r", "wss://relay.alpha.example", "write"]
+  ],
+  "content": ""
+}
+```
+
+The rules, in short:
+
+- To download events **from** a user, use that user's **write** relays.
+- To download events **about** a user (where they're tagged), use that user's **read** relays.
+- When publishing, send the event to the **author's write relays** and to the **read relays of
+  every tagged user**.
+- Spread your own kind `10002` widely, including well-known "indexer" relays that apps ask for
+  relay lists, and keep it small: 2–4 relays per direction.
+
+The demo builds one `REQ` per relay with only the authors who write there:
+
+```ts
+import { SimplePool } from "nostr-tools/pool";
+
+const pool = new SimplePool();
+const INDEXERS = ["wss://relay.alpha.example"];
+
+// 1. Where does each followed person write?
+const lists = await pool.querySync(INDEXERS, { kinds: [10002], authors: follows });
+const writeRelaysOf = new Map(
+  lists.map((e) => [
+    e.pubkey,
+    e.tags.filter((t) => t[0] === "r" && t[2] !== "read").map((t) => t[1]),
+  ]),
+);
+
+// 2. Group authors by relay, then subscribe per relay with just those authors.
+const byRelay = new Map<string, string[]>();
+for (const [author, relays] of writeRelaysOf)
+  for (const url of relays) byRelay.set(url, [...(byRelay.get(url) ?? []), author]);
+
+for (const [url, authors] of byRelay)
+  pool.subscribeMany([url], { kinds: [1], authors, limit: 20 }, { onevent: show });
+```
+
+Real clients add guardrails: cap connections per author (two or three relays is plenty),
+cache relay lists, and pick a small set that still covers everyone. The demo's "fewest relays"
+counter solves that covering problem exactly; with hundreds of relays, apps approximate it.
+
+For replies, a `p` tag (and the `e` tag of the note being replied to, per
+[NIP-10](https://github.com/nostr-protocol/nips/blob/master/10.md)) tells everyone who should
+be notified, and the outbox rules tell the app *where* to deliver it.
+
+</Drawer>
+
+## Beyond follows
+
+The follow graph is useful for more than your timeline. Apps use it as a
+<Term id="web-of-trust" locale="en">web of trust</Term>: "show replies from people my
+friends follow, hide strangers" is a surprisingly strong spam filter, and nobody had to
+build a central reputation database to get it. Your kind 3 also doubles as a portable
+backup and a list of relay hints for the people you follow.
+
+That's the trick of this chapter: a social network built entirely from small notes that each
+person signs, stores where they like, and can take anywhere.
+
+## Quick check
+
+<ChapterQuiz client:visible locale="en" />

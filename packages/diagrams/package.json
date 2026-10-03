@@ -1,0 +1,32 @@
+{
+  "name": "@nostrschool/diagrams",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Animated, accessible protocol diagrams",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": "./src/*"
+  },
+  "svelte": "./src/index.ts",
+  "scripts": {
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json --threshold warning --fail-on-warnings",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@nostrschool/tokens": "workspace:*",
+    "@nostrschool/ui": "workspace:*",
+    "d3": "^7.9.0",
+    "motion": "^14.0.0",
+    "svelte": "^5.57.1",
+    "@nostrschool/i18n": "workspace:*",
+    "@nostrschool/protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3"
+  }
+}

@@ -1,0 +1,292 @@
+---
+order: 9
+slug: zaps
+title: "Zaps"
+summary: "Tip anyone, anywhere, in seconds: how Lightning payments and Nostr events shake hands — and what a zap receipt really proves."
+estimatedMinutes: 14
+nips: ["57", "01"]
+takeaways:
+  - "A zap is a Lightning payment plus two Nostr events: a zap request (kind 9734) signed by the sender, and a zap receipt (kind 9735) signed by the recipient's wallet server."
+  - "Your Lightning address lives in the lud16 field of your kind 0 profile and is just a short way to write a web URL (LUD-16)."
+  - "The zap request travels over HTTP to the wallet server, never to relays; only the receipt is published to relays."
+  - "Apps check a receipt's signature, its signer (the wallet's nostrPubkey) and the invoice amount before counting it."
+  - "A zap receipt is the wallet server's word, not a proof of payment: you trust the recipient's wallet provider."
+mascotIntro: "Ready to throw some lightning? ⚡ Let's follow a tip from one tap to a glowing counter!"
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import ZapFlow from "~/components/chapters/09-zaps/ZapFlow.svelte";
+import Lud16Lookup from "~/components/chapters/09-zaps/Lud16Lookup.svelte";
+import ReceiptChecker from "~/components/chapters/09-zaps/ReceiptChecker.svelte";
+
+Imagine a street musician. You like the song, so you drop a coin in their hat. Everybody nearby
+sees the coin land, and the musician smiles. Simple.
+
+On the internet, that “coin in the hat” has always been awkward: card fees eat tiny tips, payment
+sites need accounts, and the platform takes a cut. Nostr's answer is the
+<Term id="zap" locale="en">zap</Term>: a small payment over
+<Term id="lightning" locale="en">Lightning</Term> (Bitcoin's fast-payments network) that shows up
+right under a post, for everyone to see. Tips of a few cents are fine, and they arrive in seconds.
+
+Here's the twist that makes zaps interesting: **relays never touch the money.** A relay only
+stores <Term id="event" locale="en">events</Term>. So a zap is a little relay race between four
+players, and Nostr events are just the paperwork at the start and the finish line.
+
+## The four players
+
+- **The sender's app** — the Nostr client you're tapping ⚡ in, connected to your Lightning wallet.
+- **The recipient's wallet server** — the company or self-hosted box that receives Lightning
+  payments for the recipient. It speaks <Term id="lnurl" locale="en">LNURL</Term>, a simple
+  web protocol for “how do I pay you?”.
+- **The Lightning network** — where the money actually moves.
+- **Relays** — where the zap gets *announced*, so every app can show it.
+
+Press play (or step with the arrows) and watch Alice zap Erin's ostrich drawing. Each step shows
+exactly what travels between the players.
+
+<ZapFlow client:visible locale="en" />
+
+## Step 1: finding the hat
+
+To tip someone you need to know where their hat is. On Nostr, it's in their profile: the
+<Term id="metadata" locale="en">metadata</Term> event (kind 0) has a field called
+<Term id="lud16" locale="en">lud16</Term> holding a **Lightning address**. It looks like an email,
+`erin@wallet.alpha.example`, but it's really a shortcut for a web URL. Try it:
+
+<Lud16Lookup client:visible locale="en" />
+
+The app fetches that URL and the wallet server replies with its payment details. Two fields in the
+reply matter for zaps: `allowsNostr: true` (“yes, I understand zaps”) and `nostrPubkey` — the
+<Term id="pubkey" locale="en">public key</Term> the wallet server will use to sign receipts.
+Keep that key in mind; it's the star of the last section.
+
+<Drawer client:visible testid="ch09-uth-lnurl" locale="en" title="Under the hood: Lightning addresses and LNURL">
+
+**LUD-16 → LUD-06.** A Lightning address `name@domain` maps to
+`https://domain/.well-known/lnurlp/name` ([LUD-16](https://github.com/lnurl/luds/blob/luds/16.md)).
+The response is an LNURL-pay ([LUD-06](https://github.com/lnurl/luds/blob/luds/06.md)) document;
+<Term id="nip57" locale="en">NIP-57</Term> ([spec](https://github.com/nostr-protocol/nips/blob/master/57.md)) adds two fields:
+
+```json
+{
+  "callback": "https://wallet.alpha.example/lnurlp/erin/callback",
+  "minSendable": 1000,
+  "maxSendable": 100000000000,
+  "metadata": "[[\"text/plain\",\"Zap Erin\"],[\"text/identifier\",\"erin@wallet.alpha.example\"]]",
+  "tag": "payRequest",
+  "allowsNostr": true,
+  "nostrPubkey": "044b2cc412cc89149bc4f38a5067db6034dbaafe20321721a5414bb7237176f4"
+}
+```
+
+Amounts are in **millisatoshis** (1 sat = 1000 msat). nostr-tools does the lookup for you:
+
+```ts
+import { nip57 } from "nostr-tools";
+
+// metadataEvent = the recipient's kind 0
+const callback = await nip57.getZapEndpoint(metadataEvent); // null if !allowsNostr
+```
+
+</Drawer>
+
+## Steps 2–6: the paperwork
+
+Before paying, Alice's app writes a **zap request**: a tiny note that says *“I, Alice, want to
+zap Erin 2,100 sats for this post, with the comment ‘Love the ostrich! ⚡’. Please announce it on
+these relays.”* Alice <Term id="signature" locale="en">signs</Term> it with her key, like any
+event, using kind 9734.
+
+Surprise: this note is **not** posted to relays. The app hands it straight to Erin's wallet server
+in a web request. The wallet server checks it, then creates a Lightning **<Term id="invoice" locale="en">invoice</Term>** — a one-time
+bill for exactly 2,100 sats — and tucks the whole zap request into the invoice's description.
+Now the bill and the note are glued together.
+
+<Drawer client:visible testid="ch09-uth-request" locale="en" title="Under the hood: the zap request">
+
+**The zap request (kind 9734)** — required tags: `p` (recipient) and `relays` (where the receipt
+should go). Recommended but optional: `amount` (msat, as a string) and `lnurl`. Optional: `e` (zapped event),
+`a` (zapped addressable event), `k` (its kind). `content` is an optional comment.
+
+```json
+{
+  "kind": 9734,
+  "content": "Love the ostrich! ⚡",
+  "tags": [
+    ["relays", "wss://relay.alpha.example", "wss://relay.gamma.example"],
+    ["amount", "2100000"],
+    ["p", "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb"],
+    ["e", "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356"]
+  ],
+  "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+  "created_at": 1735684800,
+  "id": "24539a56…",
+  "sig": "b5beae9e…"
+}
+```
+
+It is sent with an HTTP GET to the `callback`, URI-encoded in the `nostr` query parameter:
+`<callback>?amount=2100000&nostr=%7B%22kind%22%3A9734…&lnurl=<lnurl>`.
+The server must check: valid signature, tags present, exactly one `p`, zero or one `e`, a
+`relays` tag, `amount` equal to the query amount, at most one `P`. It replies `{ "pr": "<bolt11>" }`
+— a *description-hash* invoice whose description is the zap request JSON.
+
+```ts
+import { finalizeEvent, nip57 } from "nostr-tools";
+
+const template = nip57.makeZapRequest({
+  event: erinsPost,          // or { pubkey } for a profile zap
+  amount: 2_100_000,         // msat
+  comment: "Love the ostrich! ⚡",
+  relays: ["wss://relay.alpha.example"],
+});
+const zapRequest = finalizeEvent(template, aliceSecretKey);
+const url = `${callback}?amount=2100000&nostr=${encodeURIComponent(JSON.stringify(zapRequest))}`;
+const { pr: invoice } = await (await fetch(url)).json();
+```
+
+</Drawer>
+
+## Steps 7–10: money moves, then the announcement
+
+Alice's wallet pays the invoice over Lightning. Relays don't see this at all — it's pure
+Lightning. When the payment arrives, Erin's wallet server writes a **zap receipt** (kind 9735),
+signs it with its `nostrPubkey`, and publishes it to the relays Alice listed. Every app that loads
+Erin's post finds the receipt, checks it, and adds ⚡ 2,100 to the counter. 🎉
+
+<Drawer client:visible testid="ch09-uth-receipt" locale="en" title="Under the hood: the zap receipt">
+
+**The zap receipt (kind 9735)** is signed by the wallet server, *not* by Erin or Alice.
+Tags: `p` (recipient), optional `P` (sender), `e`/`a`/`k` copied from the request, `bolt11` (the
+invoice), `description` (the zap request JSON, verbatim) and optional `preimage`.
+`created_at` should be the invoice's paid-at time.
+
+```json
+{
+  "kind": 9735,
+  "pubkey": "044b2cc412cc89149bc4f38a5067db6034dbaafe20321721a5414bb7237176f4",
+  "content": "",
+  "tags": [
+    ["p", "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb"],
+    ["P", "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"],
+    ["e", "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356"],
+    ["bolt11", "lnbc21000n1p…"],
+    ["description", "{\"kind\":9734,\"content\":\"Love the ostrich! ⚡\",…}"],
+    ["preimage", "0e03fe78…"]
+  ],
+  "created_at": 1735684802
+}
+```
+
+To show zaps on a post, subscribe with a [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) filter:
+
+```json
+["REQ", "zaps", { "kinds": [9735], "#e": ["def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356"] }]
+```
+
+`lnbc21000n` is the amount: 21000 × `n` (nano-BTC, 0.1 sat) = 2,100 sats.
+`nip57.getSatoshisAmountFromBolt11(invoice)` decodes it for you.
+
+</Drawer>
+
+<Callout tone="tip" locale="en" testid="ch09-callout-anon">
+Zaps are public: the receipt, with the zap request inside it, shows who zapped whom, how much,
+and the comment. Think “coin in the hat on a busy street”, not “private bank transfer”.
+</Callout>
+
+## Can you trust a zap?
+
+Here's the honest part. Anyone can publish a kind 9735 event — it's just an event. So before an
+app adds a zap to the counter it checks the receipt:
+
+1. Is the receipt's signature valid?
+2. Was it signed by the recipient's wallet server — the `nostrPubkey` we saw in step 1?
+3. Does it contain a real, signed zap request?
+4. Does the amount in the invoice match the amount Alice asked for?
+
+These checks catch tampering and impostors. But look closely at the last scenario below: a
+dishonest wallet server can sign a perfect-looking receipt for an invoice nobody paid. Every
+check passes!
+
+<ReceiptChecker client:visible locale="en" />
+
+That's the trust model in one sentence: **a zap receipt is the recipient's wallet provider
+saying “this was paid.”** It proves someone requested an invoice, and the wallet vouches for the
+rest. Usually that's fine — the wallet is chosen by the recipient, and lying would only fake
+their own income — but it's why zap counts are social signals, not accounting records. The only
+people who know *for sure* a payment happened are the payer (who holds the preimage) and the
+recipient (whose balance went up).
+
+<Drawer client:visible testid="ch09-uth-trust" locale="en" title="Under the hood: validating receipts">
+
+**Client-side validation (NIP-57, Appendix F):**
+
+- the receipt `pubkey` MUST equal the recipient's LNURL `nostrPubkey`;
+- the `bolt11` invoice amount MUST equal the request's `amount` tag (if present);
+- the request's `lnurl` tag SHOULD match the recipient's lnurl.
+
+Appendix E adds that `SHA256(description)` should match the invoice's description hash, which
+glues the invoice to the exact zap request.
+
+NIP-57 says it plainly: a zap receipt is “not a proof of payment”; it only shows that
+someone fetched an invoice. A `preimage` tag doesn't help either: the wallet that created the
+invoice knows the preimage before anyone pays.
+
+Related: events can carry `zap` tags to *split* zaps between several recipients (NIP-57
+Appendix G), and [NIP-47](https://github.com/nostr-protocol/nips/blob/master/47.md) (Nostr
+Wallet Connect) lets apps talk to your wallet so zapping is one tap.
+
+```ts
+import { nip57 } from "nostr-tools";
+
+// Throws away receipts that fail the basics before you count them.
+const request = JSON.parse(receipt.tags.find((t) => t[0] === "description")?.[1] ?? "null");
+const err = nip57.validateZapRequest(JSON.stringify(request)); // null when the request is OK
+const okSigner = receipt.pubkey === lnurlPayResponse.nostrPubkey;
+const sats = nip57.getSatoshisAmountFromBolt11(receipt.tags.find((t) => t[0] === "bolt11")?.[1] ?? "");
+```
+
+</Drawer>
+
+<Callout tone="safety" locale="en" testid="ch09-callout-safety">
+Everything on this page is demo data: fake wallets, fake invoices, no real sats. Nostr School never
+moves money.
+</Callout>
+
+## Quick check
+
+<Quiz
+  client:visible
+  testid="ch09-quiz-1"
+  locale="en"
+  question="Where does the sender's app send the zap request (kind 9734)?"
+  options={[
+    { id: "relays", label: "To the relays, like any other note", correct: false, explanation: "Only the receipt is published to relays." },
+    { id: "wallet", label: "To the recipient's wallet server, over HTTP", correct: true, explanation: "It rides to the LNURL callback URL, which turns it into an invoice." },
+    { id: "lightning", label: "Into the Lightning network directly", correct: false, explanation: "Lightning carries the payment, not Nostr events." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch09-quiz-2"
+  locale="en"
+  question="Who signs the zap receipt (kind 9735)?"
+  options={[
+    { id: "sender", label: "The sender", correct: false, explanation: "The sender signs the request, not the receipt." },
+    { id: "recipient", label: "The recipient, with their own key", correct: false, explanation: "The recipient's key isn't involved at all." },
+    { id: "wallet", label: "The recipient's wallet server, with its nostrPubkey", correct: true, explanation: "That's why apps check the signer against the LNURL nostrPubkey." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch09-quiz-3"
+  locale="en"
+  question="A receipt passes every check. What does that prove?"
+  options={[
+    { id: "paid", label: "The money definitely arrived", correct: false, explanation: "A dishonest wallet can sign a receipt for an unpaid invoice." },
+    { id: "vouched", label: "The recipient's wallet server says it was paid", correct: true, explanation: "Exactly: receipts are the wallet's word, not a proof of payment." },
+    { id: "relay", label: "The relay verified the payment", correct: false, explanation: "Relays never see Lightning payments." },
+  ]}
+/>

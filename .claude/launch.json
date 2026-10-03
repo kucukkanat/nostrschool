@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "site-preview",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "run",
+        "--cwd",
+        "apps/site",
+        "preview",
+        "--",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "4321"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "test-relay",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "packages/test-relay/src/cli.ts"
+      ],
+      "port": 7447
+    }
+  ]
+}

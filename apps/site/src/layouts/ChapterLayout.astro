@@ -1,0 +1,283 @@
+---
+/**
+ * Owner: shell agent. Wraps a chapter's MDX: reading bar, sticky course rail, chapter header with
+ * the mascot's intro line, the content, takeaways, "mark complete" and prev/next.
+ */
+import { format, getDictionary, type Locale } from "@nostrschool/i18n";
+import { Mascot } from "@nostrschool/mascot";
+import { nipUrl } from "@nostrschool/protocol";
+import { Takeaway } from "@nostrschool/ui";
+import ChapterComplete from "~/components/shell/ChapterComplete.svelte";
+import ChapterRail from "~/components/shell/ChapterRail.svelte";
+import { chapterLinks } from "~/components/shell/lib/links";
+import ReadingProgress from "~/components/shell/ReadingProgress.svelte";
+import type { ChapterRef } from "~/lib/chapters";
+import { href, mascotRive } from "~/lib/href";
+import BaseLayout from "./BaseLayout.astro";
+
+export interface ChapterMeta {
+  readonly order: number;
+  readonly title: string;
+  readonly summary: string;
+  readonly estimatedMinutes: number;
+  readonly nips: readonly string[];
+  readonly takeaways: readonly string[];
+  readonly mascotIntro?: string | undefined;
+}
+
+interface Props {
+  readonly locale: Locale;
+  readonly chapter: ChapterRef;
+  readonly meta: ChapterMeta;
+  /** True when this locale's MDX is missing and English is shown instead. */
+  readonly isFallback: boolean;
+  readonly prev?: ChapterRef | undefined;
+  readonly next?: ChapterRef | undefined;
+}
+
+const { locale, chapter, meta, isFallback, prev, next } = Astro.props;
+const dict = getDictionary(locale);
+const t = dict.common.chapter;
+const chapters = chapterLinks(locale);
+const pager = [
+  { ref: prev, dir: "prev", label: t.previous },
+  { ref: next, dir: "next", label: t.next },
+] as const;
+---
+
+<BaseLayout locale={locale} title={meta.title} description={meta.summary}>
+  <ReadingProgress slot="top" client:idle locale={locale} />
+  <div class="chapter-shell">
+    <aside class="rail-col">
+      <ChapterRail client:idle locale={locale} chapters={chapters} current={chapter.slug} />
+    </aside>
+    <article class="chapter" data-testid="chapter" data-chapter={chapter.nn}>
+      <header class="chapter-head">
+        <div class="intro">
+          <p class="eyebrow" data-testid="chapter-number">{format(t.chapter, { n: meta.order })}</p>
+          <h1 data-testid="chapter-title">{meta.title}</h1>
+          <p class="summary" data-testid="chapter-summary">{meta.summary}</p>
+          <ul class="meta">
+            <li class="pill" data-testid="chapter-minutes">
+              <span aria-hidden="true">⏱ </span>{format(t.minutes, { n: meta.estimatedMinutes })}
+            </li>
+            {meta.nips.length > 0 && (
+              <li class="pill nips" data-testid="chapter-nips">
+                {t.nips}:
+                {meta.nips.map((nip) => (
+                  <a
+                    href={nipUrl(nip)}
+                    data-testid={`chapter-nip-${nip}`}
+                    rel="external noopener"
+                    target="_blank"
+                  >
+                    {nip}
+                  </a>
+                ))}
+              </li>
+            )}
+          </ul>
+          {isFallback && (
+            <p class="fallback" role="note" data-testid="chapter-fallback-notice">
+              {t.notTranslated}
+            </p>
+          )}
+        </div>
+        <div class="mascot">
+          <Mascot
+            client:visible
+            locale={locale}
+            size="md"
+            pose="wave"
+            {...mascotRive}
+            testid="chapter-mascot"
+            {...meta.mascotIntro === undefined ? {} : { say: meta.mascotIntro }}
+          />
+        </div>
+      </header>
+      <div class="prose" data-testid="chapter-content"><slot /></div>
+      <Takeaway
+        testid="chapter-takeaways"
+        locale={locale}
+        title={t.takeaways}
+        points={meta.takeaways}
+      />
+      <ChapterComplete client:visible locale={locale} slug={chapter.slug} order={chapter.order} />
+      <nav class="pager" aria-label={t.progress} data-testid="chapter-pager">
+        {pager.map(({ ref, dir, label }) =>
+          ref === undefined ? (
+            <span class="spacer" />
+          ) : (
+            <a
+              class={`page ${dir}`}
+              data-testid={`chapter-${dir}`}
+              href={href(locale, `learn/${ref.slug}`)}
+            >
+              <span class="dir">
+                {dir === "prev" && <span aria-hidden="true">← </span>}
+                {label}
+                {dir === "next" && <span aria-hidden="true"> →</span>}
+              </span>
+              <span class="visually-hidden">: </span>
+              <span class="name">{dict.chapters[ref.key].title}</span>
+            </a>
+          ),
+        )}
+      </nav>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .chapter-shell {
+    display: grid;
+    gap: var(--space-xl);
+  }
+  .chapter {
+    min-inline-size: 0;
+    max-inline-size: var(--size-content);
+  }
+  .chapter-head {
+    display: grid;
+    gap: var(--space-md);
+    align-items: end;
+    margin-block-end: var(--space-xl);
+    padding-block-end: var(--space-lg);
+    border-block-end: var(--border-width-medium) dashed var(--color-border-strong);
+  }
+  .eyebrow {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--font-letter-spacing-caps);
+  }
+  h1 {
+    margin: var(--space-2xs) 0 var(--space-sm);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-black);
+    view-transition-name: chapter-title;
+  }
+  .summary {
+    margin: 0 0 var(--space-md);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-muted);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pill {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: var(--space-3xs) var(--space-sm);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-sunken);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+  }
+  .nips a {
+    color: var(--color-text-primary);
+  }
+  .fallback {
+    margin: var(--space-md) 0 0;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    background: var(--color-warning-subtle);
+    border: var(--border-width-thin) solid var(--color-warning);
+  }
+  .mascot {
+    justify-self: end;
+    min-block-size: var(--size-mascot-md);
+  }
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-block-start: var(--space-xl);
+  }
+  .page {
+    display: grid;
+    gap: var(--space-3xs);
+    padding: var(--space-md);
+    border: var(--border-width-medium) solid var(--color-text);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-decoration: none;
+    box-shadow: var(--shadow-pop-sm);
+    transition: transform var(--motion-duration-normal) var(--motion-easing-bounce);
+  }
+  .page:hover {
+    transform: translateY(calc(var(--space-3xs) * -1));
+  }
+  .next {
+    text-align: end;
+  }
+  .dir {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+  .name {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+  }
+  /* < tokens.breakpoint.md: a small Nos beside the speech bubble in one row, so the intro costs
+     about one line of height and the lesson starts on the first screen. The Mascot island keeps
+     its own column layout; these overrides only reshape it here (three classes beat its two). */
+  @media (max-width: 767px) {
+    .mascot {
+      justify-self: stretch;
+      min-block-size: 0;
+    }
+    .chapter-head .mascot :global(.mascot-container) {
+      --mascot-size: var(--size-mascot-sm);
+      /* Reversed so Nos (second child) comes first; flex-end is the inline start here. */
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      align-items: center;
+      gap: var(--space-sm);
+      display: flex;
+    }
+    .chapter-head .mascot :global(.bubble-region) {
+      flex: 1;
+    }
+    .chapter-head .mascot :global(.bubble) {
+      max-inline-size: none;
+      text-align: start;
+    }
+    /* Tail points left at Nos instead of down. */
+    .chapter-head .mascot :global(.bubble::after) {
+      left: calc(var(--space-xs) * -1);
+      bottom: auto;
+      top: 50%;
+      transform: translateY(-50%) rotate(135deg);
+    }
+  }
+  /* >= tokens.breakpoint.md */
+  @media (min-width: 768px) {
+    .chapter-head {
+      grid-template-columns: 1fr auto;
+    }
+  }
+  /* >= tokens.breakpoint.lg: sticky rail beside the content. */
+  @media (min-width: 1024px) {
+    .chapter-shell {
+      grid-template-columns: var(--size-rail) minmax(0, 1fr);
+      align-items: start;
+    }
+    .rail-col {
+      position: sticky;
+      inset-block-start: calc(var(--size-header) + var(--space-md));
+      max-block-size: calc(100vh - var(--size-header) - var(--space-xl));
+      overflow-y: auto;
+    }
+  }
+</style>

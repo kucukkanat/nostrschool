@@ -1,0 +1,42 @@
+---
+/** Owner: chapter 06 agent. Standalone kinds reference: searchable table + classifier, reusing chapter 06 components. */
+import { getDictionary } from "@nostrschool/i18n";
+import KindClassifier from "~/components/chapters/06-kinds/KindClassifier.svelte";
+import KindsReference from "~/components/chapters/06-kinds/KindsReference.svelte";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { href } from "~/lib/href";
+import { assertLocale, localeStaticPaths } from "~/lib/locale";
+
+export const getStaticPaths = localeStaticPaths;
+const locale = assertLocale(Astro.params.locale);
+const dict = getDictionary(locale);
+const title = dict.common.tools.kinds;
+---
+
+<BaseLayout locale={locale} title={title} description={dict.chapters.ch06.tool.intro}>
+  <h1 data-testid="tool-title">{title}</h1>
+  <p class="lede">
+    <a href={href(locale, "learn/kinds")} data-testid="tool-chapter-link"
+      >{dict.chapters.ch06.title}</a
+    >
+    · {dict.chapters.ch06.summary}
+  </p>
+  <KindsReference client:load locale={locale} testid="ch06-reference" />
+  <KindClassifier client:visible locale={locale} testid="ch06-tool-classifier" headingLevel={2} />
+</BaseLayout>
+
+<style>
+  h1 {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-black);
+  }
+  .lede {
+    margin: 0 0 var(--space-lg);
+    color: var(--color-text-muted);
+  }
+  a {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+  }
+</style>

@@ -1,0 +1,38 @@
+---
+/** Owner: shell agent. Renders one chapter; falls back to English MDX with a notice. */
+
+import { getEntry, render } from "astro:content";
+import { DEFAULT_LOCALE, LOCALES } from "@nostrschool/i18n";
+import ChapterLayout from "~/layouts/ChapterLayout.astro";
+import { CHAPTERS, type ChapterRef, neighbors } from "~/lib/chapters";
+import { assertLocale } from "~/lib/locale";
+
+export const getStaticPaths = () =>
+  LOCALES.flatMap((locale) =>
+    CHAPTERS.map((chapter) => ({ params: { locale, slug: chapter.slug }, props: { chapter } })),
+  );
+
+interface Props {
+  readonly chapter: ChapterRef;
+}
+
+const locale = assertLocale(Astro.params.locale);
+const { chapter } = Astro.props;
+const localized = await getEntry("chapters", `${locale}/${chapter.dir}`);
+const entry = localized ?? (await getEntry("chapters", `${DEFAULT_LOCALE}/${chapter.dir}`));
+if (entry === undefined)
+  throw new Error(`Missing chapter MDX: ${DEFAULT_LOCALE}/${chapter.dir}.mdx`);
+const { Content } = await render(entry);
+const { prev, next } = neighbors(chapter.slug);
+---
+
+<ChapterLayout
+  locale={locale}
+  chapter={chapter}
+  meta={entry.data}
+  isFallback={localized === undefined}
+  prev={prev}
+  next={next}
+>
+  <Content />
+</ChapterLayout>

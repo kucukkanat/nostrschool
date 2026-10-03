@@ -1,0 +1,203 @@
+---
+order: 5
+slug: filters
+title: "Filtros"
+summary: "Pide a los relays exactamente los eventos que quieres."
+estimatedMinutes: 12
+nips: ["01"]
+takeaways:
+  - "Un filtro es un pequeño objeto JSON que describe los eventos que quieres; se lo envías a un relay dentro de un mensaje REQ."
+  - "Dentro de un mismo campo, los valores se combinan con O (cualquiera de estos autores). Entre campos, las condiciones se combinan con Y (este autor Y este kind)."
+  - "Varios filtros en el mismo REQ se combinan con O: el relay envía los eventos que cumplan cualquiera de ellos."
+  - "Los filtros de etiquetas como #e, #p y #t siguen hilos, menciones y hashtags; since, until y limit recortan por tiempo."
+  - "limit solo da forma al primer lote, de lo más nuevo a lo más viejo; después de EOSE la suscripción sigue abierta para eventos nuevos."
+mascotIntro: "Los relays no te dejan curiosear. Les das una lista de deseos ¡y te traen exactamente eso!"
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import { href } from "~/lib/href";
+import FilterBuilder from "~/components/chapters/05-filters/FilterBuilder.svelte";
+import FilterQuest from "~/components/chapters/05-filters/FilterQuest.svelte";
+
+## El bibliotecario más paciente del mundo
+
+Imagina una biblioteca sin estanterías por las que pasear. Solo hay un mostrador y un bibliotecario:
+el <Term id="relay" locale="es">relay</Term>. No puedes andar curioseando. En su lugar, rellenas una
+**ficha de pedido** y se la entregas: "notas de Alice, por favor" o "todo lo etiquetado #nostr desde
+ayer". El bibliotecario va a la trastienda, reúne todo lo que coincide y lo trae al mostrador,
+empezando por lo más nuevo.
+
+Esa ficha es un <Term id="filter" locale="es">filtro</Term>. Es la única forma en que un
+<Term id="client" locale="es">cliente</Term> le pide algo a un relay. Tu timeline, tus
+notificaciones, una página de perfil, un hilo de respuestas: por debajo, cada pantalla de cada app
+de Nostr no es más que un puñado de filtros.
+
+Un filtro es un objeto JSON diminuto. Cada clave es una pregunta sobre un <Term id="event" locale="es">evento</Term>:
+
+- **`authors`**: ¿quién lo firmó? (una lista de <Term id="pubkey" locale="es">claves públicas</Term>)
+- **`kinds`**: ¿qué tipo de cosa es? (`1` = nota, `7` = reacción, `0` = perfil…)
+- **`ids`**: ¿es uno de estos eventos exactos? (por <Term id="event-id" locale="es">id de evento</Term>)
+- **`#e`, `#p`, `#t`**: ¿lleva una <Term id="tag" locale="es">etiqueta</Term> que apunta a este evento, menciona a esta persona o usa este hashtag?
+- **`since`, `until`**: ¿se creó dentro de esta ventana de tiempo?
+- **`limit`**: ¿cuántos de los más nuevos quiero ahora mismo?
+
+## Constrúyelo tú
+
+Aquí abajo está la estantería completa de nuestro relay de ejemplo: 60 eventos reales y firmados de
+Alice, Bob, Carol y compañía. Todas las tarjetas empiezan encendidas, porque **un filtro vacío
+coincide con todo**. Empieza a añadir condiciones y mira cómo se apagan las tarjetas que no encajan.
+Haz clic en cualquier tarjeta para preguntar *"¿por qué esta está dentro (o fuera)?"*
+
+<FilterBuilder client:visible locale="es" />
+
+<Drawer client:visible testid="ch05-uth-wire" locale="es" title="Bajo el capó: el REQ en el cable">
+El JSON del constructor viaja por el <Term id="websocket" locale="es">WebSocket</Term> envuelto en un
+mensaje <Term id="req" locale="es">REQ</Term>, junto con un id de suscripción que eliges tú:
+
+```json
+["REQ", "alice-notes", { "authors": ["e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"], "kinds": [1], "limit": 20 }]
+```
+
+El relay responde con un `["EVENT", "alice-notes", {…}]` por cada coincidencia guardada y luego
+`["EOSE", "alice-notes"]` (<Term id="eose" locale="es">fin de los eventos guardados</Term>). La <Term id="subscription" locale="es">suscripción</Term> sigue abierta: los nuevos eventos que coincidan
+siguen llegando hasta que envíes `["CLOSE", "alice-notes"]`. Con nostr-tools:
+
+```ts
+import { SimplePool } from "nostr-tools/pool";
+import { matchFilter } from "nostr-tools/filter";
+
+const pool = new SimplePool();
+const sub = pool.subscribeMany(
+  ["wss://relay.damus.io", "wss://nos.lol"],
+  { authors: [alicePubkey], kinds: [1], limit: 20 },
+  {
+    onevent: (event) => console.log(event.content),
+    oneose: () => console.log("eventos guardados listos, ahora en directo"),
+  },
+);
+// más tarde: sub.close();
+
+matchFilter({ kinds: [1], "#t": ["nostr"] }, someEvent); // la misma comprobación, en local
+```
+
+Especificación: [NIP-01, "Communication between clients and relays"](https://github.com/nostr-protocol/nips/blob/master/01.md#from-client-to-relay-sending-events-and-creating-subscriptions).
+</Drawer>
+
+## Y dentro de la ficha, O entre fichas
+
+Las reglas para combinar condiciones caben en una nota adhesiva:
+
+1. **Dentro de un campo, es O.** `"authors": [alice, bob]` significa *de Alice o de Bob*.
+   `"kinds": [1, 7]` significa *una nota o una reacción*.
+2. **Entre campos, es Y.** `{"authors": [alice], "kinds": [1]}` significa *de Alice y que sea una nota*.
+   Cada condición que añades solo puede hacer el resultado más pequeño. Basta con que falle una
+   condición para dejar fuera un evento (eso es lo que muestran las marcas ✓ y ✗ del panel "¿por qué?").
+3. **Varios filtros en un REQ se combinan con O.** ¿Quieres las notas de Alice *más* las reacciones
+   de todo el mundo a ellas? Manda dos fichas en el mismo sobre: `["REQ", "sub", {filtro A}, {filtro B}]`.
+
+<Callout client:visible locale="es" tone="tip" title="Campo ausente = me da igual">
+Omitir un campo significa "cualquier valor vale". Por eso `{}` devuelve la estantería entera, y por
+eso nunca se envía una lista vacía como `"kinds": []`: una lista sin nada dentro nunca puede coincidir.
+</Callout>
+
+## Etiquetas: siguiendo los hilos
+
+Los eventos se apuntan unos a otros mediante etiquetas, y los filtros pueden seguir esos punteros
+hacia atrás. El truco de <Term id="nip01" locale="es">NIP-01</Term> es el prefijo `#`: `"#x": [...]`
+coincide con los eventos que tienen una etiqueta llamada `x` cuyo **primer valor** está en la lista.
+
+- **`#e`**: todo lo que apunta a un evento. Las respuestas, <Term id="reaction" locale="es">reacciones</Term>,
+  reposts y zaps llevan una etiqueta `e`, así que `{"#e": [threadId]}` reúne una conversación entera.
+- **`#p`**: todo lo que menciona a una persona. Ahí tienes tu pestaña de notificaciones en una línea.
+- **`#t`**: hashtags. Los clientes ponen `#nostr` en el texto *y* una etiqueta `["t", "nostr"]`, porque
+  los relays solo indexan etiquetas, nunca el contenido.
+
+Prueba la receta "El hilo de Alice" en el constructor y luego añade el kind `7`: acabas de construir
+un contador de likes.
+
+## Ventanas de tiempo y límites
+
+`since` y `until` son marcas de tiempo Unix (segundos desde el 1 de enero de 1970), igual que el
+`created_at` de un evento. Un evento coincide cuando `since <= created_at <= until`, con ambos
+extremos incluidos. Las apps los usan para los botones de "cargar publicaciones anteriores"
+(`until` = lo más antiguo que hay en pantalla) y para ponerse al día (`since` = la última vez que miraste).
+
+`limit` es distinto: no es una condición, es una petición sobre **cuántos**. El relay ordena las
+coincidencias de la más nueva a la más vieja y envía como mucho esa cantidad en el primer lote. En el
+constructor, las coincidencias que se quedaron fuera llevan un borde discontinuo y un ✂.
+
+<Drawer client:visible testid="ch05-uth-rules" locale="es" title="Bajo el capó: las reglas de filtros de NIP-01">
+La letra pequeña, directamente de [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md#from-client-to-relay-sending-events-and-creating-subscriptions):
+
+- `ids`, `authors`, `#e` y `#p` deben contener valores **hex en minúsculas de exactamente 64
+  caracteres**. (Los relays antiguos aceptaban prefijos; eso se eliminó, así que no cuentes con ello.)
+  El constructor convierte `npub1…`, `note1…`, `nprofile1…` y `nevent1…` a hex por ti, porque las
+  cadenas NIP-19 nunca viajan por el cable.
+- Solo se indexan las etiquetas de **una sola letra** (`a`–`z`, `A`–`Z`), y solo por su primer valor.
+  `#d` encuentra eventos direccionables por su identificador, `#a` sigue direcciones y `#k` encuentra
+  reacciones según el kind de lo que reaccionan.
+- `limit` solo se aplica a la consulta inicial y se ignora para los eventos que llegan después de
+  `EOSE`. Los relays DEBERÍAN devolver los `limit` eventos más nuevos, desempatando por el id más bajo
+  cuando coincide el `created_at`, y pueden devolver menos. Cada relay lo aplica por su cuenta, así que
+  pedir `"limit": 10` a tres relays puede traerte hasta 30 eventos (menos los duplicados, que tu
+  cliente fusiona por id).
+- Los relays pueden limitar lo que devuelven, rechazar filtros costosos o responder con
+  `["CLOSED", subId, "motivo"]`.
+
+Extensiones relacionadas: [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md) añade
+`["COUNT", subId, filter]` para preguntar *cuántos* sin descargar nada, y
+[NIP-50](https://github.com/nostr-protocol/nips/blob/master/50.md) añade un campo `search` para
+búsquedas de texto completo en los relays que lo soportan.
+</Drawer>
+
+## Misiones de filtros
+
+¿Listo para juntarlo todo? Cada misión describe un conjunto de eventos con palabras sencillas.
+Construye cualquier filtro cuyos resultados sean **exactamente** ese conjunto. ¡Casi siempre hay más
+de una respuesta correcta!
+
+<FilterQuest client:visible locale="es" />
+
+<Callout client:visible locale="es" tone="info" title="Ve más allá">
+El <a href={href("es", "tools/filter-playground")} data-testid="ch05-playground-link">laboratorio de filtros</a>
+tiene el mismo constructor más un editor de JSON, y puede enviar tu filtro como un REQ real. Activa
+el modo en vivo en la cabecera y consultará relays públicos reales (solo lectura; nunca publicamos nada).
+</Callout>
+
+## Comprobación rápida
+
+<Quiz
+  client:visible
+  testid="ch05-quiz-and-or"
+  locale="es"
+  question={'¿Qué pide {"authors": [alice, bob], "kinds": [1]}?'}
+  options={[
+    { id: "and", label: "Notas firmadas por Alice y Bob a la vez", correct: false, explanation: "Un evento tiene exactamente un autor. Los valores dentro de una lista se combinan con O." },
+    { id: "mixed", label: "Notas de Alice, o notas de Bob", correct: true, explanation: "O dentro de un campo (Alice o Bob), Y entre campos (y kind 1)." },
+    { id: "all", label: "Todo lo de Alice, más cada nota de cualquiera", correct: false, explanation: "Para eso harían falta dos filtros separados en el REQ." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch05-quiz-tags"
+  locale="es"
+  question="¿Qué filtro te muestra todas las respuestas y reacciones a una nota concreta?"
+  options={[
+    { id: "ids", label: '{"ids": [noteId]}', correct: false, explanation: "Eso trae la nota en sí, no lo que apunta a ella." },
+    { id: "e", label: '{"#e": [noteId]}', correct: true, explanation: "Las respuestas y reacciones llevan una etiqueta e que apunta a la nota." },
+    { id: "p", label: '{"#p": [noteId]}', correct: false, explanation: "Las etiquetas p contienen claves públicas (personas), no ids de eventos." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch05-quiz-window"
+  locale="es"
+  question="Abriste tu app por última vez en la marca de tiempo 1700000000. ¿Qué filtro te pone al día con todas las notas publicadas desde entonces?"
+  options={[
+    { id: "since", label: '{"kinds": [1], "since": 1700000000}', correct: true, explanation: "since es el límite inferior: solo coinciden los eventos con created_at >= 1700000000." },
+    { id: "until", label: '{"kinds": [1], "until": 1700000000}', correct: false, explanation: "until es el límite superior: eso devuelve las notas anteriores, de antes de que te fueras." },
+    { id: "limit", label: '{"kinds": [1], "limit": 1700000000}', correct: false, explanation: "limit es una cantidad, no un tiempo. Solo pone un tope a cuántos de los eventos más nuevos se devuelven." },
+  ]}
+/>

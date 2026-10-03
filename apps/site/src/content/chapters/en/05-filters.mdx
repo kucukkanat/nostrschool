@@ -1,0 +1,197 @@
+---
+order: 5
+slug: filters
+title: "Filters"
+summary: "Ask relays for exactly the events you want."
+estimatedMinutes: 12
+nips: ["01"]
+takeaways:
+  - "A filter is a small JSON object that describes the events you want; you send it to a relay inside a REQ message."
+  - "Inside one field, values are OR-ed (any of these authors). Across fields, conditions are AND-ed (this author AND this kind)."
+  - "Several filters in the same REQ are OR-ed: the relay sends events matching any of them."
+  - "Tag filters like #e, #p and #t follow threads, mentions and hashtags; since, until and limit slice by time."
+  - "limit only shapes the first batch, newest first; after EOSE the subscription stays open for new events."
+mascotIntro: "Relays don't do browsing. You hand them a wish list, and they fetch exactly that!"
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import { href } from "~/lib/href";
+import FilterBuilder from "~/components/chapters/05-filters/FilterBuilder.svelte";
+import FilterQuest from "~/components/chapters/05-filters/FilterQuest.svelte";
+
+## The world's most patient librarian
+
+Picture a library with no shelves you can walk along. There's just a counter and a librarian:
+the <Term id="relay" locale="en">relay</Term>. You can't wander around. Instead you fill in a
+**request slip** and hand it over: "notes by Alice, please" or "anything tagged #nostr since
+yesterday". The librarian goes into the back, grabs every matching item, and brings it to the
+counter, newest first.
+
+That slip is a <Term id="filter" locale="en">filter</Term>. It's the only way a
+<Term id="client" locale="en">client</Term> ever asks a relay for anything. Your timeline, your
+notifications, a profile page, a reply thread: under the hood, every screen of every Nostr app is
+just a handful of filters.
+
+A filter is a tiny JSON object. Each key is one question about an <Term id="event" locale="en">event</Term>:
+
+- **`authors`**: who signed it? (a list of <Term id="pubkey" locale="en">public keys</Term>)
+- **`kinds`**: what sort of thing is it? (`1` = note, `7` = reaction, `0` = profile…)
+- **`ids`**: is it one of these exact events? (by <Term id="event-id" locale="en">event id</Term>)
+- **`#e`, `#p`, `#t`**: does it carry a <Term id="tag" locale="en">tag</Term> pointing at this event, mentioning this person, or using this hashtag?
+- **`since`, `until`**: was it created inside this time window?
+- **`limit`**: how many of the newest ones do I want right now?
+
+## Build one yourself
+
+Below is our sample relay's whole shelf: 60 real, signed events from Alice, Bob, Carol and friends.
+Every card starts lit, because **an empty filter matches everything**. Start adding conditions and
+watch the cards that don't fit fade away. Click any card to ask *"why is this one in (or out)?"*
+
+<FilterBuilder client:visible locale="en" />
+
+<Drawer client:visible testid="ch05-uth-wire" locale="en" title="Under the hood: the REQ on the wire">
+The JSON in the builder goes over the <Term id="websocket" locale="en">WebSocket</Term> wrapped in a
+<Term id="req" locale="en">REQ</Term> message, together with a subscription id you pick:
+
+```json
+["REQ", "alice-notes", { "authors": ["e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"], "kinds": [1], "limit": 20 }]
+```
+
+The relay answers with one `["EVENT", "alice-notes", {…}]` per stored match, then
+`["EOSE", "alice-notes"]` (<Term id="eose" locale="en">end of stored events</Term>). The <Term id="subscription" locale="en">subscription</Term> stays open: new matching events
+keep arriving until you send `["CLOSE", "alice-notes"]`. With nostr-tools:
+
+```ts
+import { SimplePool } from "nostr-tools/pool";
+import { matchFilter } from "nostr-tools/filter";
+
+const pool = new SimplePool();
+const sub = pool.subscribeMany(
+  ["wss://relay.damus.io", "wss://nos.lol"],
+  { authors: [alicePubkey], kinds: [1], limit: 20 },
+  {
+    onevent: (event) => console.log(event.content),
+    oneose: () => console.log("stored events done, now streaming live"),
+  },
+);
+// later: sub.close();
+
+matchFilter({ kinds: [1], "#t": ["nostr"] }, someEvent); // the same check, locally
+```
+
+Spec: [NIP-01, "Communication between clients and relays"](https://github.com/nostr-protocol/nips/blob/master/01.md#from-client-to-relay-sending-events-and-creating-subscriptions).
+</Drawer>
+
+## AND inside the slip, OR between slips
+
+The rules for combining conditions are short enough to fit on a sticky note:
+
+1. **Inside one field, it's OR.** `"authors": [alice, bob]` means *by Alice or by Bob*.
+   `"kinds": [1, 7]` means *a note or a reaction*.
+2. **Across fields, it's AND.** `{"authors": [alice], "kinds": [1]}` means *by Alice and a note*.
+   Every condition you add can only make the result smaller. One failing condition is enough to
+   leave an event out (that's what the ✓ and ✗ chips in the "why?" panel show).
+3. **Several filters in one REQ are OR-ed.** Want Alice's notes *plus* everyone's reactions to them?
+   Send two slips in the same envelope: `["REQ", "sub", {filter A}, {filter B}]`.
+
+<Callout client:visible locale="en" tone="tip" title="Missing field = don't care">
+Leaving a field out means "any value is fine". That's why `{}` returns the whole shelf, and why
+you never send an empty list like `"kinds": []`: a list with nothing in it can never match.
+</Callout>
+
+## Tags: following the threads
+
+Events point at each other through tags, and filters can follow those pointers backwards. The
+<Term id="nip01" locale="en">NIP-01</Term> trick is the `#` prefix: `"#x": [...]` matches events that
+have a tag named `x` whose **first value** is in the list.
+
+- **`#e`**: everything that points at an event. Replies, <Term id="reaction" locale="en">reactions</Term>,
+  reposts and zaps all carry an `e` tag, so `{"#e": [threadId]}` gathers a whole conversation.
+- **`#p`**: everything that mentions a person. That's your notifications tab in one line.
+- **`#t`**: hashtags. Clients put `#nostr` in the text *and* a `["t", "nostr"]` tag, because relays
+  only index tags, never the content.
+
+Try the "Alice's thread" recipe in the builder, then add kind `7`: you've just built a like counter.
+
+## Time windows and limits
+
+`since` and `until` are Unix timestamps (seconds since 1 January 1970), just like an event's `created_at`. An event matches
+when `since <= created_at <= until`, both ends included. Apps use them for "load older posts" buttons
+(`until` = the oldest thing on screen) and for catching up (`since` = when you last looked).
+
+`limit` is different: it isn't a condition, it's a request about **how many**. The relay sorts
+matches newest first and sends at most that many in the first batch. In the builder, matches that
+didn't make the cut get a dashed border and a ✂.
+
+<Drawer client:visible testid="ch05-uth-rules" locale="en" title="Under the hood: NIP-01 filter rules">
+The fine print, straight from [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md#from-client-to-relay-sending-events-and-creating-subscriptions):
+
+- `ids`, `authors`, `#e` and `#p` must contain **exact 64-character lowercase hex** values. (Old
+  relays accepted prefixes; that was removed, so don't rely on it.) The builder converts `npub1…`,
+  `note1…`, `nprofile1…` and `nevent1…` to hex for you, because NIP-19 strings never go on the wire.
+- Only **single-letter** tags (`a`–`z`, `A`–`Z`) are indexed, and only by their first value.
+  `#d` finds addressable events by identifier, `#a` follows addresses, `#k` finds reactions by the
+  kind of thing they react to.
+- `limit` only applies to the initial query and is ignored for events that arrive after `EOSE`.
+  Relays SHOULD return the newest `limit` events, with ties on `created_at` broken by lowest id,
+  and may return fewer. Every relay applies it independently, so asking three relays for
+  `"limit": 10` can bring back up to 30 events (minus duplicates, which your client merges by id).
+- Relays may cap what they return, refuse expensive filters, or answer with
+  `["CLOSED", subId, "reason"]`.
+
+Related extensions: [NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md) adds
+`["COUNT", subId, filter]` to ask *how many* without downloading anything, and
+[NIP-50](https://github.com/nostr-protocol/nips/blob/master/50.md) adds a `search` field for
+full-text search on relays that support it.
+</Drawer>
+
+## Filter quests
+
+Ready to put it together? Each quest describes a set of events in plain words. Build any filter
+whose results are **exactly** that set. There's usually more than one right answer!
+
+<FilterQuest client:visible locale="en" />
+
+<Callout client:visible locale="en" tone="info" title="Take it further">
+The <a href={href("en", "tools/filter-playground")} data-testid="ch05-playground-link">filter playground</a>
+has the same builder plus a JSON editor, and can send your filter as a real REQ. Switch on live
+mode in the header and it asks real public relays (read-only; we never publish anything).
+</Callout>
+
+## Quick check
+
+<Quiz
+  client:visible
+  testid="ch05-quiz-and-or"
+  locale="en"
+  question={'What does {"authors": [alice, bob], "kinds": [1]} ask for?'}
+  options={[
+    { id: "and", label: "Notes signed by both Alice and Bob together", correct: false, explanation: "An event has exactly one author. Values inside one list are OR-ed." },
+    { id: "mixed", label: "Notes by Alice, or notes by Bob", correct: true, explanation: "OR inside a field (Alice or Bob), AND across fields (and kind 1)." },
+    { id: "all", label: "Everything by Alice, plus every note by anyone", correct: false, explanation: "That would take two separate filters in the REQ." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch05-quiz-tags"
+  locale="en"
+  question="Which filter shows you every reply and reaction to one specific note?"
+  options={[
+    { id: "ids", label: '{"ids": [noteId]}', correct: false, explanation: "That fetches the note itself, not what points at it." },
+    { id: "e", label: '{"#e": [noteId]}', correct: true, explanation: "Replies and reactions carry an e tag pointing at the note." },
+    { id: "p", label: '{"#p": [noteId]}', correct: false, explanation: "p tags hold public keys (people), not event ids." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch05-quiz-window"
+  locale="en"
+  question="You last opened your app at timestamp 1700000000. Which filter catches up on every note posted since then?"
+  options={[
+    { id: "since", label: '{"kinds": [1], "since": 1700000000}', correct: true, explanation: "since is the lower bound: only events with created_at >= 1700000000 match." },
+    { id: "until", label: '{"kinds": [1], "until": 1700000000}', correct: false, explanation: "until is the upper bound: that returns the older notes, from before you left." },
+    { id: "limit", label: '{"kinds": [1], "limit": 1700000000}', correct: false, explanation: "limit is a count, not a time. It only caps how many of the newest events come back." },
+  ]}
+/>

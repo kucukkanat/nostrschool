@@ -1,0 +1,230 @@
+---
+order: 2
+slug: keys
+title: "Identity is a keypair"
+summary: "No accounts, no passwords: you are a secret key and its public key."
+estimatedMinutes: 14
+nips: ["01", "06", "19", "49"]
+takeaways:
+  - "Your Nostr identity is a secp256k1 keypair: a secret key you keep and a public key you share."
+  - "The public key is computed from the secret key, but you can't run that math backwards."
+  - "npub and nsec are the same bytes as the hex keys, re-spelled in bech32 with a typo-catching checksum (NIP-19)."
+  - "Signing proves an event came from your key; anyone can verify it with your public key alone."
+  - "Never share your nsec. There is no password reset: lose it or leak it, and that identity is gone."
+mascotIntro: "No sign-up form, no password, no username police. Let's forge you an identity in one click!"
+---
+import Term from "~/components/shell/Term.astro";
+import { href } from "~/lib/href";
+import { Callout, Drawer } from "@nostrschool/ui";
+import KeyForge from "~/components/chapters/02-keys/KeyForge.svelte";
+import OneWayClock from "~/components/chapters/02-keys/OneWayClock.svelte";
+import SignatureStamp from "~/components/chapters/02-keys/SignatureStamp.svelte";
+import NsecGuard from "~/components/chapters/02-keys/NsecGuard.svelte";
+import ChapterQuiz from "~/components/chapters/02-keys/ChapterQuiz.svelte";
+
+## No sign-up form. Ever.
+
+Every app you've used starts the same way: pick a username, choose a password, confirm your email.
+Behind the scenes, a company writes you into **its** database. Your account lives there, and it
+exists only as long as they say so.
+
+Nostr skips all of that. Your identity is not a row in someone's database: it's a
+<Term id="keypair" locale="en">keypair</Term>, two big numbers that belong together:
+
+- a **secret key** (<Term id="privkey" locale="en">private key</Term>): 32 random bytes that only you know, and
+- a **public key** (<Term id="pubkey" locale="en">pubkey</Term>): computed from the secret key, and safe to show the world.
+
+Think of a mailbox with a slot. The **public key** is the address painted on the front: you put it
+on business cards so people can find you. The **secret key** is the only key that opens the box,
+and here it does something even better: it lets you stamp letters with a seal nobody else can
+forge.
+
+No server hands these out. You make them yourself, on your own device, in a fraction of a second.
+Let's do that right now.
+
+<KeyForge client:visible locale="en" />
+
+Press the button a few times. Every keypair is brand new: there are about 2<sup>256</sup> possible
+secret keys, so the chance of two people ever rolling the same one is effectively zero. No
+registry is needed to keep keys unique: math does it for free.
+
+<Callout locale="en" tone="safety" testid="ch02-demo-keys-callout">
+  Keys forged on this page are **demo keys**. They are generated in your browser and never saved
+  or sent anywhere, but treat them as throwaway: don't use them for a real identity.
+</Callout>
+
+## Why can't anyone work out my secret?
+
+The public key is calculated *from* the secret key using an elliptic curve called
+<Term id="secp256k1" locale="en">secp256k1</Term> (the same one Bitcoin uses). The magic property is
+that this calculation is a **one-way street**: going forward takes microseconds, going backward is
+hopeless.
+
+Here's a toy version you can actually see. Your secret is a number of hops; the public key is where
+you land on the clock. Try it, then try to work backwards.
+
+<OneWayClock client:visible locale="en" />
+
+On a 61-spot clock, guessing backwards takes a blink. On the real curve there are about
+10<sup>77</sup> spots. Every computer on Earth guessing for the lifetime of the universe would
+not make a dent. That's what lets you publish your public key everywhere and sleep soundly.
+
+<Drawer client:visible testid="ch02-uth-curve" locale="en" title="Under the hood: secp256k1 & x-only keys">
+
+The real operation is **scalar multiplication on an elliptic curve**: `P = k · G`, where `k` is your
+secret key (a 256-bit integer between 1 and the curve order *n* − 1), `G` is the curve's fixed
+generator point, and `P` is the public point. Recovering `k` from `P` is the *elliptic-curve
+discrete logarithm problem*, which has no known efficient solution.
+
+[NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) says keys and signatures follow
+[BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki) (Schnorr signatures on
+secp256k1). BIP-340 uses **x-only** public keys: only the 32-byte x coordinate is kept, and the y
+coordinate is implied to be even. That's why a Nostr `pubkey` is exactly 64 lowercase hex
+characters, not the 66-character "compressed" keys you may know from elsewhere.
+
+```ts
+import { generateSecretKey, getPublicKey } from "nostr-tools/pure";
+
+const sk = generateSecretKey(); // Uint8Array(32), from a CSPRNG
+const pk = getPublicKey(sk); // 64 lowercase hex chars (x-only)
+console.log(pk);
+```
+
+Not every 32-byte value is a valid key: the secret must be below *n*
+(≈ 1.158 × 10<sup>77</sup>), and a public key must be an x coordinate that is actually on the curve.
+
+</Drawer>
+
+## npub and nsec: same keys, friendlier spelling
+
+Raw keys are written in **hex**: 64 characters of `0–9` and `a–f`. Computers love hex. Humans
+copy-pasting it into a chat… less so. Mix up one character and you've silently pointed at someone
+else (or no one).
+
+So <Term id="nip19" locale="en">NIP-19</Term> re-spells keys using <Term id="bech32" locale="en">bech32</Term>:
+
+- your public key becomes an <Term id="npub" locale="en">npub</Term>: `npub1…`
+- your secret key becomes an <Term id="nsec" locale="en">nsec</Term>: `nsec1…`
+
+The prefix tells you **what** you're holding (so you notice when you're about to paste a secret),
+the alphabet skips look-alike characters like `1`, `b`, `i` and `o`, and the last six characters are
+a **checksum**: change any character and software will refuse it instead of quietly using the wrong
+key. Scroll back up to the forge and step through the encoding: the bytes are regrouped 5 bits at a
+time, and each 5-bit number picks one letter from a 32-letter alphabet.
+
+<Drawer client:visible testid="ch02-uth-bech32" locale="en" title="Under the hood: NIP-19 encoding">
+
+1. Take the 32 payload bytes (256 bits).
+2. Regroup them into **5-bit words**: 256 / 5 = 51.2, so 52 words, the last one padded with zero bits.
+3. Compute a 6-word **BCH checksum** over the prefix (the *human-readable part*, `npub`) and the words.
+4. Map all 58 words through the alphabet `qpzry9x8gf2tvdw0s3jn54khce6mua7l` and glue it together:
+   `hrp + "1" + chars`. Result: 63 characters for every npub and nsec.
+
+Bech32 strings are **for humans only**. [NIP-19](https://github.com/nostr-protocol/nips/blob/master/19.md)
+is explicit: they must not be used inside events or relay messages. On the wire, it's always hex
+(event trimmed to the interesting field):
+
+```json
+{
+  "kind": 1,
+  "pubkey": "7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e",
+  "content": "gm"
+}
+```
+
+```ts
+import * as nip19 from "nostr-tools/nip19";
+
+const npub = nip19.npubEncode(pk); // "npub1…"
+const nsec = nip19.nsecEncode(sk); // "nsec1…" (sk is a Uint8Array)
+const { type, data } = nip19.decode(npub); // type === "npub", data === pk (hex)
+```
+
+NIP-19 also defines `note` (an event id), plus "shareable identifiers" that bundle extra hints as
+**TLV** (type-length-value) records: <Term id="nprofile" locale="en">nprofile</Term> (pubkey + relays),
+<Term id="nevent" locale="en">nevent</Term> (event id + relays, optional author and kind) and
+<Term id="naddr" locale="en">naddr</Term> (kind + author + `d` tag of an addressable event). Try them
+all in the standalone <a href={href("en", "tools/keys")} data-testid="ch02-tool-link">key tool</a>.
+
+Two related NIPs: [NIP-49](https://github.com/nostr-protocol/nips/blob/master/49.md) defines
+<Term id="ncryptsec" locale="en">`ncryptsec`</Term>, a password-encrypted secret key and the recommended backup format, and
+[NIP-06](https://github.com/nostr-protocol/nips/blob/master/06.md) derives keys from a BIP-39 seed
+phrase (path `m/44'/1237'/<account>'/0/0`). NIP-06 is now marked *unrecommended* in the NIPs index
+in favor of a single nsec, so treat it as legacy you may meet in older wallets.
+
+</Drawer>
+
+## Your key is your pen
+
+Holding a secret key isn't just about *being* someone: it's about *proving* it. Every post you
+publish is a little JSON <Term id="event" locale="en">event</Term> carrying your public key and a
+<Term id="signature" locale="en">signature</Term>, made with your secret key using the
+<Term id="schnorr" locale="en">Schnorr</Term> scheme. Anyone (any <Term id="relay" locale="en">relay</Term>,
+any app, any stranger) can check that signature with nothing but your public key. Nobody can fake
+it without your secret.
+
+Try it with the key you forged above. Then change a single letter.
+
+<SignatureStamp client:visible locale="en" />
+
+That's why Nostr doesn't need a trusted server: the proof travels *with* the message. We'll take a
+signed event apart byte by byte in the next chapter.
+
+<Drawer client:visible testid="ch02-uth-schnorr" locale="en" title="Under the hood: what actually gets signed">
+
+Nostr never signs your raw text. The event is serialized as
+`[0, pubkey, created_at, kind, tags, content]`, hashed with <Term id="sha256" locale="en">SHA-256</Term>
+to get the 32-byte `id`, and **the id** is signed with BIP-340 Schnorr, producing a 64-byte `sig`
+(128 hex characters). Change the content and the id changes, so the old signature no longer matches.
+
+```ts
+import { finalizeEvent, verifyEvent } from "nostr-tools/pure";
+
+const event = finalizeEvent(
+  { kind: 1, created_at: Math.floor(Date.now() / 1000), tags: [], content: "gm" },
+  sk,
+); // adds pubkey, id and sig
+verifyEvent(event); // true
+```
+
+</Drawer>
+
+## Guard the nsec with your life (well, almost)
+
+Here's the flip side of "no company owns your account": **no company can rescue it either**.
+
+- Anyone who gets your nsec **is** you. They can post, follow and DM as you, forever, and you can't
+  change "your password", because there isn't one.
+- If you lose your nsec with no backup, the identity is gone. That's <Term id="key-loss" locale="en">key loss</Term>,
+  and it's one of Nostr's honest trade-offs (more in the last chapter).
+
+Your npub, on the other hand, is meant to be shared: on your website, in your bio, on a T-shirt.
+Let's practice telling the two apart.
+
+<NsecGuard client:visible locale="en" />
+
+<Callout locale="en" tone="danger" testid="ch02-never-share">
+  Real apps never need you to paste your nsec. Use a <Term id="signer" locale="en">signer</Term>
+  instead: a browser extension (<Term id="nip07" locale="en">NIP-07</Term>) or a remote
+  <Term id="bunker" locale="en">bunker</Term> (<Term id="nip46" locale="en">NIP-46</Term>) keeps the
+  secret key in one place and only hands out signatures. Chapter 10 shows how.
+</Callout>
+
+<Drawer client:visible testid="ch02-uth-hygiene" locale="en" title="Under the hood: key hygiene for developers">
+
+- Generate keys with a CSPRNG (`generateSecretKey()` uses `crypto.getRandomValues`), never with
+  `Math.random()` or a hash of something guessable.
+- Keep secret keys as `Uint8Array` in memory, and don't log them. Prefer delegating to a signer:
+  `window.nostr.signEvent()` ([NIP-07](https://github.com/nostr-protocol/nips/blob/master/07.md)) or a
+  `bunker://` connection ([NIP-46](https://github.com/nostr-protocol/nips/blob/master/46.md)).
+- For backups, offer `ncryptsec` ([NIP-49](https://github.com/nostr-protocol/nips/blob/master/49.md))
+  instead of plain nsec text. Skip NIP-06 seed phrases for new code: the NIPs index marks them
+  unrecommended in favor of a single nsec.
+- Accept both hex and NIP-19 input, but store and transmit **hex**; decode `nostr:` URIs
+  ([NIP-21](https://github.com/nostr-protocol/nips/blob/master/21.md)) with the same NIP-19 decoder.
+
+</Drawer>
+
+## Quick check
+
+<ChapterQuiz client:visible locale="en" />

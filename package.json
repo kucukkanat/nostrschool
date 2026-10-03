@@ -1,0 +1,34 @@
+{
+  "name": "nostrschool",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run tokens && bun run --cwd apps/site dev",
+    "build": "bun run tokens && bun run --cwd apps/site build",
+    "preview": "bun run --cwd apps/site preview",
+    "tokens": "bun run --cwd packages/tokens build",
+    "typecheck": "tsc --noEmit -p tsconfig.json && bun run --filter '@nostrschool/*' typecheck",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "test:e2e": "bun run build && bun run --cwd apps/site test:e2e",
+    "snapshot:ecosystem": "bun run scripts/snapshot-ecosystem.ts"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@biomejs/biome": "^2.5.15",
+    "@happy-dom/global-registrator": "^20.14.5",
+    "@playwright/test": "^1.63.0",
+    "@testing-library/svelte": "^5.4.2",
+    "@types/bun": "^1.4.2",
+    "happy-dom": "^20.14.5",
+    "svelte": "^5.57.1",
+    "svelte-check": "^4.7.6",
+    "typescript": "^6.0.3"
+  }
+}

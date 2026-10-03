@@ -1,0 +1,299 @@
+---
+order: 9
+slug: zaps
+title: "Zaps"
+summary: "Dale propina a cualquiera, en cualquier lugar, en segundos: cómo los pagos Lightning y los eventos de Nostr se dan la mano, y qué demuestra de verdad un recibo de zap."
+estimatedMinutes: 14
+nips: ["57", "01"]
+takeaways:
+  - "Un zap es un pago Lightning más dos eventos de Nostr: una solicitud de zap (kind 9734) firmada por quien envía y un recibo de zap (kind 9735) firmado por el servidor de la wallet de quien recibe."
+  - "Tu dirección Lightning vive en el campo lud16 de tu perfil kind 0 y no es más que una forma corta de escribir una URL web (LUD-16)."
+  - "La solicitud de zap viaja por HTTP al servidor de la wallet, nunca a los relays; solo el recibo se publica en los relays."
+  - "Las apps verifican la firma del recibo, quién lo firmó (el nostrPubkey de la wallet) y el monto de la factura antes de contarlo."
+  - "Un recibo de zap es la palabra del servidor de la wallet, no una prueba de pago: confías en el proveedor de wallet de quien recibe."
+mascotIntro: "¿Listo para lanzar unos rayos? ⚡ ¡Sigamos una propina desde un toque hasta un contador brillante!"
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import ZapFlow from "~/components/chapters/09-zaps/ZapFlow.svelte";
+import Lud16Lookup from "~/components/chapters/09-zaps/Lud16Lookup.svelte";
+import ReceiptChecker from "~/components/chapters/09-zaps/ReceiptChecker.svelte";
+
+Imagina a un músico callejero. Te gusta la canción, así que dejas una moneda en su sombrero. Todos
+los que están cerca ven caer la moneda, y el músico sonríe. Así de simple.
+
+En internet, esa “moneda en el sombrero” siempre ha sido incómoda: las comisiones de las tarjetas
+se comen las propinas pequeñas, los sitios de pago piden crear una cuenta y la plataforma se queda
+con una parte. La respuesta de Nostr es el <Term id="zap" locale="es">zap</Term>: un pequeño pago
+por <Term id="lightning" locale="es">Lightning</Term> (la red de pagos rápidos de Bitcoin) que
+aparece justo debajo de una publicación, a la vista de todos. Las propinas de unos pocos centavos
+están bien, y llegan en segundos.
+
+Y aquí viene el giro que hace interesantes a los zaps: **los relays nunca tocan el dinero.** Un
+relay solo guarda <Term id="event" locale="es">eventos</Term>. Así que un zap es una pequeña
+carrera de relevos entre cuatro participantes, y los eventos de Nostr son solo el papeleo de la
+salida y de la meta.
+
+## Los cuatro participantes
+
+- **La app de quien envía**: el cliente de Nostr donde tocas ⚡, conectado a tu wallet Lightning.
+- **El servidor de la wallet de quien recibe**: la empresa o el equipo autoalojado que recibe pagos
+  Lightning en nombre de quien recibe. Habla <Term id="lnurl" locale="es">LNURL</Term>, un
+  protocolo web sencillo para preguntar “¿cómo te pago?”.
+- **La red Lightning**: donde el dinero se mueve de verdad.
+- **Los relays**: donde se *anuncia* el zap, para que todas las apps puedan mostrarlo.
+
+Dale a reproducir (o avanza con las flechas) y mira cómo Alice le hace un zap al dibujo del avestruz
+de Erin. Cada paso muestra exactamente qué viaja entre los participantes.
+
+<ZapFlow client:visible locale="es" />
+
+## Paso 1: encontrar el sombrero
+
+Para dar una propina necesitas saber dónde está el sombrero. En Nostr, está en el perfil: el evento
+de <Term id="metadata" locale="es">metadatos</Term> (kind 0) tiene un campo llamado
+<Term id="lud16" locale="es">lud16</Term> con una **dirección Lightning**. Parece un correo,
+`erin@wallet.alpha.example`, pero en realidad es un atajo para una URL web. Pruébalo:
+
+<Lud16Lookup client:visible locale="es" />
+
+La app consulta esa URL y el servidor de la wallet responde con sus datos de pago. Dos campos de la
+respuesta importan para los zaps: `allowsNostr: true` (“sí, entiendo los zaps”) y `nostrPubkey`: la
+<Term id="pubkey" locale="es">clave pública</Term> que el servidor de la wallet usará para firmar
+los recibos. Recuerda esa clave; es la estrella de la última sección.
+
+<Drawer client:visible testid="ch09-uth-lnurl" locale="es" title="Bajo el capó: direcciones Lightning y LNURL">
+
+**LUD-16 → LUD-06.** Una dirección Lightning `nombre@dominio` se convierte en
+`https://dominio/.well-known/lnurlp/nombre` ([LUD-16](https://github.com/lnurl/luds/blob/luds/16.md)).
+La respuesta es un documento LNURL-pay ([LUD-06](https://github.com/lnurl/luds/blob/luds/06.md));
+<Term id="nip57" locale="es">NIP-57</Term> ([especificación](https://github.com/nostr-protocol/nips/blob/master/57.md)) le añade dos campos:
+
+```json
+{
+  "callback": "https://wallet.alpha.example/lnurlp/erin/callback",
+  "minSendable": 1000,
+  "maxSendable": 100000000000,
+  "metadata": "[[\"text/plain\",\"Zap Erin\"],[\"text/identifier\",\"erin@wallet.alpha.example\"]]",
+  "tag": "payRequest",
+  "allowsNostr": true,
+  "nostrPubkey": "044b2cc412cc89149bc4f38a5067db6034dbaafe20321721a5414bb7237176f4"
+}
+```
+
+Los montos están en **milisatoshis** (1 sat = 1000 msat). nostr-tools hace la consulta por ti:
+
+```ts
+import { nip57 } from "nostr-tools";
+
+// metadataEvent = el kind 0 de quien recibe
+const callback = await nip57.getZapEndpoint(metadataEvent); // null si !allowsNostr
+```
+
+</Drawer>
+
+## Pasos 2–6: el papeleo
+
+Antes de pagar, la app de Alice escribe una **solicitud de zap**: una notita que dice *“Yo, Alice,
+quiero hacerle un zap de 2.100 sats a Erin por esta publicación, con el comentario ‘Love the
+ostrich! ⚡’. Por favor, anúncialo en estos relays.”* Alice la
+<Term id="signature" locale="es">firma</Term> con su clave, como cualquier evento, usando el kind
+9734.
+
+Sorpresa: esta nota **no** se publica en los relays. La app se la entrega directamente al servidor
+de la wallet de Erin en una petición web. El servidor la revisa y luego crea una **<Term id="invoice" locale="es">factura</Term>**
+Lightning (un cobro de un solo uso por exactamente 2.100 sats) y mete la solicitud de zap completa
+en la descripción de la factura. Ahora el cobro y la nota quedan pegados.
+
+<Drawer client:visible testid="ch09-uth-request" locale="es" title="Bajo el capó: la solicitud de zap">
+
+**La solicitud de zap (kind 9734)**: etiquetas obligatorias: `p` (quien recibe) y `relays` (adónde
+debe ir el recibo). Recomendadas pero opcionales: `amount` (en msat, como texto) y `lnurl`.
+Opcionales: `e` (evento que recibe el zap), `a` (evento direccionable que recibe el zap), `k` (su
+kind). `content` es un comentario opcional.
+
+```json
+{
+  "kind": 9734,
+  "content": "Love the ostrich! ⚡",
+  "tags": [
+    ["relays", "wss://relay.alpha.example", "wss://relay.gamma.example"],
+    ["amount", "2100000"],
+    ["p", "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb"],
+    ["e", "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356"]
+  ],
+  "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
+  "created_at": 1735684800,
+  "id": "24539a56…",
+  "sig": "b5beae9e…"
+}
+```
+
+Se envía con un HTTP GET al `callback`, codificada como URI en el parámetro de consulta `nostr`:
+`<callback>?amount=2100000&nostr=%7B%22kind%22%3A9734…&lnurl=<lnurl>`.
+El servidor debe comprobar: firma válida, etiquetas presentes, exactamente una `p`, cero o una `e`,
+una etiqueta `relays`, `amount` igual al monto de la consulta y como máximo una `P`. Responde
+`{ "pr": "<bolt11>" }`: una factura con *description hash* cuya descripción es el JSON de la
+solicitud de zap.
+
+```ts
+import { finalizeEvent, nip57 } from "nostr-tools";
+
+const template = nip57.makeZapRequest({
+  event: erinsPost,          // o { pubkey } para un zap a un perfil
+  amount: 2_100_000,         // msat
+  comment: "Love the ostrich! ⚡",
+  relays: ["wss://relay.alpha.example"],
+});
+const zapRequest = finalizeEvent(template, aliceSecretKey);
+const url = `${callback}?amount=2100000&nostr=${encodeURIComponent(JSON.stringify(zapRequest))}`;
+const { pr: invoice } = await (await fetch(url)).json();
+```
+
+</Drawer>
+
+## Pasos 7–10: se mueve el dinero y luego llega el anuncio
+
+La wallet de Alice paga la factura por Lightning. Los relays no ven nada de esto: es Lightning puro.
+Cuando llega el pago, el servidor de la wallet de Erin escribe un **recibo de zap** (kind 9735), lo
+firma con su `nostrPubkey` y lo publica en los relays que indicó Alice. Cada app que carga la
+publicación de Erin encuentra el recibo, lo verifica y suma ⚡ 2.100 al contador. 🎉
+
+<Drawer client:visible testid="ch09-uth-receipt" locale="es" title="Bajo el capó: el recibo del zap">
+
+**El recibo de zap (kind 9735)** lo firma el servidor de la wallet, *no* Erin ni Alice.
+Etiquetas: `p` (quien recibe), `P` opcional (quien envía), `e`/`a`/`k` copiadas de la solicitud,
+`bolt11` (la factura), `description` (el JSON de la solicitud de zap, tal cual) y `preimage`
+opcional. `created_at` debería ser el momento en que se pagó la factura.
+
+```json
+{
+  "kind": 9735,
+  "pubkey": "044b2cc412cc89149bc4f38a5067db6034dbaafe20321721a5414bb7237176f4",
+  "content": "",
+  "tags": [
+    ["p", "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb"],
+    ["P", "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"],
+    ["e", "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356"],
+    ["bolt11", "lnbc21000n1p…"],
+    ["description", "{\"kind\":9734,\"content\":\"Love the ostrich! ⚡\",…}"],
+    ["preimage", "0e03fe78…"]
+  ],
+  "created_at": 1735684802
+}
+```
+
+Para mostrar los zaps de una publicación, suscríbete con un filtro de [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md):
+
+```json
+["REQ", "zaps", { "kinds": [9735], "#e": ["def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356"] }]
+```
+
+`lnbc21000n` es el monto: 21000 × `n` (nano-BTC, 0,1 sat) = 2.100 sats.
+`nip57.getSatoshisAmountFromBolt11(invoice)` lo decodifica por ti.
+
+</Drawer>
+
+<Callout tone="tip" locale="es" testid="ch09-callout-anon">
+Los zaps son públicos: el recibo, con la solicitud de zap adentro, muestra quién le hizo un zap a
+quién, cuánto y con qué comentario. Piensa en “una moneda en el sombrero en una calle concurrida”,
+no en “una transferencia bancaria privada”.
+</Callout>
+
+## ¿Puedes confiar en un zap?
+
+Ahora viene la parte honesta. Cualquiera puede publicar un evento kind 9735: es solo un evento. Así
+que, antes de sumar un zap al contador, una app revisa el recibo:
+
+1. ¿La firma del recibo es válida?
+2. ¿Lo firmó el servidor de la wallet de quien recibe, es decir, el `nostrPubkey` que vimos en el paso 1?
+3. ¿Contiene una solicitud de zap real y firmada?
+4. ¿El monto de la factura coincide con el monto que pidió Alice?
+
+Estas comprobaciones atrapan manipulaciones e impostores. Pero mira con atención el último escenario
+de abajo: un servidor de wallet deshonesto puede firmar un recibo de aspecto perfecto para una
+factura que nadie pagó. ¡Y pasa todas las comprobaciones!
+
+<ReceiptChecker client:visible locale="es" />
+
+Ese es el modelo de confianza en una frase: **un recibo de zap es el proveedor de wallet de quien
+recibe diciendo “esto se pagó”.** Demuestra que alguien pidió una factura, y la wallet responde por
+el resto. Normalmente no hay problema (la wallet la elige quien recibe, y mentir solo inflaría sus
+propios ingresos), pero por eso los contadores de zaps son señales sociales, no registros contables.
+Los únicos que saben *con certeza* que hubo un pago son quien pagó (que tiene la preimagen) y quien
+recibió (cuyo saldo subió).
+
+<Drawer client:visible testid="ch09-uth-trust" locale="es" title="Bajo el capó: cómo validar recibos">
+
+**Validación del lado del cliente (NIP-57, Apéndice F):**
+
+- el `pubkey` del recibo DEBE ser igual al `nostrPubkey` del LNURL de quien recibe;
+- el monto de la factura `bolt11` DEBE ser igual a la etiqueta `amount` de la solicitud (si existe);
+- la etiqueta `lnurl` de la solicitud DEBERÍA coincidir con el lnurl de quien recibe.
+
+El Apéndice E añade que `SHA256(description)` debería coincidir con el hash de descripción de la
+factura, lo que pega la factura a esa solicitud de zap exacta.
+
+NIP-57 lo dice claramente: un recibo de zap “no es una prueba de pago”; solo muestra que alguien
+obtuvo una factura. Una etiqueta `preimage` tampoco ayuda: la wallet que creó la factura conoce la
+preimagen antes de que nadie pague.
+
+Relacionado: los eventos pueden llevar etiquetas `zap` para *repartir* los zaps entre varias
+personas (NIP-57, Apéndice G), y [NIP-47](https://github.com/nostr-protocol/nips/blob/master/47.md)
+(Nostr Wallet Connect) permite que las apps hablen con tu wallet para que hacer un zap sea cosa de
+un toque.
+
+```ts
+import { nip57 } from "nostr-tools";
+
+// Descarta los recibos que fallan lo básico antes de contarlos.
+const request = JSON.parse(receipt.tags.find((t) => t[0] === "description")?.[1] ?? "null");
+const err = nip57.validateZapRequest(JSON.stringify(request)); // null cuando la solicitud está bien
+const okSigner = receipt.pubkey === lnurlPayResponse.nostrPubkey;
+const sats = nip57.getSatoshisAmountFromBolt11(receipt.tags.find((t) => t[0] === "bolt11")?.[1] ?? "");
+```
+
+</Drawer>
+
+<Callout tone="safety" locale="es" testid="ch09-callout-safety">
+Todo en esta página son datos de demostración: wallets falsas, facturas falsas, ningún sat real.
+Nostr School nunca mueve dinero.
+</Callout>
+
+## Comprobación rápida
+
+<Quiz
+  client:visible
+  testid="ch09-quiz-1"
+  locale="es"
+  question="¿Adónde envía la app de quien envía la solicitud de zap (kind 9734)?"
+  options={[
+    { id: "relays", label: "A los relays, como cualquier otra nota", correct: false, explanation: "Solo el recibo se publica en los relays." },
+    { id: "wallet", label: "Al servidor de la wallet de quien recibe, por HTTP", correct: true, explanation: "Viaja a la URL de callback de LNURL, que la convierte en una factura." },
+    { id: "lightning", label: "Directamente a la red Lightning", correct: false, explanation: "Lightning lleva el pago, no los eventos de Nostr." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch09-quiz-2"
+  locale="es"
+  question="¿Quién firma el recibo de zap (kind 9735)?"
+  options={[
+    { id: "sender", label: "Quien envía", correct: false, explanation: "Quien envía firma la solicitud, no el recibo." },
+    { id: "recipient", label: "Quien recibe, con su propia clave", correct: false, explanation: "La clave de quien recibe no interviene en absoluto." },
+    { id: "wallet", label: "El servidor de la wallet de quien recibe, con su nostrPubkey", correct: true, explanation: "Por eso las apps comparan quién firmó con el nostrPubkey del LNURL." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch09-quiz-3"
+  locale="es"
+  question="Un recibo pasa todas las comprobaciones. ¿Qué demuestra eso?"
+  options={[
+    { id: "paid", label: "Que el dinero llegó con seguridad", correct: false, explanation: "Una wallet deshonesta puede firmar un recibo para una factura sin pagar." },
+    { id: "vouched", label: "Que el servidor de la wallet de quien recibe dice que se pagó", correct: true, explanation: "Exacto: los recibos son la palabra de la wallet, no una prueba de pago." },
+    { id: "relay", label: "Que el relay verificó el pago", correct: false, explanation: "Los relays nunca ven los pagos Lightning." },
+  ]}
+/>

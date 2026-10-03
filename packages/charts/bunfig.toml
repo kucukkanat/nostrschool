@@ -1,0 +1,5 @@
+# Mirrors the root bunfig so `bun test` also works from inside this package.
+[test]
+preload = ["../../tooling/test-preload.ts"]
+pathIgnorePatterns = ["**/e2e/**", "**/node_modules/**", "**/dist/**"]
+coverageSkipTestFiles = true

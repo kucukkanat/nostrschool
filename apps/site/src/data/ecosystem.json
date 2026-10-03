@@ -1,0 +1,480 @@
+{
+  "capturedAt": "2026-10-03T13:10:15.403Z",
+  "sources": [
+    {
+      "id": "nip66",
+      "name": "NIP-66 relay monitors (nostr.watch)",
+      "url": "https://github.com/nostr-protocol/nips/blob/master/66.md",
+      "retrievedAt": "2026-10-03T13:10:15.403Z",
+      "status": "ok",
+      "lastError": null,
+      "detail": {
+        "kind": "nip66",
+        "monitorRelays": [
+          "wss://relay.nostr.watch",
+          "wss://monitorlizard.nostr1.com",
+          "wss://relaypag.es"
+        ],
+        "windowHours": 24,
+        "partial": [
+          {
+            "relay": "wss://relay.nostr.watch",
+            "reason": "wss://relay.nostr.watch: timed out before EOSE (kept 5000 events from earlier pages)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "nips-repo",
+      "name": "nostr-protocol/nips",
+      "url": "https://github.com/nostr-protocol/nips",
+      "retrievedAt": "2026-10-03T13:10:15.403Z",
+      "status": "ok",
+      "lastError": null,
+      "detail": {
+        "kind": "github-head"
+      }
+    },
+    {
+      "id": "clients",
+      "name": "nostrapps.com + project sites",
+      "url": "https://nostrapps.com",
+      "retrievedAt": "2026-10-03T00:00:00.000Z",
+      "status": "curated",
+      "lastError": null,
+      "detail": {
+        "kind": "curated"
+      }
+    }
+  ],
+  "relays": {
+    "sourceId": "nip66",
+    "windowHours": 24,
+    "online": 1407,
+    "monitors": 17,
+    "withNipList": 1330,
+    "paid": 45,
+    "authRequired": 32,
+    "networks": [
+      {
+        "id": "clearnet",
+        "label": "clearnet",
+        "value": 1271
+      },
+      {
+        "id": "tor",
+        "label": "tor",
+        "value": 131
+      },
+      {
+        "id": "i2p",
+        "label": "i2p",
+        "value": 5
+      }
+    ],
+    "software": [
+      {
+        "id": "strfry",
+        "label": "strfry",
+        "value": 305
+      },
+      {
+        "id": "nostr-rs-relay",
+        "label": "nostr-rs-relay",
+        "value": 278
+      },
+      {
+        "id": "unknown",
+        "label": "unknown",
+        "value": 233
+      },
+      {
+        "id": "haven",
+        "label": "haven",
+        "value": 165
+      },
+      {
+        "id": "pyramid",
+        "label": "pyramid",
+        "value": 54
+      },
+      {
+        "id": "nostr",
+        "label": "nostr",
+        "value": 44
+      },
+      {
+        "id": "khatru",
+        "label": "khatru",
+        "value": 36
+      },
+      {
+        "id": "nostream",
+        "label": "nostream",
+        "value": 32
+      },
+      {
+        "id": "other",
+        "label": "other",
+        "value": 260
+      }
+    ],
+    "nipSupport": [
+      {
+        "id": "01",
+        "label": "NIP-01",
+        "value": 1310
+      },
+      {
+        "id": "11",
+        "label": "NIP-11",
+        "value": 1294
+      },
+      {
+        "id": "09",
+        "label": "NIP-09",
+        "value": 1281
+      },
+      {
+        "id": "40",
+        "label": "NIP-40",
+        "value": 1135
+      },
+      {
+        "id": "02",
+        "label": "NIP-02",
+        "value": 775
+      },
+      {
+        "id": "70",
+        "label": "NIP-70",
+        "value": 765
+      },
+      {
+        "id": "45",
+        "label": "NIP-45",
+        "value": 646
+      },
+      {
+        "id": "42",
+        "label": "NIP-42",
+        "value": 641
+      },
+      {
+        "id": "22",
+        "label": "NIP-22",
+        "value": 570
+      },
+      {
+        "id": "16",
+        "label": "NIP-16",
+        "value": 518
+      },
+      {
+        "id": "33",
+        "label": "NIP-33",
+        "value": 484
+      },
+      {
+        "id": "86",
+        "label": "NIP-86",
+        "value": 482
+      },
+      {
+        "id": "20",
+        "label": "NIP-20",
+        "value": 471
+      },
+      {
+        "id": "12",
+        "label": "NIP-12",
+        "value": 466
+      },
+      {
+        "id": "04",
+        "label": "NIP-04",
+        "value": 451
+      }
+    ]
+  },
+  "nips": {
+    "sourceId": "nips-repo",
+    "total": 99,
+    "unrecommended": 13,
+    "kinds": 180,
+    "growth": [
+      {
+        "date": "2022-06-30",
+        "count": 16
+      },
+      {
+        "date": "2022-09-30",
+        "count": 21
+      },
+      {
+        "date": "2022-12-31",
+        "count": 26
+      },
+      {
+        "date": "2023-03-31",
+        "count": 43
+      },
+      {
+        "date": "2023-06-30",
+        "count": 50
+      },
+      {
+        "date": "2023-09-30",
+        "count": 58
+      },
+      {
+        "date": "2023-12-31",
+        "count": 61
+      },
+      {
+        "date": "2024-03-31",
+        "count": 67
+      },
+      {
+        "date": "2024-06-30",
+        "count": 70
+      },
+      {
+        "date": "2024-09-30",
+        "count": 74
+      },
+      {
+        "date": "2024-12-31",
+        "count": 82
+      },
+      {
+        "date": "2025-03-31",
+        "count": 85
+      },
+      {
+        "date": "2025-06-30",
+        "count": 88
+      },
+      {
+        "date": "2025-09-30",
+        "count": 91
+      },
+      {
+        "date": "2025-12-31",
+        "count": 94
+      },
+      {
+        "date": "2026-03-31",
+        "count": 96
+      },
+      {
+        "date": "2026-06-30",
+        "count": 99
+      },
+      {
+        "date": "2026-09-30",
+        "count": 100
+      },
+      {
+        "date": "2026-10-03",
+        "count": 100
+      }
+    ]
+  },
+  "clients": {
+    "sourceId": "clients",
+    "items": [
+      {
+        "id": "damus",
+        "name": "Damus",
+        "url": "https://damus.io",
+        "platforms": [
+          "ios",
+          "desktop"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "primal",
+        "name": "Primal",
+        "url": "https://primal.net",
+        "platforms": [
+          "ios",
+          "android",
+          "web"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "amethyst",
+        "name": "Amethyst",
+        "url": "https://github.com/vitorpamplona/amethyst",
+        "platforms": [
+          "android"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "nostur",
+        "name": "Nostur",
+        "url": "https://nostur.com",
+        "platforms": [
+          "ios"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "nos",
+        "name": "Nos",
+        "url": "https://nos.social",
+        "platforms": [
+          "ios"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "yakihonne",
+        "name": "YakiHonne",
+        "url": "https://yakihonne.com",
+        "platforms": [
+          "ios",
+          "android",
+          "web",
+          "desktop"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "coracle",
+        "name": "Coracle",
+        "url": "https://coracle.social",
+        "platforms": [
+          "web"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "iris",
+        "name": "Iris",
+        "url": "https://iris.to",
+        "platforms": [
+          "web"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "snort",
+        "name": "Snort",
+        "url": "https://snort.social",
+        "platforms": [
+          "web"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "nostrudel",
+        "name": "noStrudel",
+        "url": "https://nostrudel.ninja",
+        "platforms": [
+          "web"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "jumble",
+        "name": "Jumble",
+        "url": "https://jumble.social",
+        "platforms": [
+          "web"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "gossip",
+        "name": "Gossip",
+        "url": "https://github.com/mikedilger/gossip",
+        "platforms": [
+          "desktop"
+        ],
+        "focus": "social"
+      },
+      {
+        "id": "olas",
+        "name": "Olas",
+        "url": "https://olas.app",
+        "platforms": [
+          "ios",
+          "android",
+          "web"
+        ],
+        "focus": "media"
+      },
+      {
+        "id": "0xchat",
+        "name": "0xchat",
+        "url": "https://0xchat.com",
+        "platforms": [
+          "ios",
+          "android"
+        ],
+        "focus": "chat"
+      },
+      {
+        "id": "flotilla",
+        "name": "Flotilla",
+        "url": "https://flotilla.social",
+        "platforms": [
+          "web"
+        ],
+        "focus": "chat"
+      },
+      {
+        "id": "habla",
+        "name": "Habla",
+        "url": "https://habla.news",
+        "platforms": [
+          "web"
+        ],
+        "focus": "long-form"
+      },
+      {
+        "id": "zapstream",
+        "name": "zap.stream",
+        "url": "https://zap.stream",
+        "platforms": [
+          "web",
+          "android",
+          "ios"
+        ],
+        "focus": "live"
+      },
+      {
+        "id": "shopstr",
+        "name": "Shopstr",
+        "url": "https://shopstr.store",
+        "platforms": [
+          "web"
+        ],
+        "focus": "commerce"
+      },
+      {
+        "id": "zapstore",
+        "name": "Zapstore",
+        "url": "https://zapstore.dev",
+        "platforms": [
+          "android"
+        ],
+        "focus": "apps"
+      },
+      {
+        "id": "yakbak",
+        "name": "YakBak",
+        "url": "https://yakbak.app",
+        "platforms": [
+          "web"
+        ],
+        "focus": "media"
+      }
+    ]
+  }
+}

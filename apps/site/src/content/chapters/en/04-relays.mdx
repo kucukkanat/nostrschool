@@ -1,0 +1,258 @@
+---
+order: 4
+slug: relays
+title: "Relays & the wire protocol"
+summary: "Watch REQ, EVENT, EOSE and friends fly between clients and relays."
+estimatedMinutes: 14
+nips: ["01", "11", "42", "65"]
+takeaways:
+  - "A relay is a simple server that stores signed events and hands them out when asked. Relays don't talk to each other."
+  - "Clients do the clever work: they pick relays, merge and deduplicate answers, and verify every signature themselves."
+  - "The whole conversation is a handful of JSON arrays over a WebSocket: REQ, EVENT, EOSE, CLOSE, OK, NOTICE, CLOSED and AUTH."
+  - "Publishing the same event to several relays keeps it findable when one relay goes down or kicks you out."
+  - "A relay can refuse or forget your events, but it can never change them or fake new ones in your name."
+mascotIntro: "Packets incoming! Grab a seat, we're going to eavesdrop on a relay. Totally legal, I checked."
+---
+import Term from "~/components/shell/Term.astro";
+import { Callout, Drawer, Quiz } from "@nostrschool/ui";
+import WireTheater from "~/components/chapters/04-relays/WireTheater.svelte";
+import RedundancyLab from "~/components/chapters/04-relays/RedundancyLab.svelte";
+import LiveWire from "~/components/chapters/04-relays/LiveWire.svelte";
+
+You have a <Term id="keypair" locale="en">keypair</Term> and you know how to sign an
+<Term id="event" locale="en">event</Term>. But a signed note sitting on your laptop is a diary,
+not a social network. To reach other people it has to travel somewhere. On Nostr, that somewhere
+is a <Term id="relay" locale="en">relay</Term>.
+
+## Relays are dumb (and that's a compliment)
+
+Picture a relay as a **community notice board** in a café. Anyone can pin a card on it, anyone
+can walk up and read the cards, and the café owner decides house rules: no ads, members only,
+cards taken down after a month. That's it. The notice board doesn't know your friends, doesn't
+rank your feed, and doesn't talk to the notice board in the café across the street.
+
+Your <Term id="client" locale="en">client</Term> (the app you use) is the opposite: it's your
+**personal assistant**. It knows which notice boards your friends use, walks to several of them,
+collects the cards, throws away duplicates, checks every <Term id="signature" locale="en">signature</Term>,
+and lays everything out nicely for you.
+
+This split is on purpose:
+
+- **Relays stay simple**, so they're cheap to run. Thousands of people run one, from big public
+  relays to a tiny one in someone's closet.
+- **Clients hold the intelligence**, so *you* choose the algorithm, not a company.
+- **Nothing depends on one relay.** If a board disappears, your assistant just reads another one.
+  That's where Nostr's <Term id="censorship-resistance" locale="en">censorship resistance</Term> comes from.
+
+<Callout tone="tip" locale="en" title="Relays can't lie about what you said">
+A relay can refuse your note, lose it, or hide it. What it can't do is *edit* it or post in your
+name: every event carries your signature, and clients verify it on their own device (chapter 3).
+The worst a relay can do is stay silent, and that's why we use more than one.
+</Callout>
+
+## Eavesdropping on the wire
+
+Clients and relays talk over a <Term id="websocket" locale="en">WebSocket</Term>: a phone line
+that stays open, so both sides can speak whenever they like. Every message on that line is a tiny
+JSON array whose first item is a shouty uppercase word: the **verb**.
+
+Pick a conversation below, then press play, step through it with the arrows, or drag the scrubber.
+Click any packet type in the legend to jump straight to it. Keep an eye on the client's notebook:
+that's all the bookkeeping relays *don't* do.
+
+<WireTheater client:visible locale="en" />
+
+## The whole vocabulary fits on a sticky note
+
+[NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) defines the core language. Your
+client says three things:
+
+| Client says | Meaning |
+|---|---|
+| `REQ` | "Send me events matching these <Term id="filter" locale="en">filters</Term>, and keep me posted." Opens a <Term id="subscription" locale="en">subscription</Term> with a name you pick. |
+| `EVENT` | "Please store this signed event." (Publishing.) |
+| `CLOSE` | "I'm done with that subscription." |
+
+The relay answers with five:
+
+| Relay says | Meaning |
+|---|---|
+| `EVENT` | "Here's an event for your subscription called *feed*." |
+| `EOSE` | "That's everything I had stored." <Term id="eose" locale="en">End Of Stored Events</Term>: stop the spinner. The subscription stays open for brand-new events. |
+| `OK` | "About that event you sent: stored (`true`) or refused (`false`), and here's why." |
+| `CLOSED` | "I'm ending your subscription," with a reason. |
+| `NOTICE` | A human-readable message, like a note taped to the door. |
+
+And there's one extra pair for logging in, from <Term id="nip42" locale="en">NIP-42</Term>: `AUTH`.
+The relay sends a random challenge; your client signs it with your key and sends it back. No
+password ever crosses the wire, only a signature. (There's also `COUNT` from
+[NIP-45](https://github.com/nostr-protocol/nips/blob/master/45.md), for "how many?" questions, but
+you rarely see it.)
+
+<Drawer client:visible testid="ch04-uth-frames" locale="en" title="Under the hood: the exact frames">
+
+Every frame is a JSON array sent as one WebSocket text message.
+
+```json
+["REQ", "feed", {"authors": ["e550c6e9…"], "kinds": [1], "limit": 2}]
+["EVENT", "feed", {"id": "…", "pubkey": "…", "created_at": 1735686600, "kind": 1, "tags": [], "content": "…", "sig": "…"}]
+["EOSE", "feed"]
+["CLOSE", "feed"]
+
+["EVENT", {"id": "…", "kind": 1, "…": "…"}]
+["OK", "<event id>", true, ""]
+["OK", "<event id>", false, "pow: difficulty 16 or more is required"]
+["CLOSED", "feed", "rate-limited: slow down, too many requests"]
+["NOTICE", "heads up: this relay restarts at 03:00 UTC"]
+```
+
+Rules worth knowing, straight from [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md):
+
+- The **subscription id** is any non-empty string up to 64 characters, chosen by the client and
+  scoped to one connection. Sending a new `REQ` with an id that's already open **replaces** that
+  subscription.
+- A `REQ` may carry several filters; they're combined with OR. `limit` only applies to the first,
+  stored batch. With `limit: 0` the relay skips stored events entirely and just streams new ones.
+- After `EOSE`, the relay keeps sending matching events in real time until you `CLOSE`, it sends
+  `CLOSED`, or the socket drops.
+- A relay **must** answer every published `EVENT` with `OK`, and must send `CLOSED` when it refuses
+  a `REQ`.
+- `OK` and `CLOSED` messages start with a machine-readable prefix: `duplicate:`, `pow:`, `blocked:`,
+  `rate-limited:`, `invalid:`, `restricted:`, `mute:` or `error:`. NIP-42 adds `auth-required:`.
+  Note that `["OK", id, true, "duplicate: …"]` is a success: the relay already had it.
+
+</Drawer>
+
+<Drawer client:visible testid="ch04-uth-auth" locale="en" title="Under the hood: logging in with AUTH (NIP-42)">
+
+The relay may send a challenge at any time, typically right after you connect or just before it
+refuses something:
+
+```json
+["AUTH", "ostrich-7f3a9c2e"]
+["CLOSED", "dms", "auth-required: gift wraps are only served to their recipient"]
+```
+
+The client answers with a signed, **never published** event of kind `22242`, tagging the relay URL
+and the challenge. Relays check the signature, the challenge, the URL, and that `created_at` is
+recent (roughly within 10 minutes):
+
+```json
+["AUTH", {"kind": 22242, "tags": [["relay", "wss://relay.delta.example"], ["challenge", "ostrich-7f3a9c2e"]], "content": "", "…": "id, pubkey, created_at, sig"}]
+["OK", "<auth event id>", true, ""]
+```
+
+If you're logged in but your key still isn't allowed, the relay uses the `restricted:` prefix
+instead. Paid relays and relays serving private <Term id="gift-wrap" locale="en">gift wraps</Term>
+(chapter 8) rely on this. Spec: [NIP-42](https://github.com/nostr-protocol/nips/blob/master/42.md).
+
+</Drawer>
+
+<Drawer client:visible testid="ch04-uth-code" locale="en" title="Under the hood: talking to relays with nostr-tools">
+
+`SimplePool` manages one WebSocket per relay and fans your requests out to all of them, deduplicating
+events by id for you:
+
+```ts
+import { SimplePool } from "nostr-tools/pool";
+import { finalizeEvent, generateSecretKey } from "nostr-tools/pure";
+
+const relays = ["wss://relay.damus.io", "wss://nos.lol", "wss://relay.primal.net"];
+const pool = new SimplePool();
+
+// REQ to every relay; onevent fires once per unique event, oneose when all relays sent EOSE.
+const sub = pool.subscribeMany(relays, { kinds: [1], limit: 3 }, {
+  onevent: (event) => console.log(event.pubkey.slice(0, 8), event.content),
+  oneose: () => sub.close(), // sends CLOSE to each relay
+});
+
+// Publishing = one EVENT per relay; each promise settles with that relay's OK.
+const event = finalizeEvent(
+  { kind: 1, created_at: Math.floor(Date.now() / 1000), tags: [], content: "hello relays" },
+  generateSecretKey(),
+);
+const results = await Promise.allSettled(pool.publish(relays, event));
+console.log(results.map((r) => r.status)); // e.g. ["fulfilled", "fulfilled", "rejected"]
+```
+
+For a single connection there's `Relay.connect(url)` from `nostr-tools/relay`, with `relay.subscribe`,
+`relay.publish` and `relay.auth(sign)` for NIP-42. Under the hood it's exactly the frames you saw above.
+
+Bonus: a relay can describe itself. Fetch its URL over HTTPS with the header
+`Accept: application/nostr+json` and you get a JSON document with its name, contact, supported NIPs
+and limits (<Term id="nip11" locale="en">NIP-11</Term>, [spec](https://github.com/nostr-protocol/nips/blob/master/11.md)).
+
+</Drawer>
+
+## Don't put all your notes in one relay
+
+Because relays don't copy events between each other, your client usually sends every note to
+**several** relays at once. If one goes offline, gets overloaded, or decides it doesn't like you,
+your followers can still find your note on the others. Some relays are free, some are
+<Term id="paid-relay" locale="en">paid</Term> (a small fee is a great <Term id="spam" locale="en">spam</Term>
+filter), and each has its own house rules. Mix and match.
+
+Try it: choose where to publish, then start knocking relays offline.
+
+<RedundancyLab client:visible locale="en" />
+
+How does Bob's client know *which* relays to check for your notes? You publish a small list of
+"where I write" relays, and his client goes there. That's the
+<Term id="outbox-model" locale="en">outbox model</Term>
+([NIP-65](https://github.com/nostr-protocol/nips/blob/master/65.md)), and it's coming up in chapter 7.
+
+<Callout tone="info" locale="en" title="Relays have rules, and that's fine">
+`OK false` isn't an error in the protocol: it's a relay exercising its right to choose. One relay
+might demand <Term id="proof-of-work" locale="en">proof of work</Term>, another only accepts members,
+a third deletes everything after a week. Since no relay is special, you simply pick the ones whose
+rules you like.
+</Callout>
+
+## Listen to the real thing
+
+Everything above was scripted. This panel sends a real `REQ` and shows every frame exactly as it
+arrives. By default it talks to our practice relays; flip **Live mode** in the header and it talks to
+real public relays instead. Don't worry: it only ever *reads*. We never publish anything.
+
+<LiveWire client:visible locale="en" />
+
+Notice the `CLOSE` frames at the end: once every relay has said `EOSE`, the panel politely hangs up.
+A real client would often keep the subscription open to receive new notes as they're posted.
+
+## Quick check
+
+<Quiz
+  client:visible
+  testid="ch04-quiz-eose"
+  locale="en"
+  question={'Your client receives ["EOSE", "feed"]. What does it mean?'}
+  options={[
+    { id: "a", label: "The relay has sent all the stored events that match; new ones may still arrive.", correct: true, explanation: "End Of Stored Events. The subscription stays open until someone closes it." },
+    { id: "b", label: "The relay has closed the subscription for good.", correct: false, explanation: "That's CLOSED (from the relay) or CLOSE (from you). EOSE keeps the subscription open." },
+    { id: "c", label: "There was an error reading the database.", correct: false, explanation: "Errors come as CLOSED or NOTICE with a reason. EOSE is good news." },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch04-quiz-relay"
+  locale="en"
+  question="Relay Beta goes rogue. Which of these can it do to Alice's notes?"
+  options={[
+    { id: "a", label: "Quietly change a word in one of them.", correct: false, explanation: "The id and signature would no longer match. Every client would reject the edited copy." },
+    { id: "b", label: "Refuse to store or serve them.", correct: true, explanation: "Right: relays choose what to keep. That's why Alice publishes to several." },
+    { id: "c", label: "Copy her notes to other relays on her behalf, as a favor.", correct: false, explanation: "Relays don't sync with each other. (Anyone could re-publish a signed event, but that's a client's choice, not relay magic.)" },
+  ]}
+/>
+
+<Quiz
+  client:visible
+  testid="ch04-quiz-publish"
+  locale="en"
+  question={'Alice publishes to three relays and gets OK true, OK true, and OK false "pow: …". What should her client conclude?'}
+  options={[
+    { id: "a", label: "The note's signature is invalid.", correct: false, explanation: "An invalid signature would get an invalid: prefix, and from every relay, not just one." },
+    { id: "b", label: "Publishing failed and must be retried everywhere.", correct: false, explanation: "Nostr isn't all-or-nothing. Relays are independent; one refusal doesn't undo the others." },
+    { id: "c", label: "The note is published: two relays stored it, one asked for proof of work.", correct: true, explanation: "Each relay answers for itself. Two copies out there is a success." },
+  ]}
+/>

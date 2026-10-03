@@ -1,0 +1,20 @@
+---
+/** Root: send visitors to the default locale. Static hosting can't redirect, so meta refresh + link. */
+import { DEFAULT_LOCALE } from "@nostrschool/i18n";
+import { href } from "~/lib/href";
+
+const target = href(DEFAULT_LOCALE);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content={`0; url=${target}`}>
+    <link rel="canonical" href={target}>
+    <title>Nostr School</title>
+  </head>
+  <body>
+    <a href={target} data-testid="root-redirect">Nostr School</a>
+  </body>
+</html>

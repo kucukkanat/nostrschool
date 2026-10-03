@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "types": ["bun"],
+    "paths": { "~/*": ["./src/*"] }
+  },
+  "include": [".astro/types.d.ts", "src/**/*", "e2e/**/*", "test/**/*", "*.ts"],
+  "exclude": ["dist", "node_modules"]
+}
