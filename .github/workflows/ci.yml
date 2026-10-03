@@ -19,6 +19,8 @@ jobs:
           bun-version: 1.3.14
       - run: bun install --frozen-lockfile
       - run: bun run lint
+      # Fails when NIP summaries/specs changed without re-running `bun run embed:nips`.
+      - run: bun run embed:nips -- --check
       - run: bun run typecheck
       - run: bun run build
       # After build so apps/site/test/build.test.ts can inspect dist/.

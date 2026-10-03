@@ -1,0 +1,36 @@
+{
+  "name": "@nostrschool/nips",
+  "version": "0.0.0",
+  "private": true,
+  "description": "NIP corpus snapshot, NipSpec schema, per-NIP specs, validator and search helpers",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./corpus": {
+      "types": "./src/corpus.ts",
+      "default": "./src/corpus.ts"
+    },
+    "./specs": {
+      "types": "./src/specs/index.ts",
+      "default": "./src/specs/index.ts"
+    },
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@nostrschool/i18n": "workspace:*",
+    "@nostrschool/protocol": "workspace:*",
+    "marked": "^18.0.14",
+    "sanitize-html": "^2.18.0"
+  },
+  "devDependencies": {
+    "@nostrschool/fixtures": "workspace:*",
+    "@types/sanitize-html": "^2.16.2"
+  }
+}

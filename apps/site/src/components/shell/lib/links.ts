@@ -20,7 +20,7 @@ export const TOOL_SLUGS = ["keys", "event-inspector", "filter-playground", "kind
 export type ToolSlug = (typeof TOOL_SLUGS)[number];
 
 export interface ToolLink {
-  readonly id: ToolSlug | "glossary";
+  readonly id: ToolSlug | "nips" | "glossary";
   readonly title: string;
   readonly description: string;
   readonly href: string;
@@ -33,7 +33,7 @@ const TOOL_KEYS = {
   kinds: "kinds",
 } as const satisfies Record<ToolSlug, string>;
 
-/** The four tools plus the glossary, which is reference material of the same flavour. */
+/** The four tools plus the NIP reference and the glossary, reference material of the same flavour. */
 export const toolLinks = (locale: Locale): readonly ToolLink[] => {
   const t = getDictionary(locale).common;
   return [
@@ -43,6 +43,12 @@ export const toolLinks = (locale: Locale): readonly ToolLink[] => {
       description: t.toolCards[TOOL_KEYS[slug]],
       href: href(locale, `tools/${slug}`),
     })),
+    {
+      id: "nips",
+      title: t.tools.nips,
+      description: t.toolCards.nips,
+      href: href(locale, "nips"),
+    },
     {
       id: "glossary",
       title: t.glossary.title,

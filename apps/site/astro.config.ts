@@ -29,4 +29,11 @@ export default defineConfig({
   ],
   // Also used by `astro preview` (Playwright webServer).
   server: { port: 4321 },
+  vite: {
+    // The NIP search worker uses import.meta and dynamic imports, which the default iife worker
+    // format rejects.
+    worker: { format: "es" },
+    // transformers.js ships its own wasm loader; pre-bundling it in dev breaks the worker.
+    optimizeDeps: { exclude: ["@huggingface/transformers"] },
+  },
 });

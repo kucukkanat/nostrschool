@@ -37,8 +37,11 @@ Who has which dependency (you may only import these from your package):
 | `@nostrschool/diagrams` | tokens, ui, i18n, protocol, svelte, d3 (+types), motion |
 | `@nostrschool/charts` | tokens, ui, i18n, svelte, d3 (+types) |
 | `@nostrschool/mascot` | ui, i18n, svelte, @rive-app/canvas, motion, nanostores |
+| `@nostrschool/nips` | i18n, protocol, marked 18, sanitize-html 2.18 (+ @types/sanitize-html; fixtures as dev) |
+| `@nostrschool/nip-search` | nips, protocol, @huggingface/transformers 4.3, minisearch 7.2, nanostores |
+| `@nostrschool/nip-editor` | nips, protocol, fixtures, i18n, ui, tokens, diagrams, svelte, nostr-tools (NIP-49, NIP-06), @lezer/highlight, @codemirror/{state,view,language,commands,lang-json,lint} 6 |
 | `@nostrschool/site` | all packages above (test-relay as dev), astro + integrations, svelte, nanostores, fonts, playwright, axe |
-| root (tooling) | typescript, biome, happy-dom, @happy-dom/global-registrator, @testing-library/svelte, svelte, svelte-check, @types/bun, playwright, axe |
+| root (tooling) | typescript, biome, happy-dom, @happy-dom/global-registrator, @testing-library/svelte, svelte, svelte-check, @types/bun, playwright, axe, @huggingface/transformers (for `scripts/embed-nips.ts`) |
 
 Need something else? Don't install it — list it under **NEEDS** in your final report.
 
@@ -56,6 +59,8 @@ Run from the **repo root** (or from a package root — each package has a `bunfi
 | `bun run --cwd packages/<pkg> typecheck` | `tsc --noEmit` (TS pkgs) or `svelte-check` (ui, diagrams, charts, mascot) |
 | `bunx biome check <your paths>` / `bunx biome check --write <your paths>` | lint + format your files |
 | `bun run --cwd packages/tokens build` | regenerate tokens (tokens owner only) |
+| `bun run snapshot:nips [-- --commit <sha>]` | refresh the NIP corpus (integrator; then new ids need specs) |
+| `bun run embed:nips` | rebuild NIP embeddings (embeddings agent) |
 
 Full-repo commands (integrator / CI only — they race with other agents): `bun run typecheck`,
 `bun run lint`, `bun run test`, `bun run build`, `bun run test:e2e`.
@@ -229,7 +234,8 @@ export const LOCALES: readonly ["en", "es"]; export type Locale = "en" | "es";
 export const DEFAULT_LOCALE: Locale;            // "en"
 export const LOCALE_NAMES: Record<Locale, string>; LOCALE_TAGS: Record<Locale, string>; // "en-US", "es-ES"
 export const isLocale: (v: unknown) => v is Locale;
-export type Dictionary = typeof en;             // { common, ui, diagrams, charts, mascot, kinds, chapters: { ch01 … ch12 } }
+export type Dictionary = typeof en;             // { common, ui, diagrams, charts, mascot, kinds, nips: { ui, editor, issues, r1…r6 }, chapters: { ch01 … ch12 } }
+export const getNipStrings: (locale, id) => NipStrings | undefined; nipRange(id): NipRange; NIP_RANGES; // §3.11
 export type MessageKey;                         // "common.nav.learn" | "chapters.ch02.title" | …
 export type ChapterKey = "ch01" | … | "ch12";
 export interface PluralMessage { one: string; other: string; zero?: string }
@@ -244,7 +250,8 @@ export type Glossary = Readonly<Record<GlossaryId, GlossaryEntry>>;
 export const getGlossary: (locale) => Glossary; getGlossaryEntry: (locale, id) => GlossaryEntry; isGlossaryId;
 export const fallbackLocale: (locale) => Locale; // "en"
 ```
-Files: `src/locales/<loc>/{common,ui,diagrams,charts,mascot,kinds}.ts`, `src/locales/<loc>/chapters/NN.ts`
+Files: `src/locales/<loc>/{common,ui,diagrams,charts,mascot,kinds}.ts`, `src/locales/<loc>/chapters/NN.ts`,
+`src/locales/<loc>/nips/{ui,editor,issues,r1…r6}.ts` (§3.11)
 (exports `chNN`, starts with `{ title, summary }` — add your keys), `src/glossary/{ids,en,es}.ts`.
 `kinds.ts` = `{ categories, categoryDescriptions, names: { k<kind>: { name, description } } }` for every `KINDS` entry.
 GlossaryIds: nostr relay client event kind tag pubkey privkey npub nsec keypair secp256k1 schnorr
@@ -478,6 +485,203 @@ poseForEvent(event: MascotEventType): MascotPose; REACTION_HOLD_MS = 2400
 ```
 Rive file goes to `apps/site/public/mascot/ostrich.riv`; the site passes `riveSrc={assetHref("mascot/ostrich.riv")}`.
 
+### 3.11 NIP reference — `packages/nips`, `packages/nip-search`, `packages/nip-editor`
+
+Goal: `/<locale>/nips/` searches (by meaning and keyword), filters and browses every NIP;
+`/<locale>/nips/<id>/` shows one NIP with an interactive editor for what it defines (JSON
+structure, convenient editing, per-field explanations, how it works) above the spec text.
+Implemented: all 99 NIPs have finished specs (en + es strings), the validator, hybrid search with the
+self-hosted model, the editor for every variant, and both routes.
+
+**Snapshot.** `bun run snapshot:nips [-- --commit <sha>]` (`scripts/snapshot-nips.ts`, pure parsing
+in `packages/nips/src/corpus/parse.ts`; wire messages come from the README table plus
+`extractBodyMessages(md, exclude?)`: top-level `["VERB", …]` arrays in code blocks under a heading that states a
+direction, e.g. NIP-77 NEG-OPEN/NEG-MSG/NEG-CLOSE/NEG-ERR) clones github.com/nostr-protocol/nips and writes
+`packages/nips/src/data/corpus.json` (full, ~1.4 MB, build time only) and `index.json`
+(metadata, ~160 KB, browser-safe). Pinned at **`0046368a747c5c25ae2bec28bae0e537744c8f10`**
+(2026-09-27): 99 NIPs — draft 80, final 2, unrecommended 13, deprecated 4 (12/16/20/33, "moved to
+NIP-01"). NIP spec prose stays English (pages show `nips.ui.proseNote`).
+
+#### `@nostrschool/nips` (entry points)
+| Import | Contents | Use from |
+|---|---|---|
+| `@nostrschool/nips` | types below, `NIP_INDEX`, `NIP_IDS`, `getNipMeta(id)`, `kindRegistryRows(kind)`, spec helpers, validator, browse helpers, re-exports `getNipStrings`/`nipRange`/`NIP_RANGES` | anywhere (islands OK) |
+| `@nostrschool/nips/specs` | `NIP_SPECS: {[id]: NipSpec}`, `getSpec(id)`, `listNips(): NipListing[]` | build time; pass ONE spec (or the listing) to an island as a prop |
+| `@nostrschool/nips/corpus` | `NIP_CORPUS`, `getNipDocument(id)`, `renderNipMarkdown(md, { nipHref, sourceBase, headingIdPrefix? = "spec-", headingOffset? = 1, stripHeader? = true })` (marked + sanitize-html allow-list; NIP links → our pages, other relative links → GitHub at the commit, heading ids = `NipSection.id` slugs) | build time only |
+
+```ts
+// types.ts — corpus
+type NipId = string;                       // "01", "5A", "C7" (file name; upper-case hex). isNipId, normalizeNipId("nip-5a") → "5A", NIP_ID_PATTERN
+type NipStatus = "final" | "draft" | "unrecommended" | "deprecated"; NIP_STATUSES
+interface NipMeta { id; title; summary /* English, ≤320 chars */; status; maturity: "draft"|"final"|null; requirement: "mandatory"|"optional"|null;
+  relay: boolean; statusTags; listed; unrecommended?: { reason; replacedBy: NipId[] }; movedTo?: NipId;
+  kinds: { kind; to?; description; deprecated? }[];   // README kinds table (ranges: 9000–9030, 39000–39009)
+  exampleKinds: number[]; messages: { type; direction: "client-to-relay"|"relay-to-client"; description }[];
+  tags: string[] /* heuristic, from examples */; idents: string[] /* identifier-like inline code outside code blocks: "supported_nips" */; mentions: NipId[]; mentionedBy: NipId[]; headings: string[]; url; updatedAt: string|null; wordCount }
+interface NipDocument extends NipMeta { markdown; sections: { id /* GitHub slug, "intro" first */; heading; level; markdown }[] }
+interface NipIndex { source: { repo; commit; committedAt; snapshotAt }; nips: NipMeta[]; kinds: KindRegistryRow[]; messages: MessageRegistryRow[] }   // NipCorpus = same with NipDocument
+```
+
+```ts
+// spec.ts — NipSpec (pure JSON data; no prose: every explanation is a TextKey)
+type TextKey = string;            // key into getNipStrings(locale, nip).text — kebab-case, dotted by area: "tag.e.marker", "content", "step.sign"
+type JsonValue; type JsonPath = readonly (string | number)[]; type PersonaRef = string /* fixtures PersonaId */;
+type FieldType =                  // semantic type of a string value → input widget + validation
+  | { type: "hex"; bytes? } | { type: "hex32" } | { type: "pubkey" } | { type: "event-id" } | { type: "relay-url"; literals?: EnumOption[] /* exact non-URL values, NIP-62 "ALL_RELAYS" */ }
+  | { type: "url"; schemes? } | { type: "timestamp" } | { type: "kind"; kinds? } | { type: "addr"; kinds? /* kind:pubkey:d */ }
+  | { type: "bech32"; prefixes; uri? } | { type: "enum"; values: { value; explain? }[]; open? }
+  | { type: "text"; pattern?; multiline?; minLength?; maxLength? } | { type: "number"; integer?; min?; max? }
+  | { type: "json"; schema: JsonSchema } | { type: "event-json"; kinds? } | { type: "base64"; of?: "event" | "bytes" };
+type JsonSchema = (SchemaBase /* explain?, deprecated? */) & (
+  | { type: "object"; properties; required?; additionalProperties?: boolean | JsonSchema } | { type: "array"; items; minItems?; maxItems? }
+  | { type: "tuple"; items: JsonSchema[]; minItems?; rest? } | { type: "string"; field?: FieldType } | { type: "number"; integer?; minimum?; maximum? }
+  | { type: "boolean" } | { type: "null" } | { type: "any-of"; options } | { type: "event"; shape? /* EventShape id */; signed? } | { type: "filter" } | { type: "any" });
+type KindSelector = number | { from; to };
+type ContentSpec = { format: "text"; explain; required?; multiline?; field? } | { format: "json"; explain; schema }
+  | { format: "encrypted"; explain; scheme: "nip44" | "nip04"; plaintext: ContentSpec } | { format: "empty"; explain? };
+interface TagFieldSpec { name; type: FieldType; explain; optional?; placeholder? }
+interface TagSpec { id? /* when one name has variants */; name; explain; presence: "required"|"recommended"|"optional"; repeatable;
+  fields: TagFieldSpec[]; rest?: TagFieldSpec /* variadic */; when?: { index /* 1-based after name */; equals }; template?: string[]; deprecated? }
+interface RequireOneOf { tags: string[] /* tag names, any one satisfies */; explain: TextKey }
+interface EventShape { id; label; explain; kinds: KindSelector[]; content: ContentSpec; tags: TagSpec[]; requireOneOf?: RequireOneOf[] /* NIP-09 e|a, NIP-22 E|A|I + e|a|i */; unknownTags?: "allow"|"warn";
+  signature?: "required" | "none" /* rumor */; deprecated?: { explain: TextKey; replacedBy?: string /* shape id */ } /* legacy shape, e.g. NIP-72 kind 1 posts */; examples: { id; label; explain?; signer?: PersonaRef; template: { kind; created_at?; tags; content } }[] }
+interface WireMessageSpec { id; label; explain; direction; type /* "REQ" */; elements: { name; explain; schema; optional?; repeatable? }[]; replies?: string[]; examples: { id; label; explain?; message: JsonValue[] }[] }
+interface DocumentSpec { id; label; explain; mediaType; urlTemplate /* "https://<domain>/.well-known/nostr.json?name=<local-part>" */; requestHeaders?; schema; examples: { id; label; explain?; value }[] }
+interface HttpRequestSpec { id; label; explain; method; urlTemplate; headers: { name; explain; value: FieldType; required }[]; body?: { mediaType; schema };
+  responses: { status; explain; mediaType?; schema? }[]; authEvent? /* EventShape id */; examples: { id; label; explain?; url; headers; body? }[] }
+type EncodingCodec = "npub"|"nsec"|"note"|"nprofile"|"nevent"|"naddr"|"nostr-uri"|"ncryptsec"|"mnemonic"|"nip44-payload"|"nip04-payload";
+interface EncodingSpec { id; label; explain; codec; inputs: { name; type: FieldType; explain; optional?; repeatable? }[]; output: TextKey; examples: { id; label; explain?; inputs }[] }
+interface ProcessSpec { actors: { id; label; kind: "user"|"client"|"relay"|"signer"|"server"|"wallet"|"extension" }[];
+  steps: { id; from; to?; label; explain; packet?; payload?; part?: SpecPartKey }[] }
+type SpecPartKind = "event" | "message" | "document" | "http" | "encoding"; interface SpecPartKey { kind; id }
+interface HowItWorksStep { id; title; body; focus?: { part: SpecPartKey; path?: JsonPath } }
+interface RelatedNip { nip; relation: "depends-on"|"extends"|"used-by"|"replaces"|"replaced-by"|"see-also"; explain? }
+interface NipFlow { id; label; explain; steps: { part: SpecPartKey; explain }[] }     // e.g. zap request → zap receipt
+type NipSpecVariant = "event" | "message" | "document" | "encoding" | "http" | "process"; NIP_SPEC_VARIANTS
+type NipSpec = { nip; variant; todo?; howItWorks; related; flows?; events?; messages?; documents?; http?; encodings?; process? }
+  // discriminated by variant: "event" requires events, "message" messages, "document" documents, "encoding" encodings, "http" http, "process" process.
+  // Other collections may appear as secondary parts (NIP-42: message + 22242 event; NIP-98: http + 27235 event via authEvent).
+specParts(spec): SpecPart[] /* primary variant first */; findSpecPart(spec, key); kindSelected(selectors, kind); tagSpecId(tag); specTextKeys(spec): TextKey[]
+```
+
+```ts
+// validate.ts — implemented
+VALIDATION_CODES /* 41 codes, see file; "missing-one-of" { tags: "e, a" } at path ["tags"] explained by the rule */; type ValidationCode; type ValidationSeverity = "error" | "warning" | "info";
+interface ValidationIssue { severity; code; path: JsonPath; params?: {[k]: string|number}; explain?: TextKey }
+interface ValidationReport { valid /* no errors */; issues }
+type SpecTarget = { kind: "event"; part: EventShape } | { kind: "message"; part: WireMessageSpec } | { kind: "document"; part: DocumentSpec } | { kind: "http"; part: HttpRequestSpec } | { kind: "encoding"; part: EncodingSpec };
+validateAgainstSpec(value: unknown, target: SpecTarget, options?: { verifySignature? = true; shapes?: {[id]: EventShape} }): ValidationReport   // never throws on bad input
+validateField(value, field: FieldType, path? = [], options?): ValidationIssue[];  validateSchema(value, schema, path? = [], options?): ValidationIssue[]
+validateJsonText(text, target, options?); matchTagSpec(tag, shape); describeKinds(selectors); jsonTypeOf(value)
+// Issue paths may point INSIDE a JSON-encoded string (["content","name"], ["tags",4,1,"kind"]): map them to the
+// longest prefix that exists in the JSON text. `invalid-json` has no params (the editor supplies the position).
+// HTTP values are { url, headers, body? }; encoding values are the inputs record. Pass `shapes` so nested events and
+// `authEvent` are checked. `out-of-range` with one bound passes "-∞"/"∞" for the other.
+// An event matched to a shape with `deprecated` gets ONE `info` "deprecated" at the event's path
+// ({ replacedBy? } params, explain = deprecated.explain); it stays valid. Relay-url `literals` pass as-is.
+// build.ts: defaultEventTemplate, tagTemplate, defaultKind, defaultSchemaValue, defaultContent, defaultMessage,
+// defaultDocument, defaultHttpRequest, defaultEncodingInputs, defaultPartValue (spec example first, else a required-only skeleton).
+// index.ts accessors: nipsForKind(kind), nipsWithStatus(status), getNipRelations(id)
+// Messages: getDictionary(locale).nips.issues[code] with {params}. A test requires one message per code.
+```
+
+```ts
+// search.ts — browse helpers (implemented, tested)
+interface NipListing extends NipMeta { variant: NipSpecVariant; todo: boolean }      // listNips()
+interface NipFilters { statuses?; variants?; relay?: boolean; kind?: number; tag?: string; dependsOn?: NipId }  // facets AND, values OR, empty = any; nipRelations()
+filterNips(listings, filters); matchesFilters; nipCoversKind(meta, kind)
+type NipSort = "id" | "title" | "updated"; sortNips(nips, sort, locale?)   // "id" = hex order = README order (59 < 5A < 60)
+facetCounts(listings): { statuses; variants; relay }
+parseNipQuery(text, knownIds?, isKnownKind?): { text; ids; kinds; tags }   // "kind:9735", "kind 9735", "#imeta", "nip-57" consumed; bare "57"/"5A"/"EE" pinned + kept in text;
+                                                                // with isKnownKind a bare 3–5 digit registered kind ("9735") is pinned as a kind and kept (years stay text)
+fuseRankings(rankings: {id}[][], { k? = 60, weights? }): { id; score }[]   // reciprocal rank fusion
+```
+
+#### `@nostrschool/nip-search` — implemented
+```ts
+DEFAULT_MODEL_ID = "Xenova/all-MiniLM-L6-v2"
+createNipSearch({ listings: NipListing[], locale?: "en" | "es" /* es adds Spanish titles, summaries, hints, stop words, accent folding */, semantic?: { modelBaseUrl /* assetHref("models/") */; wasmBaseUrl /* assetHref("models/ort/") */; modelId? } | false }): NipSearch
+interface NipSearch {
+  lexical(q: { text; filters?; limit? }): NipSearchResult;                     // sync, MiniSearch fuzzy+prefix, shortcuts pinned first (ids, kinds incl. bare registered kinds, #tags,
+                                                                               // exact upper-case wire messages: "AUTH" → 42), filters applied; NipMeta.idents indexed (boost 0.7)
+  search(q, { signal? }?): Promise<Result<NipSearchResult, NipSearchError>>;   // hybrid by score fusion (each side normalised to its best score, keyword 1 : meaning 2; beat RRF on the quality set); resolves ok "lexical" when semantic is unavailable; err only "aborted";
+                                                                               // a NIP found only by meaning needs similarity ≥ semanticOnlyMinSimilarity (0.4, rank.ts) so gibberish returns []
+  warmup(): Promise<Result<void, NipSearchError>>; $semantic: ReadableAtom<SemanticState>; dispose(): void }
+interface NipSearchResult { query; hits: { id; score; lexicalRank?; semanticRank?; similarity?; pinned; terms; snippet?: { sectionId; heading; text } }[]; mode: "lexical" | "hybrid" }
+type SemanticStatus = "idle" | "loading" | "ready" | "unavailable" | "error"; SemanticState { status; progress?; reason?: "offline"|"unsupported"|"save-data"|"disabled"|"model-failed"|"embeddings-failed" }
+quantizeInt8(v): { data: Int8Array; scale }; decodeEmbeddings(manifest, bytes): EmbeddingsIndex; cosineTopK(query, index, k): { chunk; similarity }[]
+// Committed data: src/data/embeddings.json = { version: 1, model, dims, commit (== NIP_INDEX.source.commit), textHash /* of embedded text: summaries + hints */, chunks: { id, nip, sectionId, heading, text }[], scales: number[] }
+// Passages per NIP: an "about" passage, ~110-word section windows (code removed), and short everyday-wording hints (src/aliases.ts).
+// src/data/definitions.json: term → NIPs that define it (heading 3, row/list/bold 2, JSON key 1; linking NIPs dropped; terms in > 4 NIPs dropped),
+//   plus DEFINITION_OVERRIDES (lud06/lud16 → 57). Only identifier-shaped words (snake_case, dotted, letter+digit, quoted/backticked) use it: the strongest definer
+//   is pinned ("Exact match") and boosted in lexical. Options: `definitions` on HybridSearchOptions, LexicalOptions, RankInput. Regenerate: `bun run --cwd packages/nip-search definitions`
+//   (a test fails when it is stale). Site cards skip stop words when highlighting (`isStopWord`, en+es).
+//                 src/data/embeddings.bin  = chunks × dims int8, row-major (vector ≈ int8 × scale, L2-normalised first). Load in the browser via new URL("./data/embeddings.bin", import.meta.url).
+```
+Model hosting rules: no third-party network calls. In the browser set transformers.js `env.allowRemoteModels = false`,
+`env.localModelPath = modelBaseUrl` (root-relative path or same-origin URL; reduced to a path — transformers.js 4.3 ignores local files at absolute URLs),
+`env.backends.onnx.wasm.wasmPaths = wasmBaseUrl` (joined with exactly one `/`: `assetHref` drops trailing slashes). The site needs `vite.worker.format = "es"`.
+If the Cache API write fails (quota: private windows, small phones), the model load retries once with
+`env.useBrowserCache = false` (`withoutCacheOnFailure`). Files live under
+`apps/site/public/models/`: `Xenova/all-MiniLM-L6-v2/{config.json, tokenizer.json, tokenizer_config.json, onnx/model_quantized.onnx}`
+(~23 MB) and `ort/` with only the plain CPU runtime `ort-wasm-simd-threaded.{wasm,mjs}` (~14 MB; skip jsep/jspi/asyncify).
+Lazy-load on first search/focus, never on page load; respect `navigator.connection.saveData` and offline (state `unavailable`, keyword search continues).
+`scripts/embed-nips.ts` (`bun run embed:nips`) fetches missing model files at a pinned revision (SHA-256 checked), copies the CPU wasm runtime and embeds with the SAME model in Bun; `-- --assets` files only, `-- --check` exits 1 when anything is stale. Re-run after editing English summaries. `public/models/` (~37 MB) is committed and ignored by biome.
+
+#### `@nostrschool/nip-editor` — implemented
+Components (all take `testid`, `locale`; parts `${testid}-…`): `NipEditor { spec; part?; example?; syncHash? = true; layout?: "auto"|"tabs"|"split"; onchange?(state) }`
+(parts `-parts -part-<kind>-<id> -examples -example-<id> -tabs -form -json -explain -validity -sign -signer -copy -share -how`; Form | JSON | Explain tabs below `md`, side by side above),
+`JsonCodeEditor { value (bindable); diagnostics; highlight?; readonly?; onselectpath?; label }` (CodeMirror 6 + @codemirror/lang-json + @codemirror/lint),
+`ExplainPanel { nip; target }`, `HowItWorks { spec; step? (bindable); onfocus? }`, `ValidityBadge { report }`,
+variant renderers `EventForm` (kind picker, created_at, content by format, tag rows: add-from-template/remove/reorder, persona signer), `MessageForm`, `DocumentForm`, `EncodingForm`, `HttpForm { authEvent? }`, `ProcessExplainer { process; step? }` (uses diagrams' SequenceDiagram).
+Pure helpers (`state.ts`): `initialValue(part, exampleId?)`, `encodeEditorHash(state)` → `#edit=<base64url JSON>`, `decodeEditorHash(hash, spec): Result<EditorState, HashError>`,
+`pathAtOffset(json, offset)`, `rangeOfPath(json, path)`, `explainAt(part, value, path, issues): ExplainTarget` (`rules?: RuleExplain[]` lists the shape's `requireOneOf` tag rules,
+met or not, when the path is the tags list, a tag row a rule names, or the "Add tag" buttons), `livePath(value, path)` (cuts a selection back at the first list index
+that no longer exists, so deleted/reordered rows never leave a stale heading), `issueDiagnostics(json, issues, message)`.
+Relay-URL fields with `literals` use `type="text"` and list the literals before the fixture relays in the picker.
+`EditorState { part: SpecPartKey; value: JsonValue; example?; signer? }`. Signing: `signEvent` from protocol with the persona's demo key (fixtures); demo keys only, never ask for a real nsec.
+Document-level issues (path `[]` or a missing top-level field) anchor on the opening bracket, not the whole document.
+Encoding inputs are matched by type first, then name: NIP-19 `pubkey secretKey id relays author kind identifier` (numbers as strings),
+NIP-06 `mnemonic account`, NIP-44 `sender recipient plaintext nonce?`, NIP-49 `secret-key password log-n key-security`.
+Secret-key inputs are persona pickers only. `MAX_DEMO_LOGN = 16`: heavier NIP-49 scrypt settings are explained, not run.
+
+#### i18n (`packages/i18n/src/locales/<loc>/nips/`)
+`getDictionary(locale).nips = { ui, editor, issues, r1, r2, r3, r4, r5, r6 }`.
+- `ui.ts` list/detail page strings · `editor.ts` editor chrome · `issues.ts` one message per `ValidationCode`.
+- `rN.ts`: `{ n<id>: NipStrings }` where `NipStrings = { title; summary /* our own words */; text: { [TextKey]: string } }`.
+  `getNipStrings(locale, id)`, `nipRange(id)`, `nipStringsKey(id)`, `NIP_RANGES` from `@nostrschool/i18n` (re-exported by nips).
+- All `summary` texts are our own words; every `es` file is translated (no `TODO(es)` left).
+
+Ranges (exact ids in the snapshot):
+
+| Range | NIP ids |
+|---|---|
+| r1 (01–19) | 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 |
+| r2 (20–39) | 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 |
+| r3 (40–59) | 40 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 |
+| r4 (60–79) | 60 61 62 64 65 66 67 68 69 70 71 72 73 75 77 78 |
+| r5 (80–99) | 84 85 86 87 88 89 90 92 94 96 98 99 |
+| r6 (letters) | 5A 7D A0 A3 A4 B0 B7 BE C0 C7 CC EE F4 |
+
+Final variants: document 05 11 · encoding 06 19 21 44 49 · http 86 96 98 ·
+message 42 45 50 67 77 · process 07 12 16 20 33 55 70 BE · event: all others (incl. 31 and B7).
+
+#### Writing a spec (spec authors) — definition of done
+1. `packages/nips/src/specs/nip-<id>.ts`: fill the variant collection, `howItWorks` (≥ 1 step, ideally 3–6 with `focus`), `related`, `flows` where a NIP chains parts; drop `todo: true`.
+   Base examples on the NIP text and real fixture personas (`signer: "alice"`); kinds/tags must match the spec; `created_at` omitted (editor uses FIXTURE_NOW) unless the example needs a date.
+2. Every `label`/`explain`/`title`/`body`/`output` is a TextKey with English text in `en/nips/rN.ts → n<id>.text`; rewrite `summary` in our own words (friendly, specific; no "unlock/dive in/seamless/journey"); add the same keys to `es/nips/rN.ts` (English + `// TODO(es)`).
+3. `bun test packages/nips` checks: spec per corpus id, JSON-serialisable, finished specs non-empty, unique part/tag ids, focus/flow/process refs resolve, example kinds match, every TextKey has English text and no text is unused.
+4. Add spec-specific tests (e.g. `nip-57.test.ts`) once the validator lands: every example validates without errors.
+
+#### Routes (`apps/site/src/pages/[locale]/nips/`)
+`/<locale>/nips/` (static list of every NIP = no-JS fallback; testids `nips-title nips-count nips-list nips-item-<id> nips-snapshot`,
+`nips-search nips-search-clear nips-semantic nips-filters-toggle nips-filters nips-status-<s> nips-variant-<v> nips-category-<c> nips-kind nips-editor nips-course nips-relay nips-clear nips-sort nips-view-grid|list nips-empty`,
+`nips-item-<id>-link|-pinned|-snippet|-editor|-course`) and
+`/<locale>/nips/<id>/` with the id exactly as the repo names it (`/en/nips/7D/`; testids `nip-back nip-id nip-title nip-summary nip-facts nip-status nip-variant nip-kinds nip-moved nip-unrecommended nip-todo nip-editor nip-spec nip-github`,
+`nip-relay nip-tags nip-messages nip-course nip-course-<nn> nip-related nip-related-<id> nip-spec-details nip-spec-toggle nip-pager nip-prev nip-next`).
+Spec code blocks and tables get `tabindex="0"` (they scroll sideways on phones).
+The editor island renders only for non-`todo` specs (`client:idle`, so a tap right after a deep link is not lost). `NipBrowser` takes `createSearch?(listings, semantic, locale): NipSearch` (default `createNipSearch` with the page locale and the self-hosted model). Header nav has `nav-nips`; the tools index has `tool-link-nips`; glossary NIP pills link to `/nips/<id>/` when the id is in the corpus.
+
 ---
 
 ## 4. Site (`apps/site`)
@@ -485,7 +689,8 @@ Rive file goes to `apps/site/public/mascot/ostrich.riv`; the site passes `riveSr
 - `astro.config.ts`: static, `base = BASE_PATH ?? "/understanding-nostr"`, `site = SITE_URL ?? placeholder`,
   `trailingSlash: "always"`, i18n `en`/`es` with `prefixDefaultLocale: true`, mdx, svelte, sitemap.
 - Routes: `/` (meta-refresh to `/en/`), `/404`, `/<locale>/`, `/<locale>/learn/`, `/<locale>/learn/<slug>/`,
-  `/<locale>/tools/`, `/<locale>/tools/{keys,event-inspector,filter-playground,kinds}/`, `/<locale>/glossary/` (anchors `#<glossaryId>`).
+  `/<locale>/tools/`, `/<locale>/tools/{keys,event-inspector,filter-playground,kinds}/`, `/<locale>/glossary/` (anchors `#<glossaryId>`),
+  `/<locale>/nips/`, `/<locale>/nips/<id>/` (§3.11).
 - **Links**: always `href(locale, path)` / `assetHref(path)` from `~/lib/href` (`~` = `apps/site/src`).
   `href("en", "learn/keys")` → `/understanding-nostr/en/learn/keys/`; `href("en", "glossary#relay")` keeps the hash.
   `switchLocale(pathname, to)`. Works in Svelte islands too (falls back to `/` base under bun test).
@@ -573,8 +778,13 @@ Only create/modify files you own. Everything not listed belongs to the **integra
 | glossary agent | `packages/i18n/src/glossary/en.ts`, `apps/site/src/pages/[locale]/glossary.astro`, `apps/site/e2e/glossary.spec.ts` |
 | shell agent | `apps/site/src/layouts/**`, `apps/site/src/components/shell/**`, `apps/site/src/pages/[locale]/index.astro`, `apps/site/src/pages/[locale]/learn/index.astro`, `apps/site/src/pages/[locale]/learn/[slug].astro`, `apps/site/src/pages/[locale]/tools/index.astro`, `apps/site/src/pages/404.astro`, `packages/i18n/src/locales/en/common.ts`, `apps/site/src/styles/**`, `apps/site/e2e/shell.spec.ts`, `apps/site/public/**` except `public/mascot/**` |
 | chapter agent NN | `apps/site/src/content/chapters/en/NN-<slug>.mdx`, `apps/site/src/components/chapters/NN-<slug>/**` (Svelte components + `*.test.ts`), `packages/i18n/src/locales/en/chapters/NN.ts`, `apps/site/e2e/chapters/NN.spec.ts`; plus: 02 → `pages/[locale]/tools/keys.astro`; 03 → `pages/[locale]/tools/event-inspector.astro`; 05 → `pages/[locale]/tools/filter-playground.astro`; 06 → `pages/[locale]/tools/kinds.astro` + `packages/i18n/src/locales/en/kinds.ts`; 11 → `scripts/snapshot-ecosystem.ts` + `apps/site/src/data/ecosystem.json` |
+| NIP embeddings agent | `packages/nip-search/**`, `scripts/embed-nips.ts`, `apps/site/public/models/**` |
+| NIP editor agent | `packages/nip-editor/**`, `packages/i18n/src/locales/en/nips/editor.ts` |
+| NIP pages agent | `apps/site/src/pages/[locale]/nips/**`, `apps/site/src/components/nips/**`, `apps/site/e2e/nips*.spec.ts`, `packages/i18n/src/locales/en/nips/ui.ts` |
+| NIP validator agent | `packages/nips/src/**` except `src/specs/**` and `src/data/**` (validate.ts, search.ts, spec.ts, markdown.ts, corpus/…, their tests), `packages/i18n/src/locales/en/nips/issues.ts` |
+| NIP spec author rN | `packages/nips/src/specs/nip-<id>.ts` for the ids of range rN (§3.11 table) + their tests (`nip-<id>.test.ts`), `packages/i18n/src/locales/en/nips/rN.ts` |
 | translation agents | `packages/i18n/src/locales/es/**`, `packages/i18n/src/glossary/es.ts`, `apps/site/src/content/chapters/es/**` |
-| integrator | root configs (`package.json`, `tsconfig*.json`, `biome.json`, `bunfig.toml`, `.github/**`, `.gitignore`, `.editorconfig`), every `package.json`/`tsconfig.json`/`bunfig.toml`, `bun.lock`, `tooling/**`, `packages/i18n/src/index.ts`, `packages/i18n/src/{locales,types}.ts`, `packages/i18n/src/locales/*/index.ts`, `packages/i18n/src/glossary/ids.ts`, `packages/i18n/src/i18n.test.ts`, `packages/tokens/**` (implemented; request changes), `apps/site/astro.config.ts`, `apps/site/svelte.config.js`, `apps/site/playwright.config.ts`, `apps/site/src/content.config.ts`, `apps/site/src/lib/**`, `apps/site/src/env.d.ts`, `apps/site/src/pages/index.astro`, `apps/site/e2e/helpers/**`, `apps/site/test/**`, `README.md`, `CONTRACTS.md` |
+| integrator | root configs (`package.json`, `tsconfig*.json`, `biome.json`, `bunfig.toml`, `.github/**`, `.gitignore`, `.editorconfig`), every `package.json`/`tsconfig.json`/`bunfig.toml`, `bun.lock`, `tooling/**`, `packages/i18n/src/index.ts`, `packages/i18n/src/{locales,types,nips}.ts`, `packages/i18n/src/locales/*/nips/index.ts`, `packages/nips/src/specs/index.ts`, `packages/nips/src/data/**` (via `snapshot:nips`), `scripts/snapshot-nips.ts`, `packages/i18n/src/locales/*/index.ts`, `packages/i18n/src/glossary/ids.ts`, `packages/i18n/src/i18n.test.ts`, `packages/tokens/**` (implemented; request changes), `apps/site/astro.config.ts`, `apps/site/svelte.config.js`, `apps/site/playwright.config.ts`, `apps/site/src/content.config.ts`, `apps/site/src/lib/**`, `apps/site/src/env.d.ts`, `apps/site/src/pages/index.astro`, `apps/site/e2e/helpers/**`, `apps/site/test/**`, `README.md`, `CONTRACTS.md` |
 
 Exception (only one): when you add a key to an `en` i18n file you own, append the same key to the
 matching `es` file (English text + `// TODO(es)`), additively.

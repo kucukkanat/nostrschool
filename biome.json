@@ -13,6 +13,7 @@
       "!**/test-results",
       "!**/playwright-report",
       "!**/src/generated",
+      "!**/public/models",
       "!**/*.json",
       "**/package.json",
       "**/tsconfig*.json",

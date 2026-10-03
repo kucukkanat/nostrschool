@@ -16,6 +16,7 @@ import {
 import { en } from "./locales/en/index.ts";
 import { es } from "./locales/es/index.ts";
 import { DEFAULT_LOCALE, LOCALE_TAGS, type Locale } from "./locales.ts";
+import { type NipStrings, nipRange, nipStringsKey } from "./nips.ts";
 import type { MessageParams, MessagePath, PluralMessage } from "./types.ts";
 
 /** Which chapter teaches each glossary term (powers the glossary page's chapter filter). */
@@ -28,6 +29,14 @@ export {
   LOCALES,
   type Locale,
 } from "./locales.ts";
+export {
+  NIP_RANGES,
+  type NipRange,
+  type NipStrings,
+  type NipStringsRange,
+  nipRange,
+  nipStringsKey,
+} from "./nips.ts";
 export type { MessageParams, MessagePath, PluralMessage } from "./types.ts";
 export { GLOSSARY_IDS, type Glossary, type GlossaryEntry, type GlossaryId };
 
@@ -116,3 +125,12 @@ export const isGlossaryId = (value: unknown): value is GlossaryId =>
 
 /** Locale to fall back to for untranslated content (MDX chapters). */
 export const fallbackLocale = (_locale: Locale): Locale => DEFAULT_LOCALE;
+
+/**
+ * Strings for one NIP ("01", "7D") from its range file, or undefined when the id has no entry
+ * (a NIP added by a newer snapshot before its strings were written).
+ */
+export const getNipStrings = (locale: Locale, id: string): NipStrings | undefined => {
+  const range: { readonly [key: string]: NipStrings } = dictionaries[locale].nips[nipRange(id)];
+  return range[nipStringsKey(id)];
+};

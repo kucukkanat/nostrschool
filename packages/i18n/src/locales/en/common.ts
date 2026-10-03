@@ -10,6 +10,7 @@ export const common = {
     home: "Home",
     learn: "Learn",
     tools: "Tools",
+    nips: "NIPs",
     glossary: "Glossary",
     skipToContent: "Skip to content",
     primary: "Main navigation",
@@ -56,6 +57,7 @@ export const common = {
     eventInspector: "Event inspector",
     filterPlayground: "Filter playground",
     kinds: "Kinds table",
+    nips: "NIP reference",
   },
   glossary: {
     title: "Glossary",
@@ -135,6 +137,7 @@ export const common = {
       "Build a REQ filter and see which events match, against examples or live relays.",
     kinds: "A searchable periodic table of event kinds and the NIPs that define them.",
     glossary: "Every Nostr term on this site, in plain words.",
+    nips: "Search every NIP by meaning, then edit the JSON it defines with explanations for each field.",
     open: "Open",
   },
   shell: {

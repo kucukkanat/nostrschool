@@ -1,0 +1,1061 @@
+// Owner: translation agents. Must structurally match ../../en/nips/r1.ts (enforced by the type).
+import type { r1 as en } from "../../en/nips/r1.ts";
+
+export const r1: typeof en = {
+  n01: {
+    title: "Descripción del flujo básico del protocolo",
+    summary:
+      "El núcleo de Nostr: un único objeto JSON firmado llamado evento, y el puñado de mensajes que clientes y relays intercambian por un WebSocket para publicar eventos y suscribirse a ellos.",
+    text: {
+      "how.keys.title": "Eres un par de claves",
+      "how.keys.body":
+        "Cada usuario es un par de claves secp256k1. La clave pública (32 bytes, hex) es tu identidad; la clave secreta firma todo lo que publicas. No hay cuenta ni servidor que sea dueño de ti.",
+      "how.build.title": "Completa un evento",
+      "how.build.body":
+        "Un evento tiene un kind (qué es), created_at (cuándo), tags (referencias estructuradas) y content (la carga útil). Los tags son arrays de strings; el primer string da nombre al tag.",
+      "how.id.title": "Calcula su hash para obtener el id",
+      "how.id.body":
+        "Serializa [0, pubkey, created_at, kind, tags, content] como JSON compacto y calcula su SHA-256: ese es el id del evento. Cambia un solo carácter y el id cambia.",
+      "how.sign.title": "Firma el id",
+      "how.sign.body":
+        "Una firma Schnorr BIP-340 sobre el id demuestra que el dueño de la pubkey escribió exactamente este evento. Cualquiera puede verificarla; nadie puede falsificarla sin la clave secreta.",
+      "how.publish.title": "Publica en relays",
+      "how.publish.body":
+        'Envía ["EVENT", evento] por un WebSocket. El relay comprueba el id y la firma, guarda el evento y responde con un mensaje OK que dice si fue aceptado.',
+      "how.subscribe.title": "Suscríbete con filtros",
+      "how.subscribe.body":
+        'Envía ["REQ", id, filtro…] para pedir eventos. El relay transmite las coincidencias guardadas, envía EOSE cuando se ha puesto al día y luego sigue enviando nuevas coincidencias en vivo hasta que envíes CLOSE.',
+      "related.10": "Define las notas de texto kind 1 y cómo las respuestas usan tags e.",
+      "related.19": "Codificaciones npub/note/nevent para mostrar estos valores hex a personas.",
+      "related.11":
+        "Los relays describen sus límites y los NIPs que soportan en un documento HTTP.",
+      "related.merged": "Sus reglas se integraron en NIP-01.",
+      "flow.publish.label": "Publicar un evento",
+      "flow.publish.explain": "El cliente envía un evento firmado; el relay acusa recibo.",
+      "flow.publish.send": "El cliente envuelve el evento firmado en un mensaje EVENT.",
+      "flow.publish.ok":
+        "El relay responde OK con true, o con false y un motivo legible por máquinas.",
+      "flow.subscribe.label": "Suscribirse a eventos",
+      "flow.subscribe.explain": "Pide eventos una vez, recibe el historial y sigue en vivo.",
+      "flow.subscribe.req": "El cliente abre una suscripción con uno o más filtros.",
+      "flow.subscribe.event":
+        "El relay envía cada evento que coincide, etiquetado con el id de la suscripción.",
+      "flow.subscribe.eose":
+        "Fin de los eventos guardados: todo lo que llegue después son datos nuevos, en tiempo real.",
+      "flow.subscribe.close": "El cliente cierra la suscripción cuando ya no la necesita.",
+      "event.label": "Evento",
+      "event.explain":
+        "El único tipo de objeto en Nostr. Cada publicación, perfil, reacción o lista es un evento con un kind distinto.",
+      "event.content":
+        "String arbitrario. Su significado depende del kind: texto plano para kind 1, JSON serializado para kind 0, texto cifrado para DMs.",
+      "tag.e": "Apunta a otro evento por su id.",
+      "tag.e.id": "Id hex de 32 bytes del evento referenciado.",
+      "tag.e.author":
+        "Pubkey opcional del autor del evento referenciado, una pista para encontrarlo.",
+      "tag.relay":
+        "URL opcional del relay donde se puede encontrar lo referenciado. Puede estar vacía.",
+      "tag.p": "Apunta a otro usuario por su clave pública.",
+      "tag.p.pubkey": "Clave pública hex de 32 bytes del usuario referenciado.",
+      "tag.a":
+        "Apunta a un evento direccionable o reemplazable por su coordenada en lugar de por su id.",
+      "tag.a.address":
+        'Coordenada "kind:pubkey:d-tag". Para un evento reemplazable simple, conserva los dos puntos finales: "10002:<pubkey>:".',
+      "example.note.label": "Una nota de texto simple",
+      "example.note.explain":
+        "Kind 1 con un hashtag. Los tags que NIP-01 no define también están permitidos.",
+      "example.references.label": "Referenciar un evento, un usuario y un artículo",
+      "example.references.explain":
+        "El tag e apunta a la nota de Bob, el tag p a Frank y el tag a a la versión más reciente del artículo de Frank.",
+      "metadata.label": "Metadatos de usuario (kind 0)",
+      "metadata.explain":
+        "Tu perfil. Es reemplazable: los relays guardan solo el kind 0 más reciente de cada pubkey.",
+      "metadata.content":
+        "Un objeto JSON serializado como string, no un objeto anidado: content siempre es un string.",
+      "metadata.schema":
+        "Campos del perfil. Se permiten campos extra (display_name, website, nip05, lud16…).",
+      "metadata.name": "Apodo o nombre completo.",
+      "metadata.about": "Biografía breve.",
+      "metadata.picture": "URL de la imagen de avatar.",
+      "example.metadata.label": "El perfil de Alice",
+      "example.metadata.explain":
+        "Edita cualquier campo: content sigue siendo un string JSON dentro del evento.",
+      "msg.client-event.label": "EVENT (cliente → relay)",
+      "msg.client-event.explain": "Publica un evento firmado.",
+      "msg.req.label": "REQ",
+      "msg.req.explain":
+        "Abre una suscripción. Varios filtros en un mismo REQ se combinan con OR; las condiciones dentro de un filtro, con AND.",
+      "msg.close.label": "CLOSE",
+      "msg.close.explain": "Detiene una suscripción que el cliente abrió antes.",
+      "msg.relay-event.label": "EVENT (relay → cliente)",
+      "msg.relay-event.explain": "Entrega un evento que coincide con una suscripción.",
+      "msg.ok.label": "OK",
+      "msg.ok.explain":
+        "La respuesta del relay a un EVENT publicado: si fue aceptado o no, y por qué.",
+      "msg.eose.label": "EOSE",
+      "msg.eose.explain":
+        "Fin de los eventos guardados de una suscripción. Las nuevas coincidencias siguen llegando después.",
+      "msg.closed.label": "CLOSED",
+      "msg.closed.explain": "El relay rechazó o terminó una suscripción por su cuenta.",
+      "msg.notice.label": "NOTICE",
+      "msg.notice.explain":
+        "Un mensaje legible por personas enviado por el relay. No hay reglas sobre cómo tratarlo.",
+      "msg.el.event":
+        "Un evento firmado completo: id, pubkey, created_at, kind, tags, content, sig.",
+      "msg.el.sub-id":
+        "Id de suscripción: cualquier string no vacío de hasta 64 caracteres, único por conexión, elegido por el cliente.",
+      "msg.el.filter":
+        "Objeto filtro: ids, authors, kinds, valores de tags #<letra>, since, until, limit. Todos los campos que indiques deben cumplirse.",
+      "msg.el.ok-id": "Id del evento al que se refiere esta respuesta.",
+      "msg.el.accepted": "true si el relay guardó o aceptó el evento, false si lo rechazó.",
+      "msg.el.reason":
+        'Vacío, o "prefijo: mensaje". Prefijos estándar: duplicate, pow, blocked, rate-limited, invalid, restricted, mute, error.',
+      "msg.el.notice": "Texto libre para personas.",
+      "example.client-event": "Bob publica una nota",
+      "example.req.feed.label": "Feed principal",
+      "example.req.feed.explain": "Las 20 notas más recientes de Alice o Bob.",
+      "example.req.tags.label": "Menciones y un hashtag",
+      "example.req.tags.explain":
+        "Dos filtros combinados con OR: notas y reacciones que etiquetan a Alice, más los 10 eventos #nostr más recientes.",
+      "example.close": "Cerrar la suscripción del feed",
+      "example.relay-event": "Llega una nota que coincide",
+      "example.ok.accepted": "Aceptado",
+      "example.ok.rejected": "Rechazado con un motivo",
+      "example.eose": "Al día",
+      "example.closed": "Suscripción rechazada",
+      "example.notice": "Aviso de mantenimiento",
+    },
+  },
+  n02: {
+    title: "Lista de seguidos",
+    summary:
+      "El kind 3 es tu lista de seguidos: un tag p por cada persona que sigues, con una pista de relay opcional y un apodo local (petname). Publicar una nueva reemplaza la anterior.",
+    text: {
+      "how.list.title": "Un tag p por cada seguido",
+      "how.list.body":
+        'Toda la lista vive en los tags. Cada entrada es ["p", pubkey, relay, petname]; content queda vacío.',
+      "how.replace.title": "Publica siempre la lista completa",
+      "how.replace.body":
+        "El kind 3 es reemplazable: los relays guardan solo el más reciente. Seguir a alguien implica volver a publicar todos tus seguidos más el nuevo, añadido al final.",
+      "how.relays.title": "Las pistas de relay ayudan a encontrar personas",
+      "how.relays.body":
+        "La URL del relay indica dónde se pueden encontrar los eventos de esa persona. Otros clientes pueden usar estas pistas para descubrir relays.",
+      "how.petnames.title": "Los petnames son tus nombres para las personas",
+      "how.petnames.body":
+        "Un petname es un apodo local (letras, dígitos, _). Rutas como ~/erin/charlie se resuelven a través de las listas de seguidos: el petname charlie de Erin, que en tu lista es erin.",
+      "related.01": "El kind 3 es un evento reemplazable según NIP-01.",
+      "related.51": "Otras listas (silenciados, marcadores, conjuntos de seguidos) usan NIP-51.",
+      "related.65": "Las listas de relays para el modelo outbox pasaron al kind 10002 en NIP-65.",
+      "event.label": "Lista de seguidos (kind 3)",
+      "event.explain": "A quién sigues, en el orden en que empezaste a seguirlos.",
+      "event.content": "No se usa. Déjalo vacío.",
+      "tag.p": "Un perfil seguido.",
+      "tag.p.pubkey": "Clave pública hex de la persona que sigues.",
+      "tag.p.relay": "Relay donde se pueden encontrar sus eventos. String vacío si no se conoce.",
+      "tag.p.petname": "Tu nombre local para esa persona: letras ASCII, dígitos o _. Opcional.",
+      "example.alice.label": "Alice sigue a cinco personas",
+      "example.alice.explain": "Cada entrada lleva una pista de relay y un petname.",
+      "example.minimal.label": "Las pistas son opcionales",
+      "example.minimal.explain":
+        "Un relay vacío mantiene el petname en la posición 4; la segunda entrada es solo una pubkey.",
+    },
+  },
+  n03: {
+    title: "Atestaciones OpenTimestamps para eventos",
+    summary:
+      "El kind 1040 lleva una prueba OpenTimestamps de que un evento existía antes de cierto bloque de Bitcoin. Marcado como no recomendado en el repositorio oficial: es vulnerable a un ataque concreto y está pendiente de actualización.",
+    text: {
+      "how.warning.title": "No recomendado",
+      "how.warning.body":
+        "El NIP está marcado como vulnerable a un ataque concreto y necesita una actualización. Todavía no hay un NIP que lo reemplace; trata estas pruebas como informativas.",
+      "how.stamp.title": "Incluye el id del evento en la prueba",
+      "how.stamp.body":
+        "La prueba OpenTimestamps debe comprometerse con el id del evento indicado en el tag e. El tag k registra el kind del evento sellado.",
+      "how.wait.title": "Espera a Bitcoin",
+      "how.wait.body":
+        "Los servidores de calendario agregan muchos hashes en una sola transacción de Bitcoin. Cuando se confirma, el archivo .ots contiene una atestación de Bitcoin y se guarda en content como base64.",
+      "how.verify.title": "Cualquiera puede verificarla",
+      "how.verify.body":
+        "Obtén el evento, decodifica content desde base64 y pásalo por un verificador OpenTimestamps conectado a un nodo de Bitcoin: te indica el bloque que demuestra la fecha.",
+      "related.01": "Da fe de cualquier evento NIP-01 por su id.",
+      "event.label": "Atestación de marca de tiempo (kind 1040)",
+      "event.explain":
+        "Prueba de que el evento referenciado existía, como muy tarde, en un bloque de Bitcoin.",
+      "event.content":
+        "Base64 de un archivo .ots completo con, idealmente, una atestación de Bitcoin y ninguna pendiente.",
+      "tag.e": "El evento al que se pone la marca de tiempo.",
+      "tag.e.id": "Id del evento sellado; el digest de la prueba debe ser igual a él.",
+      "tag.e.relay": "Relay donde se puede encontrar el evento sellado.",
+      "tag.k": "Kind del evento sellado.",
+      "tag.k.kind": 'Número de kind como string, por ejemplo "1".',
+      "example.proof.label": "Sellar la nota de Bob",
+      "example.proof.explain":
+        "Una prueba abreviada: cabecera, un SHA-256 sobre el id del evento, un paso de append y una atestación de Bitcoin.",
+    },
+  },
+  n04: {
+    title: "Mensaje directo cifrado",
+    summary:
+      "El DM cifrado original: kind 4 con content en AES-CBC dirigido a un tag p. Obsoleto en favor de NIP-17 porque revela quién habla con quién y usa criptografía débil.",
+    text: {
+      "how.deprecated.title": "Usa NIP-17 en su lugar",
+      "how.deprecated.body":
+        "Este esquema no se recomienda. Los mensajes privados de NIP-17 ocultan remitente, destinatario y fecha con cifrado NIP-44 y gift wraps.",
+      "how.secret.title": "Secreto compartido",
+      "how.secret.body":
+        "Remitente y destinatario calculan el mismo punto ECDH a partir de su propia clave secreta y la clave pública del otro. Su coordenada X, sin hash, es la clave AES.",
+      "how.encrypt.title": "AES-256-CBC con un IV",
+      "how.encrypt.body":
+        'El texto se cifra con un IV aleatorio de 16 bytes. content es base64(texto cifrado) + "?iv=" + base64(iv).',
+      "how.address.title": "Destinatario a la vista",
+      "how.address.body":
+        "El tag p indica el destinatario para que los relays puedan entregar el mensaje. Eso también le dice a todo el mundo quién habla con quién.",
+      "how.leaks.title": "Qué se filtra",
+      "how.leaks.body":
+        "Remitente, destinatario, fecha y longitud del mensaje son públicos; el texto cifrado no está autenticado. Úsalo solo con relays que restrinjan la lectura del kind 4 mediante AUTH.",
+      "related.17": "El reemplazo recomendado: DMs privados con gift wraps.",
+      "related.44": "El esquema de cifrado moderno que reemplaza a AES-CBC.",
+      "related.42": "Los relays pueden exigir AUTH antes de servir eventos kind 4.",
+      "event.label": "DM cifrado (kind 4)",
+      "event.explain": "Un mensaje uno a uno cifrado para el destinatario indicado en el tag p.",
+      "event.content":
+        '"<texto cifrado base64>?iv=<iv base64>", cifrado con el secreto compartido de NIP-04.',
+      "event.plaintext": "El texto del mensaje antes de cifrarlo.",
+      "tag.p": "El destinatario. Exactamente uno.",
+      "tag.p.pubkey":
+        "Clave pública hex del destinatario; también es la otra mitad del secreto compartido.",
+      "tag.e": "Opcional: el mensaje anterior de la conversación.",
+      "tag.e.id": "Id del mensaje al que se responde.",
+      "example.dm.label": "Alice le escribe a Bob",
+      "example.dm.explain":
+        "Texto cifrado NIP-04 real: Bob puede descifrarlo con su clave de demostración y la pubkey de Alice.",
+    },
+  },
+  n05: {
+    title: "Asociar claves de Nostr a identificadores de internet basados en DNS",
+    summary:
+      "Te permite mostrar un nombre parecido a un email, como alice@alpha.example: el dominio sirve /.well-known/nostr.json, que asocia nombres a claves públicas, y los clientes comprueban que coincida.",
+    text: {
+      "how.claim.title": "Reclama un nombre en tu perfil",
+      "how.claim.body": 'Pon "nip05": "nombre@dominio" en tus metadatos kind 0.',
+      "how.split.title": "Divídelo",
+      "how.split.body":
+        'Los clientes lo dividen en parte local y dominio. La parte local solo puede usar a-z, 0-9, -, _ y puntos. "_@dominio" es el nombre raíz y puede mostrarse solo como el dominio.',
+      "how.fetch.title": "Obtén nostr.json",
+      "how.fetch.body":
+        "GET https://<dominio>/.well-known/nostr.json?name=<parte-local>. Si names[parte-local] es igual a la pubkey del perfil, el identificador es válido. Las redirecciones deben ignorarse.",
+      "how.relays.title": "Pistas de relay opcionales",
+      "how.relays.body":
+        "El objeto relays asocia pubkeys a URLs de relays donde se puede encontrar a ese usuario.",
+      "how.keys-win.title": "Mandan las claves; los nombres son etiquetas",
+      "how.keys-win.body":
+        "NIP-05 identifica, no verifica. Sigue la pubkey, nunca el nombre: si más adelante el dominio devuelve otra clave, deja de mostrar el nombre en lugar de cambiar de clave.",
+      "related.01": "El identificador vive en los metadatos de usuario kind 0.",
+      "related.24": "NIP-24 enumera otros campos de perfil habituales.",
+      "flow.verify.label": "Verificar un identificador",
+      "flow.verify.explain": "De lo que afirma un perfil a un nombre confirmado.",
+      "flow.verify.claim": "El perfil anuncia nip05: alice@alpha.example.",
+      "flow.verify.check": "El nostr.json del dominio asocia alice a la misma pubkey.",
+      "doc.label": "nostr.json",
+      "doc.explain":
+        "Un archivo JSON servido por el dominio con CORS (Access-Control-Allow-Origin: *) para que los clientes web puedan leerlo.",
+      "doc.schema": "Debe contener names; relays es recomendable.",
+      "doc.names": "Mapa de parte local a clave pública.",
+      "doc.names.entry": "Clave pública hex en minúsculas (nunca npub).",
+      "doc.relays": "Mapa de clave pública a los relays donde publica ese usuario.",
+      "doc.relays.entry": "Lista de URLs de relays.",
+      "example.alice.label": "alice@alpha.example",
+      "example.alice.explain": "Servido dinámicamente para ?name=alice, con el relay de Alice.",
+      "example.static.label": "Un archivo estático con varios nombres",
+      "example.static.explain": "_ hace que bob@beta.example se muestre solo como beta.example.",
+      "event.label": "Perfil con nip05",
+      "event.explain": "Metadatos kind 0 que reclaman el identificador.",
+      "event.content": "Perfil en JSON serializado; aquí solo importa el campo nip05.",
+      "event.nip05": "nombre@dominio, con la parte local en minúsculas.",
+      "example.metadata.label": "Alice reclama alice@alpha.example",
+      "example.metadata.explain":
+        "Los clientes obtendrán el nostr.json de alpha.example para comprobarlo.",
+    },
+  },
+  n06: {
+    title: "Derivación básica de claves a partir de una frase semilla mnemónica",
+    summary:
+      "Deriva claves de Nostr a partir de una frase semilla BIP-39 por la ruta m/44'/1237'/<cuenta>'/0/0. No recomendado en el repositorio oficial: es preferible manejar una sola nsec.",
+    text: {
+      "how.warning.title": "No recomendado",
+      "how.warning.body":
+        "El repositorio oficial ahora prefiere una sola nsec en lugar de frases semilla. El esquema sigue funcionando y algunas wallets lo usan.",
+      "how.words.title": "Palabras",
+      "how.words.body":
+        "Una mnemónica BIP-39 de 12 a 24 palabras codifica entropía aleatoria más un checksum.",
+      "how.seed.title": "Semilla",
+      "how.seed.body": "PBKDF2 convierte las palabras en una semilla binaria de 64 bytes.",
+      "how.path.title": "Ruta de derivación",
+      "how.path.body":
+        "BIP-32 deriva m/44'/1237'/<cuenta>'/0/0. 1237 es el coin type SLIP-44 de Nostr; incrementa la cuenta para obtener más claves de una misma frase.",
+      "how.keys.title": "Claves",
+      "how.keys.body":
+        "La clave privada derivada es tu clave secreta de Nostr; su clave pública x-only es tu pubkey.",
+      "related.19": "Muestra las claves derivadas como nsec y npub.",
+      "related.49": "Cifra una clave secreta con una contraseña en su lugar.",
+      "enc.label": "Mnemónica → claves",
+      "enc.explain":
+        "Convierte una frase semilla y un número de cuenta en un par de claves de Nostr.",
+      "enc.mnemonic": "Palabras BIP-39 separadas por un solo espacio.",
+      "enc.account": "Índice de cuenta (hardened). 0 para una sola clave.",
+      "enc.output":
+        "La clave privada (hex y nsec) y la clave pública (hex y npub) en la ruta derivada.",
+      "example.v12.label": "Vector de prueba, 12 palabras",
+      "example.v12.explain":
+        "Resultado esperado: npub1zutzeysacnf9rru6zqwmxd54mud0k44tst6l70ja5mhv8jjumytsd2x7nu.",
+      "example.v24.label": "Vector de prueba, 24 palabras",
+      "example.v24.explain":
+        "Resultado esperado: npub16sdj9zv4f8sl85e45vgq9n7nsgt5qphpvmf7vk8r5hhvmdjxx4es8rq74h.",
+    },
+  },
+  n07: {
+    title: "Capacidad window.nostr para navegadores web",
+    summary:
+      "Una extensión del navegador expone window.nostr para que los sitios web puedan obtener tu clave pública, firmar eventos y cifrar mensajes sin ver nunca tu clave secreta.",
+    text: {
+      "how.why.title": "Las claves se quedan en la extensión",
+      "how.why.body":
+        "Las apps web nunca tocan tu nsec. Se lo piden a la extensión, que te lo pregunta a ti.",
+      "how.detect.title": "Detéctala",
+      "how.detect.body":
+        "Comprueba que window.nostr existe. Las extensiones deberían inyectarlo en document_end para que esté listo al cargar la página.",
+      "how.pubkey.title": "getPublicKey()",
+      "how.pubkey.body":
+        "Devuelve tu clave pública en hex: suficiente para iniciar sesión y cargar tu feed.",
+      "how.sign.title": "signEvent(plantilla)",
+      "how.sign.body":
+        "Pasa created_at, kind, tags y content. La extensión añade pubkey, id y sig y devuelve el evento terminado.",
+      "how.encrypt.title": "Cifrado opcional",
+      "how.encrypt.body":
+        "nip44.encrypt/decrypt (y el par obsoleto nip04) permiten a las apps manejar mensajes privados sin la clave.",
+      "related.01": "signEvent devuelve un evento NIP-01.",
+      "related.44": "window.nostr.nip44 cifra con NIP-44.",
+      "related.46": "Firma remota a través de Nostr para apps fuera del navegador.",
+      "related.55": "El equivalente como app firmante en Android.",
+      "actor.user": "Tú",
+      "actor.app": "App web",
+      "actor.ext": "Extensión firmante",
+      "step.detect.label": "¿Existe window.nostr?",
+      "step.detect.explain":
+        'La app comprueba el objeto antes de ofrecer "iniciar sesión con la extensión".',
+      "step.get-public-key.label": "getPublicKey()",
+      "step.get-public-key.explain": "La app pregunta quién eres.",
+      "step.approve.label": "Pedir permiso",
+      "step.approve.explain": "La extensión te pregunta si este sitio puede usar tu clave.",
+      "step.public-key.label": "Clave pública",
+      "step.public-key.explain": "La extensión devuelve la pubkey en hex.",
+      "step.sign-event.label": "signEvent(evento)",
+      "step.sign-event.explain": "La app entrega una plantilla sin firmar.",
+      "step.signed.label": "Evento firmado",
+      "step.signed.explain": "pubkey, id y sig quedan completados; la app ya puede publicarlo.",
+      "step.encrypt.label": "nip44.encrypt()",
+      "step.encrypt.explain": "Opcional: la app pide el texto cifrado de un DM.",
+    },
+  },
+  n08: {
+    title: "Manejo de menciones",
+    summary:
+      "La forma antigua de mencionar personas y notas: sustituir la mención por #[índice], que apunta al array de tags. Obsoleto en favor de las URIs nostr: de NIP-27.",
+    text: {
+      "how.deprecated.title": "Usa NIP-27 en su lugar",
+      "how.deprecated.body":
+        "Escribe nostr:npub… o nostr:nevent… en content (NIP-27). Los marcadores de índice se rompen en cuanto se reordenan los tags.",
+      "how.tag.title": "Añade un tag",
+      "how.tag.body":
+        "Cuando el usuario menciona a alguien, el cliente añade un tag p (o un tag e para una nota).",
+      "how.placeholder.title": "Sustituye por #[índice]",
+      "how.placeholder.body":
+        "La mención en content pasa a ser #[i], donde i es la posición (empezando en 0) de ese tag en el array de tags.",
+      "how.render.title": "Vuelve a mostrarla",
+      "how.render.body":
+        "Los lectores cambian #[i] por un enlace a la pubkey o al evento del tag. Si i está fuera de rango o no es un tag e/p, muestran el texto tal cual.",
+      "related.27": "Las URIs nostr: en línea reemplazan los marcadores de índice.",
+      "related.10": "Las notas de texto y sus tags.",
+      "event.label": "Nota con menciones indexadas",
+      "event.explain": "Una nota kind 1 cuyo content se refiere a los tags por su posición.",
+      "event.content": "Texto con marcadores #[0], #[1]…",
+      "tag.p": "Un usuario mencionado.",
+      "tag.p.pubkey": "Pubkey hex que se muestra donde aparece #[i].",
+      "tag.e": "Un evento mencionado.",
+      "tag.e.id": "Id hex del evento que se muestra donde aparece #[i].",
+      "example.legacy.label": "Mención antigua",
+      "example.legacy.explain": "#[0] es Bob (tag 0), #[1] es su nota (tag 1).",
+    },
+  },
+  n09: {
+    title: "Solicitud de borrado de eventos",
+    summary:
+      "El kind 5 pide a relays y clientes que borren eventos anteriores tuyos, referenciados con tags e o a. Es una solicitud: nada puede garantizar el borrado en todas partes.",
+    text: {
+      "how.point.title": "Señala qué borrar",
+      "how.point.body":
+        "Añade un tag e por cada id de evento, o un tag a por cada coordenada direccionable (borra todas las versiones hasta el created_at de esta solicitud).",
+      "how.kinds.title": "Indica los kinds",
+      "how.kinds.body":
+        "Añade un tag k con el kind de cada evento borrado para que los relays puedan indexar las solicitudes.",
+      "how.same-author.title": "Solo tus propios eventos",
+      "how.same-author.body":
+        "Los clientes deben comprobar que cada evento referenciado tiene la misma pubkey que la solicitud antes de ocultarlo.",
+      "how.no-guarantee.title": "Una solicitud, no una garantía",
+      "how.no-guarantee.body":
+        "Los relays deberían dejar de servir los eventos y conservar la solicitud para siempre; puede que sobrevivan copias en otros lugares. Borrar una solicitud de borrado no tiene ningún efecto.",
+      "related.01": "Referencia eventos por id o por coordenada.",
+      "related.62":
+        "Solicitud de desaparición: pide a los relays que borren todo lo de una pubkey.",
+      "event.label": "Solicitud de borrado (kind 5)",
+      "event.explain": "Pide que se borren los eventos referenciados del mismo autor.",
+      "event.content": "Motivo opcional, que se muestra en lugar del contenido borrado.",
+      "tag.e": "Un evento a borrar.",
+      "rule.target":
+        "Una solicitud de borrado debe nombrar al menos un evento: una etiqueta e (por id) o una etiqueta a (por dirección).",
+      "tag.e.id": "Id de uno de tus propios eventos.",
+      "tag.relay": "Pista de relay opcional.",
+      "tag.a": "Un evento direccionable a borrar (todas las versiones hasta ahora).",
+      "tag.a.address": "Coordenada kind:pubkey:d-tag; la pubkey debe ser la tuya.",
+      "tag.k": "Kind de un evento borrado.",
+      "tag.k.kind": "Número de kind como string.",
+      "example.note.label": "Bob borra una nota de prueba",
+      "example.note.explain":
+        'La solicitud real de los datos de ejemplo para la nota "testing testing" de Bob.',
+      "example.article.label": "Frank borra un artículo",
+      "example.article.explain": "a elimina todas las versiones; e indica una versión concreta.",
+    },
+  },
+  n10: {
+    title: "Notas de texto e hilos",
+    summary:
+      "El kind 1 es la nota de texto plano. Los tags e marcados (root, reply) forman hilos, los tags p notifican a todos los participantes de la conversación y los tags q citan eventos.",
+    text: {
+      "how.note.title": "Texto plano",
+      "how.note.body": "content es texto legible por personas, sin markdown ni HTML.",
+      "how.root.title": "Marca la raíz",
+      "how.root.body":
+        'Una respuesta lleva ["e", id-raíz, relay, "root", autor]. Una respuesta directa a la raíz solo tiene este.',
+      "how.reply.title": "Marca el padre",
+      "how.reply.body":
+        'Más abajo en un hilo, añade ["e", id-padre, relay, "reply", autor] para el evento al que respondes directamente.',
+      "how.notify.title": "Notifica a los participantes",
+      "how.notify.body":
+        "Copia los tags p del padre y añade al autor del padre, para que todos en el hilo reciban la notificación.",
+      "how.quote.title": "Las citas usan q",
+      "how.quote.body":
+        "Citar un evento con nostr: en el texto añade un tag q, para que la cita no se confunda con una respuesta.",
+      "how.positional.title": "Tags e posicionales antiguos",
+      "how.positional.body":
+        "Los tags e sin marcar (el primero = raíz, el último = respuesta) están obsoletos, pero siguen apareciendo en eventos antiguos.",
+      "related.01": "El kind 1 es un evento NIP-01 normal.",
+      "related.21": "URIs nostr: a las que acompañan los tags q.",
+      "related.22": "Los comentarios sobre cualquier cosa que no sea kind 1 usan NIP-22.",
+      "related.18": "Los reposts con cita usan el mismo tag q.",
+      "event.label": "Nota de texto (kind 1)",
+      "event.explain": "Una publicación pública corta, opcionalmente una respuesta en un hilo.",
+      "event.content": "Texto plano. Las menciones son URIs nostr: (NIP-27).",
+      "tag.e-root": "La raíz del hilo.",
+      "tag.e-reply": "El evento al que se responde directamente (cuando no es la raíz).",
+      "tag.e-positional":
+        "Tag e sin marcar, obsoleto: su significado depende de su posición entre los tags e.",
+      "tag.e.id": "Id de la nota referenciada.",
+      "tag.e.marker": '"root" o "reply".',
+      "tag.e.pubkey": "Autor de la nota referenciada, para encontrarla a través de sus relays.",
+      "tag.relay": 'URL de relay recomendada; puede ser "".',
+      "marker.root": "Este tag e apunta a la raíz del hilo.",
+      "marker.reply": "Este tag e apunta al padre directo.",
+      "tag.p": "Alguien que participa en el hilo y debe recibir la notificación.",
+      "tag.p.pubkey": "Su clave pública hex.",
+      "tag.q": "Un evento citado en content.",
+      "tag.q.target": "Id del evento, o kind:pubkey:d-tag para eventos direccionables.",
+      "tag.q.pubkey": "Autor de un evento normal citado.",
+      "example.nested-reply.label": "Respuesta dentro de un hilo",
+      "example.nested-reply.explain":
+        "Alice responde a la respuesta de Bob: root marca su hilo, reply marca la nota de Bob.",
+      "example.direct-reply.label": "Respuesta directa a una nota raíz",
+      "example.direct-reply.explain":
+        "Solo un marcador root, más tags p para Grace y las personas mencionadas.",
+      "example.root.label": "Un hilo nuevo",
+      "example.root.explain": "Sin tags e: esta nota inicia un hilo.",
+    },
+  },
+  n11: {
+    title: "Documento de información del relay",
+    summary:
+      "Los relays se describen a sí mismos con un documento JSON servido por HTTP en su URL de WebSocket: nombre, contacto del administrador, NIPs soportados, límites y tarifas.",
+    text: {
+      "how.same-url.title": "Misma URL, distinto Accept",
+      "how.same-url.body":
+        "Pide la URL del relay por https con Accept: application/nostr+json. El relay debe enviar cabeceras CORS para que los clientes web puedan leerlo.",
+      "how.identity.title": "Quién lo opera",
+      "how.identity.body":
+        "name, description, icon y banner describen el relay; pubkey y contact indican cómo contactar con el operador.",
+      "how.nips.title": "Qué soporta",
+      "how.nips.body":
+        "supported_nips enumera los NIPs del lado del relay como enteros, por ejemplo 1, 11, 42.",
+      "how.limits.title": "Qué permite",
+      "how.limits.body":
+        "limitation informa de antemano a los clientes de los límites prácticos: tamaño de mensaje, suscripciones, PoW, AUTH, pago, marcas de tiempo.",
+      "how.fees.title": "Cuánto cuesta",
+      "how.fees.body":
+        "Los relays de pago enumeran tarifas de admisión, de suscripción y de publicación por kind, además de un payments_url.",
+      "related.01": "Describe un relay NIP-01.",
+      "related.13": "min_pow_difficulty usa la prueba de trabajo de NIP-13.",
+      "related.42": "auth_required significa AUTH de NIP-42 antes de cualquier otra cosa.",
+      "related.17": "Escribe a la pubkey del administrador con DMs de NIP-17.",
+      "doc.label": "Información del relay",
+      "doc.explain":
+        "Cualquier campo puede omitirse; los clientes deben ignorar los campos que no entiendan.",
+      "header.accept":
+        "Debe ser application/nostr+json; si no, obtienes la página web normal del relay.",
+      "doc.schema": "Metadatos del relay de nivel superior.",
+      "field.name": "Nombre corto, idealmente de menos de 30 caracteres.",
+      "field.description": "Descripción en texto plano; párrafos separados por líneas en blanco.",
+      "field.banner": "Imagen ancha que representa al relay.",
+      "field.icon": "Imagen cuadrada pequeña para listas de relays.",
+      "field.pubkey": "Pubkey del administrador, para DMs sobre abusos o errores.",
+      "field.self": "La pubkey de identidad propia del relay, distinta de la de su administrador.",
+      "field.contact": "URI de contacto alternativa (mailto:, https:).",
+      "field.supported_nips": "Números de los NIPs que implementa el relay.",
+      "field.software": "URL de la página principal del software del relay.",
+      "field.version": "Versión o commit del software.",
+      "field.terms_of_service": "Enlace a los términos del servicio.",
+      "field.limitation": "Límites prácticos; las peticiones que los superan fallan.",
+      "limit.max_message_length": "Mensaje WebSocket entrante más grande, en bytes.",
+      "limit.max_subscriptions": "Suscripciones activas permitidas por conexión.",
+      "limit.max_limit": "El limit de cada filtro se recorta a este valor.",
+      "limit.max_subid_length": "Id de suscripción más largo aceptado.",
+      "limit.max_event_tags": "Número máximo de tags permitidos en un evento.",
+      "limit.max_content_length": "Número máximo de caracteres permitidos en content.",
+      "limit.min_pow_difficulty": "Dificultad NIP-13 mínima para eventos nuevos.",
+      "limit.auth_required": "Se necesita AUTH de NIP-42 antes de cualquier otra acción.",
+      "limit.payment_required": "Se necesita un pago antes de cualquier acción.",
+      "limit.restricted_writes": "Solo algunos usuarios o kinds pueden escribir.",
+      "limit.created_at_lower_limit": "Cuánto puede estar created_at en el pasado, en segundos.",
+      "limit.created_at_upper_limit": "Cuánto puede estar created_at en el futuro, en segundos.",
+      "limit.default_limit": "Eventos devueltos cuando un filtro no tiene limit.",
+      "field.payments_url": "Dónde pagar.",
+      "field.fees": "Tabla de tarifas.",
+      "fee.admission": "Tarifa única de alta.",
+      "fee.subscription": "Tarifa recurrente; periodo en segundos.",
+      "fee.publication": "Tarifa por cada evento publicado de los kinds indicados.",
+      "fee.amount": "Importe en unit.",
+      "fee.unit": "Normalmente msats.",
+      "fee.period": "Periodo de facturación en segundos (2592000 = 30 días).",
+      "fee.kinds": "Kinds a los que se aplica esta tarifa.",
+      "example.free.label": "Un relay público gratuito",
+      "example.free.explain": "Límites generosos, sin AUTH ni pago.",
+      "example.paid.label": "Un relay de pago",
+      "example.paid.explain": "AUTH, pago y un poco de prueba de trabajo mantienen fuera el spam.",
+    },
+  },
+  n12: {
+    title: "Consultas genéricas por tags",
+    summary:
+      'Obsoleto: integrado en NIP-01. Introdujo los filtros sobre cualquier tag de una sola letra, como {"#t": ["nostr"]}.',
+    text: {
+      "how.moved.title": "Ahora forma parte de NIP-01",
+      "how.moved.body":
+        "Todo relay que implementa NIP-01 soporta estos filtros; este NIP solo se mantiene por motivos históricos.",
+      "how.filter.title": "Filtros #<letra>",
+      "how.filter.body":
+        'Una clave de filtro como "#t" o "#e" coincide con los eventos que tienen un tag con esa letra y uno de los valores indicados.',
+      "how.first-value.title": "Solo el primer valor",
+      "how.first-value.body":
+        'Los relays indexan los tags de una sola letra solo por su primer valor: ["t", "nostr"] coincide con #t nostr.',
+      "related.01": "Los filtros por tags ahora se definen en NIP-01.",
+      "actor.client": "Cliente",
+      "actor.relay": "Relay",
+      "step.req.label": "REQ con #t",
+      "step.req.explain": "Pide eventos kind 1 con el tag t=nostr.",
+      "step.match.label": "Comparar tags",
+      "step.match.explain": "El relay consulta su índice de valores de tags de una sola letra.",
+      "step.event.label": "Evento que coincide",
+      "step.event.explain": 'La nota de Bob tiene ["t", "nostr"], así que coincide.',
+      "step.eose.label": "EOSE",
+      "step.eose.explain": "Se enviaron todas las coincidencias guardadas.",
+      "msg.label": "REQ con filtros por tags",
+      "msg.explain": "Un REQ de NIP-01 cuyos filtros usan claves #<letra>.",
+      "msg.sub-id": "Id de suscripción elegido por el cliente.",
+      "msg.filter": "Filtro con claves #<letra> y listas de valores.",
+      "example.hashtag.label": "Notas con #nostr",
+      "example.hashtag.explain": "Los tags t contienen hashtags.",
+      "example.replies.label": "Respuestas a una nota",
+      "example.replies.explain": "Eventos cuyo tag e apunta al hilo de Alice.",
+    },
+  },
+  n13: {
+    title: "Prueba de trabajo",
+    summary:
+      "Gasta CPU para que el id de un evento empiece con bits a cero. Un tag nonce registra el contador y el objetivo comprometido, para que los relays puedan exigir una dificultad mínima contra el spam.",
+    text: {
+      "how.difficulty.title": "Dificultad = bits a cero iniciales",
+      "how.difficulty.body":
+        "Cuenta los bits a cero al principio del id: 0000b8e5… empieza con 16 bits a cero (cuatro dígitos hex 0), así que su dificultad es 16.",
+      "how.nonce.title": "Cambia el nonce, vuelve a calcular el hash",
+      "how.nonce.body":
+        "Los mineros incrementan el contador del tag nonce y recalculan el id hasta que haya suficientes bits iniciales a cero. Cada bit adicional duplica el trabajo esperado.",
+      "how.target.title": "Comprométete con un objetivo",
+      "how.target.body":
+        "El tercer valor indica la dificultad que buscabas. Los clientes pueden rechazar notas cuyo objetivo comprometido sea inferior al que exigen, aunque hayan tenido suerte.",
+      "how.verify.title": "Barato de comprobar",
+      "how.verify.body":
+        "Verificar cuesta un hash y un conteo de bits; los relays anuncian su mínimo en NIP-11.",
+      "how.delegate.title": "Minado delegado",
+      "how.delegate.body":
+        "El id no cubre la firma, así que un servicio puede minar el evento y tú firmarlo después.",
+      "related.01": "La dificultad se mide sobre el id del evento NIP-01.",
+      "related.11": "Los relays publican min_pow_difficulty en su documento de información.",
+      "event.label": "Evento minado",
+      "event.explain": "Cualquier kind puede llevar prueba de trabajo.",
+      "event.content": "Lo que necesite el kind; forma parte del hash.",
+      "tag.nonce": "El contador de minado y el objetivo comprometido.",
+      "tag.nonce.value": "Contador que cambia en cada intento.",
+      "tag.nonce.target": "Dificultad objetivo en bits (recomendado).",
+      "example.mined.label": "Una nota minada de 16 bits",
+      "example.mined.explain":
+        "Fírmala como Alice: el id empieza por 0000. Cambia cualquier carácter y el trabajo se pierde.",
+    },
+  },
+  n14: {
+    title: "Tag subject en eventos de texto",
+    summary:
+      "Añade un tag subject a las notas kind 1 para que los clientes puedan listar hilos por título, como los asuntos del email.",
+    text: {
+      "how.subject.title": "Un título para el hilo",
+      "how.subject.body":
+        '["subject", texto] le da un titular a una nota. Mantenlo por debajo de unos 80 caracteres.',
+      "how.lists.title": "Mejores listas de hilos",
+      "how.lists.body":
+        "Los clientes pueden mostrar los asuntos en lugar de las primeras palabras de cada nota.",
+      "how.replies.title": "Las respuestas lo copian",
+      "how.replies.body": 'Las respuestas deberían repetir el asunto y pueden anteponerle "Re:".',
+      "related.10": "Añade un tag a las notas de texto de NIP-10.",
+      "related.17": "Los chats privados usan el mismo tag como tema de la sala.",
+      "event.label": "Nota con asunto",
+      "event.explain": "Una nota de texto kind 1 que tiene título.",
+      "event.content": "El texto de la nota.",
+      "tag.subject": "El título del hilo.",
+      "tag.subject.value": "Título corto; los clientes recortan los largos.",
+      "example.thread.label": "Iniciar un hilo",
+      "example.thread.explain": "Dave pone título a su informe sobre relays.",
+      "example.reply.label": "Responder con Re:",
+      "example.reply.explain": "Erin mantiene el asunto y enlaza la raíz con un tag e de NIP-10.",
+    },
+  },
+  n15: {
+    title: "Marketplace de Nostr",
+    summary:
+      "Puestos, productos, subastas y mensajes de compra NIP-04 para tiendas descentralizadas. No recomendado en el repositorio oficial por ser demasiado complicado: usa los anuncios clasificados de NIP-99 en su lugar.",
+    text: {
+      "how.unrecommended.title": "Prueba NIP-99 en su lugar",
+      "how.unrecommended.body":
+        "Este protocolo de marketplace está marcado como no recomendado. Los anuncios clasificados de NIP-99 cubren la mayoría de las ventas con mucha menos maquinaria.",
+      "how.stall.title": "Abre un puesto",
+      "how.stall.body":
+        "El kind 30017 describe una tienda: nombre, moneda y zonas de envío con costos base. Su tag d repite el id del puesto.",
+      "how.product.title": "Publica productos",
+      "how.product.body":
+        "El kind 30018 publica un producto de un puesto con precio, cantidad y especificaciones. Los tags t permiten buscarlo por categoría.",
+      "how.checkout.title": "Compra por DMs",
+      "how.checkout.body":
+        "Pedidos, solicitudes de pago y actualizaciones de estado son mensajes JSON dentro de eventos kind 4 cifrados con NIP-04, distinguidos por type 0, 1 y 2.",
+      "how.auction.title": "Subastas y pujas",
+      "how.auction.body":
+        "El kind 30020 publica una subasta; las pujas kind 1021 referencian esa versión exacta por su id; el comerciante responde con confirmaciones kind 1022.",
+      "how.market.title": "Mercados personalizados",
+      "how.market.body":
+        "El kind 30019 agrupa comerciantes en un marketplace con su propio aspecto, compartido como naddr.",
+      "related.99": "El reemplazo recomendado: anuncios clasificados.",
+      "related.04": "Los mensajes de compra se cifran con NIP-04.",
+      "related.19": "Los mercados se comparten como enlaces naddr.",
+      "flow.shop.label": "Comprar un producto",
+      "flow.shop.explain": "Del puesto al pedido enviado.",
+      "flow.shop.stall": "El comerciante publica un puesto con zonas de envío.",
+      "flow.shop.product": "Los productos referencian el puesto mediante stall_id.",
+      "flow.shop.checkout": "El pedido, la solicitud de pago y el estado viajan como DMs cifrados.",
+      "flow.auction.label": "Organizar una subasta",
+      "flow.auction.explain": "Publicar, pujar, confirmar.",
+      "flow.auction.list": "El comerciante publica la subasta.",
+      "flow.auction.bid": "Los postores referencian el id del evento de la subasta.",
+      "flow.auction.confirm": "El comerciante acepta, rechaza o elige al ganador.",
+      "stall.label": "Puesto (kind 30017)",
+      "stall.explain": "La tienda de un comerciante.",
+      "stall.content": "Puesto en JSON serializado.",
+      "stall.id": "Id elegido por el comerciante; debe ser igual al tag d. Evita ids secuenciales.",
+      "stall.name": "Nombre del puesto.",
+      "stall.description": "Descripción opcional.",
+      "stall.currency": "Moneda de todos los precios de este puesto.",
+      "stall.shipping": "Zonas de envío; el cliente elige exactamente una.",
+      "stall.shipping.id": "Id de la zona, que el cliente devuelve al comprar.",
+      "stall.shipping.name": "Nombre opcional de la zona.",
+      "stall.shipping.cost": "Costo de envío base de un pedido a esta zona.",
+      "stall.shipping.regions": "Regiones incluidas en la zona.",
+      "tag.d.stall": "Id del puesto, igual que content.id.",
+      "tag.d.id": "Debe coincidir con el id dentro de content.",
+      "product.label": "Producto (kind 30018)",
+      "product.explain": "Un artículo a la venta en un puesto.",
+      "product.content": "Producto en JSON serializado.",
+      "product.id": "Id elegido por el comerciante; debe ser igual al tag d.",
+      "product.stall_id": "El puesto al que pertenece este artículo.",
+      "product.name": "Nombre del producto.",
+      "product.description": "Descripción opcional.",
+      "product.images": "URLs de imágenes opcionales.",
+      "product.currency": "Moneda del precio.",
+      "product.price": "Precio por unidad.",
+      "product.quantity":
+        "Unidades disponibles, o null si son ilimitadas (bienes digitales, servicios).",
+      "product.specs": "Pares [clave, valor] opcionales para tablas comparativas.",
+      "product.shipping": "Costo adicional opcional por zona, sumado por unidad.",
+      "product.shipping.id": "Un id de zona del puesto.",
+      "product.shipping.cost": "Costo de envío adicional de este producto en esa zona.",
+      "tag.d.product": "Id del producto, igual que content.id.",
+      "tag.t": "Una categoría, como comida o frutas.",
+      "tag.t.category": "Nombre de la categoría.",
+      "checkout.label": "Mensaje de compra (kind 4)",
+      "checkout.explain":
+        "Pedido, solicitud de pago o estado, cifrado entre cliente y comerciante.",
+      "checkout.content": "Texto cifrado NIP-04 de un mensaje JSON.",
+      "checkout.plaintext": "Un objeto JSON cuyo type indica qué es.",
+      "checkout.types": "type 0 = pedido, 1 = solicitud de pago, 2 = actualización de estado.",
+      "order.explain": "Cliente → comerciante: el pedido.",
+      "order.id": "Id del pedido, generado por el cliente y reutilizado en las respuestas.",
+      "order.type": "Número de tipo de mensaje.",
+      "order.name": "Nombre opcional del cliente.",
+      "order.address": "Dirección de envío para bienes físicos.",
+      "order.message": "Nota opcional.",
+      "order.contact": "Cómo contactar al cliente: pubkey de nostr, teléfono, email.",
+      "order.items": "Productos y cantidades.",
+      "order.shipping_id": "Id de la zona de envío elegida.",
+      "payment.explain": "Comerciante → cliente: cómo pagar.",
+      "payment.options": "Una o más formas de pago.",
+      "payment.url": "Enlace a una página de pago.",
+      "payment.btc": "Dirección de bitcoin on-chain.",
+      "payment.ln": "Factura Lightning.",
+      "payment.lnurl": "Enlace LNURL-pay.",
+      "status.explain": "Comerciante → cliente: estado del pago y del envío.",
+      "status.paid": "Pago recibido.",
+      "status.shipped": "Pedido enviado.",
+      "tag.p.checkout": "La otra parte de la compra.",
+      "tag.p.pubkey": "Su clave pública hex.",
+      "example.stall.label": "La tienda de rollos fotográficos de Frank",
+      "example.stall.explain": "Dos zonas de envío en EUR.",
+      "example.product.label": "Un rollo de película",
+      "example.product.explain": "Envío adicional fuera de la UE; dos tags de categoría.",
+      "example.order.label": "Grace hace un pedido",
+      "example.order.explain": "Pedido type 0, cifrado de Grace a Frank.",
+      "example.payment.label": "Frank pide el pago",
+      "example.payment.explain": "Type 1 con Lightning y una página de pago.",
+      "example.status.label": "Pagado y enviado",
+      "example.status.explain": "Actualización de estado type 2.",
+      "market.label": "Marketplace (kind 30019)",
+      "market.explain": "Un mercado curado con su propio aspecto y sus comerciantes.",
+      "market.content": "Configuración del mercado en JSON serializado.",
+      "market.name": "Nombre del mercado.",
+      "market.about": "Descripción del mercado.",
+      "market.ui": "Logo, banner, tema y modo oscuro.",
+      "market.merchants": "Pubkeys de los comerciantes de este mercado.",
+      "tag.d.market": "Identificador del mercado, usado en su naddr.",
+      "example.market.label": "El mercado analógico de Carol",
+      "example.market.explain": "Agrupa a Frank y Erin bajo un mismo tema.",
+      "auction.label": "Subasta (kind 30020)",
+      "auction.explain": "Un producto que se vende al mejor postor.",
+      "auction.content": "Subasta en JSON serializado.",
+      "auction.starting_bid": "Primera puja mínima aceptable.",
+      "auction.start_date": "Hora Unix en que empieza la subasta; omítela si aún no se conoce.",
+      "auction.duration": "Segundos que dura la subasta, sin contar extensiones.",
+      "example.auction.label": "Una cámara antigua",
+      "example.auction.explain": "Dura una semana desde la fecha de inicio.",
+      "bid.label": "Puja (kind 1021)",
+      "bid.explain": "Una oferta en una subasta.",
+      "bid.content": "Importe, en la moneda de la subasta, como string de un entero.",
+      "tag.e.auction": "La subasta en la que se puja.",
+      "tag.e.auction-id":
+        "Id del evento de la versión exacta de la subasta; editar la subasta después dejaría la puja huérfana.",
+      "example.bid.label": "Grace puja",
+      "example.bid.explain": "520000 en la subasta de la cámara.",
+      "confirm.label": "Confirmación de puja (kind 1022)",
+      "confirm.explain": "El veredicto del comerciante sobre una puja.",
+      "confirm.content": "JSON serializado con, al menos, status.",
+      "confirm.status": "Veredicto sobre la puja.",
+      "confirm.accepted": "La puja cuenta.",
+      "confirm.rejected": "La puja se rechaza definitivamente.",
+      "confirm.pending": "Podría aceptarse tras más comprobaciones.",
+      "confirm.winner": "Esta puja ganó la subasta.",
+      "confirm.message": "Motivo opcional.",
+      "confirm.duration_extended": "Segundos añadidos a la subasta (pujas de última hora).",
+      "tag.e.confirm": "Primero la puja, luego la subasta.",
+      "tag.e.confirm-id": "Id del evento de la puja o de la subasta.",
+      "example.confirm.label": "Puja aceptada",
+      "example.confirm.explain": "Aceptada, y la subasta se extiende cinco minutos.",
+    },
+  },
+  n16: {
+    title: "Tratamiento de eventos",
+    summary:
+      "Obsoleto: integrado en NIP-01. Introdujo los rangos de kinds reemplazables y efímeros, que cambian cómo los relays guardan los eventos.",
+    text: {
+      "how.moved.title": "Ahora forma parte de NIP-01",
+      "how.moved.body": "Los rangos de kinds se definen en la sección Kinds de NIP-01.",
+      "how.regular.title": "Eventos normales",
+      "how.regular.body": "Los kinds 1, 2, 4–44 y 1000–9999 se guardan tal cual, todos y cada uno.",
+      "how.replaceable.title": "Eventos reemplazables",
+      "how.replaceable.body":
+        "Kinds 0, 3 y 10000–19999: los relays guardan solo el más reciente por pubkey y kind (en caso de empate, gana el id más bajo).",
+      "how.ephemeral.title": "Eventos efímeros",
+      "how.ephemeral.body":
+        "Los kinds 20000–29999 se reenvían a los suscriptores en vivo y no se guardan.",
+      "related.01": "Estas reglas ahora viven en NIP-01.",
+      "related.33": "Eventos direccionables (30000–39999), también integrados en NIP-01.",
+      "actor.client": "Cliente de Alice",
+      "actor.relay": "Relay",
+      "actor.other": "Cliente de Bob",
+      "step.profile-v1.label": "Perfil v1",
+      "step.profile-v1.explain": "Alice publica un kind 0.",
+      "step.profile-v2.label": "Perfil v2",
+      "step.profile-v2.explain": "Más tarde publica un kind 0 más reciente.",
+      "step.replace.label": "Reemplazar",
+      "step.replace.explain":
+        "Misma pubkey y kind, created_at más reciente: el relay descarta la v1.",
+      "step.ephemeral.label": "Evento efímero",
+      "step.ephemeral.explain": "Un kind en 20000–29999, como un indicador de escritura.",
+      "step.forward.label": "Solo reenviar",
+      "step.forward.explain": "Los suscriptores en vivo lo reciben; no se guarda nada.",
+    },
+  },
+  n17: {
+    title: "Mensajes directos privados",
+    summary:
+      "Chats privados que ocultan quién habla con quién: los mensajes son rumores sin firmar, sellados con NIP-44 por el remitente y envueltos en un gift wrap con una clave desechable hacia los relays de DM de cada participante.",
+    text: {
+      "how.inbox.title": "Encuentra sus relays de DM",
+      "how.inbox.body":
+        "El kind 10050 indica dónde quiere recibir DMs un usuario. Si no tiene esa lista, no está preparado para mensajes NIP-17.",
+      "how.rumor.title": "Escribe un rumor sin firmar",
+      "how.rumor.body":
+        "El mensaje kind 14 tiene id pero no firma, así que una copia filtrada no puede demostrar que lo escribiste tú. Su pubkey + los tags p definen la sala de chat.",
+      "how.seal.title": "Séllalo",
+      "how.seal.body":
+        "Cifra el rumor con NIP-44 para el destinatario y fírmalo como kind 13 con tu clave real. Los sellos no tienen tags; los clientes comprueban que la pubkey del sello sea igual a la del rumor.",
+      "how.wrap.title": "Envuélvelo en un gift wrap con una clave desechable",
+      "how.wrap.body":
+        "Vuelve a cifrar el sello, desde una clave aleatoria nueva, en un kind 1059. Solo se ve el tag p del destinatario; created_at se aleatoriza hasta dos días hacia atrás.",
+      "how.fan-out.title": "Un gift wrap por participante",
+      "how.fan-out.body":
+        "Crea un gift wrap distinto para cada destinatario y otro para ti, y publica cada uno en los relays 10050 de esa persona.",
+      "how.rooms.title": "Salas y asuntos",
+      "how.rooms.body":
+        "Cambiar los participantes inicia una sala nueva. Un tag subject da nombre a la sala; manda el más reciente.",
+      "related.44": "El cifrado que usan los sellos y los gift wraps.",
+      "related.59": "Las capas de gift wrap y sello vienen de NIP-59.",
+      "related.42":
+        "Los relays deberían servir los gift wraps solo al usuario del tag p después de AUTH.",
+      "related.04": "Reemplaza los antiguos DMs kind 4.",
+      "related.40": "Un tag expiration permite mensajes que desaparecen.",
+      "flow.send.label": "Enviar un DM",
+      "flow.send.explain": "Cuatro capas, desde buscar el buzón hasta publicar el gift wrap.",
+      "flow.send.inbox": "Lee los relays de DM kind 10050 del destinatario.",
+      "flow.send.rumor": "Escribe el mensaje kind 14, sin firmar.",
+      "flow.send.seal": "Cífralo para el destinatario y fírmalo como kind 13.",
+      "flow.send.wrap":
+        "Cifra el sello desde una clave aleatoria como kind 1059, con un tag p hacia el destinatario.",
+      "chat.label": "Mensaje de chat (kind 14)",
+      "chat.explain": "El mensaje en sí. Nunca se publica directamente: viaja dentro de un sello.",
+      "chat.content": "Texto plano.",
+      "tag.p.receiver":
+        "Un destinatario. Junto con la pubkey del remitente, el conjunto de tags p es la sala.",
+      "tag.p.pubkey": "Clave pública hex.",
+      "tag.relay-hint": "Relay opcional donde se puede encontrar este usuario o evento.",
+      "tag.e.reply": "El mensaje al que responde este.",
+      "tag.e.id": "Id del mensaje padre (id del rumor).",
+      "tag.e.marker": 'Marcador "reply" opcional.',
+      "tag.subject": "Tema de la sala.",
+      "tag.subject.title": "Título actual de la conversación.",
+      "tag.q": "Un evento citado.",
+      "tag.q.target": "Id del evento o kind:pubkey:d-tag.",
+      "tag.q.pubkey": "Autor de un evento normal citado.",
+      "example.chat.label": "Alice le pregunta a Bob",
+      "example.chat.explain":
+        "El rumor real dentro del gift wrap de los datos de ejemplo. Fíjate: no tiene sig.",
+      "file.label": "Mensaje con archivo (kind 15)",
+      "file.explain": "Un archivo cifrado compartido en el chat. También es un rumor.",
+      "file.content": "URL del archivo cifrado.",
+      "tag.file-type": "Tipo MIME antes del cifrado.",
+      "tag.file-type.value": "Por ejemplo image/jpeg.",
+      "tag.encryption-algorithm": "Cómo se cifró el archivo.",
+      "tag.encryption-algorithm.value": "Nombre del algoritmo.",
+      "tag.encryption-algorithm.aes-gcm": "AES-GCM, el algoritmo soportado.",
+      "tag.decryption-key": "Clave para descifrar el archivo.",
+      "tag.decryption-key.value": "La clave, tal como la compartió el remitente.",
+      "tag.decryption-nonce": "Nonce para descifrar el archivo.",
+      "tag.decryption-nonce.value": "El nonce, tal como lo compartió el remitente.",
+      "tag.x": "Hash del archivo cifrado.",
+      "tag.x.value": "SHA-256 en hex.",
+      "tag.ox": "Hash del archivo original.",
+      "tag.ox.value": "SHA-256 en hex antes del cifrado.",
+      "tag.size": "Tamaño del archivo cifrado.",
+      "tag.size.value": "Bytes.",
+      "tag.dim": "Tamaño de la imagen o del video.",
+      "tag.dim.value": "<ancho>x<alto> en píxeles.",
+      "tag.thumbhash": "Vista previa provisional.",
+      "tag.thumbhash.value": "String thumbhash.",
+      "tag.blurhash": "Vista previa provisional.",
+      "tag.blurhash.value": "String blurhash.",
+      "tag.thumb": "Miniatura cifrada.",
+      "tag.thumb.value": "URL de la miniatura (misma clave y nonce).",
+      "tag.fallback": "Otra fuente para el archivo.",
+      "tag.fallback.value": "URL alternativa (misma clave y nonce).",
+      "example.file.label": "Alice envía una foto",
+      "example.file.explain":
+        "El archivo se cifra antes de subirlo; la clave y el nonce viajan dentro del rumor sellado.",
+      "seal.label": "Sello (kind 13)",
+      "seal.explain": "El rumor, cifrado para el destinatario y firmado por el remitente real.",
+      "seal.content": "Texto cifrado NIP-44 del remitente al destinatario.",
+      "seal.plaintext": "El JSON del rumor sin firmar.",
+      "example.seal.label": 'El sello alrededor de "Meetup?"',
+      "example.seal.explain": "Sello real de los datos de ejemplo, de Alice a Bob.",
+      "wrap.label": "Gift wrap (kind 1059)",
+      "wrap.explain": "La única capa que ven los relays: un autor aleatorio y un tag p.",
+      "wrap.content": "Texto cifrado NIP-44 de la clave desechable al destinatario.",
+      "wrap.plaintext": "El JSON del sello firmado.",
+      "tag.p.wrap": "El destinatario, para que los relays puedan entregarlo.",
+      "tag.expiration": "Caducidad opcional para mensajes que desaparecen.",
+      "tag.expiration.seal":
+        "Caducidad opcional para mensajes que desaparecen. NIP-17 la pide también en el sello, aunque NIP-59 dice que las etiquetas del sello DEBEN estar vacías.",
+      "tag.expiration.value": "Hora Unix a partir de la cual los relays pueden borrarlo.",
+      "example.wrap.label": "El gift wrap que recibe Bob",
+      "example.wrap.explain":
+        "Texto cifrado real de los datos de ejemplo. Los gift wraps reales se firman con una clave aleatoria de un solo uso; la demo firma con Dave en su lugar.",
+      "inbox.label": "Relays de DM (kind 10050)",
+      "inbox.explain": "Dónde quieres recibir mensajes privados. Limítalo a 1–3 relays.",
+      "inbox.content": "No se usa.",
+      "tag.relay": "Un relay de DM.",
+      "tag.relay.url": "URL del relay.",
+      "example.inbox.label": "El buzón de DMs de Bob",
+      "example.inbox.explain":
+        "Los remitentes publican los gift wraps para Bob solo en estos relays.",
+    },
+  },
+  n18: {
+    title: "Reposts",
+    summary:
+      "Comparte el evento de otra persona con tus seguidores: el kind 6 hace repost de una nota de texto, el kind 16 de cualquier otra cosa, y los tags q convierten una mención en una publicación con cita.",
+    text: {
+      "how.repost.title": "Incrusta el original",
+      "how.repost.body":
+        "El content de un repost kind 6 es el JSON completo de la nota compartida, para que los lectores puedan mostrarla sin buscarla. Puede estar vacío (obligatorio para eventos protegidos de NIP-70).",
+      "how.where.title": "Indica dónde encontrarlo",
+      "how.where.body":
+        "El tag e debe incluir una URL de relay; un tag p notifica al autor original.",
+      "how.generic.title": "Los otros kinds usan el 16",
+      "how.generic.body":
+        "El kind 16 hace repost de cualquier evento que no sea kind 1. Añade un tag k con su kind y, para eventos direccionables, un tag a.",
+      "how.quote.title": "Citas",
+      "how.quote.body":
+        "Una nota que incrusta nostr:note…/nevent…/naddr… lleva un tag q, así las citas se cuentan aparte y no se confunden con respuestas.",
+      "related.01": "Los reposts referencian eventos NIP-01.",
+      "related.21": "Las citas son URIs nostr: dentro de content.",
+      "related.10": "Las respuestas, a diferencia de las citas, usan tags e.",
+      "related.70": "Los eventos protegidos se comparten con content vacío.",
+      "repost.label": "Repost (kind 6)",
+      "repost.explain": "Difunde una nota kind 1 entre tus seguidores.",
+      "repost.content": "El JSON serializado de la nota compartida (o vacío, no recomendado).",
+      "tag.e.repost": "El evento compartido.",
+      "tag.e.id": "Su id.",
+      "tag.e.relay": "URL de relay obligatoria donde se puede obtener.",
+      "tag.p": "El autor original.",
+      "tag.p.pubkey": "Su clave pública hex.",
+      "tag.relay": "Pista de relay opcional.",
+      "example.repost.label": "Erin hace repost de Bob",
+      "example.repost.explain":
+        "El repost real de los datos de ejemplo, con la nota de Bob incrustada.",
+      "generic.label": "Repost genérico (kind 16)",
+      "generic.explain": "Difunde cualquier evento que no sea una nota kind 1.",
+      "generic.content": "El JSON serializado del evento compartido.",
+      "tag.k": "Kind del evento compartido.",
+      "tag.k.kind": "Número de kind como string.",
+      "tag.a": "Coordenada de un evento direccionable compartido.",
+      "tag.a.address": "kind:pubkey:d-tag.",
+      "example.generic.label": "Erin hace repost de un artículo",
+      "example.generic.explain": "Un kind 30023 dentro de un kind 16, con tags k y a.",
+      "quote.label": "Publicación con cita",
+      "quote.explain": "Una nota que cita otro evento en línea.",
+      "quote.content": "Tu texto más el enlace nostr: al evento citado.",
+      "tag.q": "El evento citado.",
+      "tag.q.target": "Id del evento o kind:pubkey:d-tag.",
+      "tag.q.pubkey": "Autor de un evento normal citado.",
+      "example.quote.label": "Carol cita a Bob",
+      "example.quote.explain":
+        "Cita real de los datos de ejemplo, con el tag q y un enlace nostr:note.",
+    },
+  },
+  n19: {
+    title: "Entidades codificadas en bech32",
+    summary:
+      "Strings fáciles de leer como npub1…, nsec1… y nevent1… para mostrar y compartir claves, ids y punteros. Solo para mostrar e introducir datos: los eventos y filtros siempre usan hex.",
+    text: {
+      "how.display.title": "Solo para personas",
+      "how.display.body":
+        "bech32 añade un prefijo legible y un checksum, que detecta errores al copiar, pegar o escanear códigos QR.",
+      "how.bare.title": "Claves e ids simples",
+      "how.bare.body":
+        "npub, nsec y note codifican 32 bytes en bruto con un prefijo que indica cuál de esos tres valores, de aspecto idéntico, es.",
+      "how.tlv.title": "TLV para punteros",
+      "how.tlv.body":
+        "nprofile, nevent y naddr empaquetan registros tipo-longitud-valor: 0 especial (clave, id o tag d), 1 relay (repetible), 2 autor, 3 kind. Los tipos desconocidos se ignoran.",
+      "how.naddr.title": "Direcciones",
+      "how.naddr.body":
+        "naddr apunta a un evento direccionable por kind, autor y tag d, así que siempre resuelve a la versión más reciente.",
+      "how.never-in-events.title": "Nunca dentro de eventos",
+      "how.never-in-events.body":
+        "Los tags, los filtros y los archivos NIP-05 usan hex. Mantén los strings por debajo de 5000 caracteres. nrelay está obsoleto.",
+      "related.21": "Las URIs nostr: envuelven estos strings.",
+      "related.27": "Las menciones dentro de content los usan.",
+      "related.49": "ncryptsec: claves secretas cifradas con contraseña.",
+      "related.01": "Los valores hex que se codifican.",
+      "input.pubkey": "Clave pública hex de 32 bytes.",
+      "input.relays": "Relay donde probablemente se encuentra la entidad. Repetible.",
+      "input.secret-key":
+        "Clave secreta hex de 32 bytes. Solo claves de demostración: nunca pegues una real.",
+      "input.id": "Id de evento hex de 32 bytes.",
+      "input.author": "Pubkey del autor, opcional.",
+      "input.kind": "Kind del evento, opcional.",
+      "input.identifier": "El valor del tag d; vacío para un evento reemplazable simple.",
+      "input.kind-addr": "Kind del evento direccionable.",
+      "npub.label": "npub",
+      "npub.explain": "Una clave pública.",
+      "npub.output": '"npub" + "1" + 32 bytes en bech32 + checksum de 6 caracteres.',
+      "nsec.label": "nsec",
+      "nsec.explain": "Una clave secreta. Quien la tenga controla la cuenta.",
+      "nsec.output": '"nsec" + "1" + 32 bytes secretos + checksum.',
+      "note.label": "note",
+      "note.explain": "Un id de evento sin pistas.",
+      "note.output": '"note" + "1" + id de 32 bytes + checksum.',
+      "nprofile.label": "nprofile",
+      "nprofile.explain": "Una clave pública más relays donde se puede encontrar el perfil.",
+      "nprofile.output": "TLV: 0 = pubkey, 1 = relay (cada relay en su propio registro).",
+      "nevent.label": "nevent",
+      "nevent.explain": "Un id de evento más relays, autor y kind opcionales.",
+      "nevent.output": "TLV: 0 = id, 1 = relay, 2 = autor, 3 = kind (32 bits big-endian).",
+      "naddr.label": "naddr",
+      "naddr.explain": "Un puntero a un evento direccionable.",
+      "naddr.output": "TLV: 0 = tag d, 1 = relay, 2 = autor, 3 = kind.",
+      "example.npub-spec.label": "Vector de prueba de la especificación",
+      "example.npub-spec.explain":
+        "Debería dar npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg.",
+      "example.npub-alice.label": "Alice",
+      "example.nsec-spec.label": "Vector de prueba de la especificación",
+      "example.nsec-spec.explain":
+        "Debería dar nsec1vl029mgpspedva04g90vltkh6fvh240zqtv9k0t9af8935ke9laqsnlfe5.",
+      "example.note.label": "La opinión polémica de Bob",
+      "example.nprofile-spec.label": "Vector de prueba de la especificación",
+      "example.nprofile-spec.explain": "Un registro de pubkey y dos registros de relay.",
+      "example.nprofile-alice.label": "Alice con su relay",
+      "example.nevent.label": "La nota de Bob con pistas",
+      "example.nevent.explain":
+        "El relay, el autor y el kind ayudan a los clientes a obtenerla rápido.",
+      "example.naddr.label": "El artículo de Frank",
+      "example.naddr.explain": "Kind 30023 con el tag d protocols-not-platforms.",
+    },
+  },
+};

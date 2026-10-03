@@ -17,6 +17,7 @@ import { common } from "./common.ts";
 import { diagrams } from "./diagrams.ts";
 import { kinds } from "./kinds.ts";
 import { mascot } from "./mascot.ts";
+import { nips } from "./nips/index.ts";
 import { ui } from "./ui.ts";
 
 export const en = {
@@ -26,5 +27,6 @@ export const en = {
   charts,
   mascot,
   kinds,
+  nips,
   chapters: { ch01, ch02, ch03, ch04, ch05, ch06, ch07, ch08, ch09, ch10, ch11, ch12 },
 };

@@ -203,9 +203,10 @@ describe("links", () => {
     expect(links[1]?.title.length).toBeGreaterThan(0);
   });
 
-  test("toolLinks lists the four tools plus the glossary", () => {
+  test("toolLinks lists the four tools, the NIP reference and the glossary", () => {
     const tools = toolLinks("es");
-    expect(tools.map((t) => t.id)).toEqual([...TOOL_SLUGS, "glossary"]);
+    expect(tools.map((t) => t.id)).toEqual([...TOOL_SLUGS, "nips", "glossary"]);
+    expect(tools.find((t) => t.id === "nips")?.href).toBe("/es/nips/");
     expect(tools[0]?.href).toBe("/es/tools/keys/");
     expect(tools.at(-1)?.href).toBe("/es/glossary/");
   });

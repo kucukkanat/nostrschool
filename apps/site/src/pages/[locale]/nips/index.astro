@@ -1,0 +1,90 @@
+---
+/**
+ * Owner: NIP pages agent. /<locale>/nips/ — search, filter and browse every NIP in the snapshot.
+ * The browser island is server-rendered with the default state (every NIP, by number), so the
+ * page is a complete, linked list without JavaScript. The header stays short so the search box
+ * and first results fit above a phone keyboard; the source note sits after the results.
+ */
+import { format, formatDate, getDictionary, plural } from "@nostrschool/i18n";
+import { NIP_INDEX } from "@nostrschool/nips";
+import { listNips } from "@nostrschool/nips/specs";
+import type { SpecSummary } from "~/components/nips/browse";
+import { loadCourseMap } from "~/components/nips/course";
+import NipBrowser from "~/components/nips/NipBrowser.svelte";
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { assertLocale, localeStaticPaths } from "~/lib/locale";
+
+export const getStaticPaths = localeStaticPaths;
+const locale = assertLocale(Astro.params.locale);
+const ui = getDictionary(locale).nips.ui;
+const nips = listNips();
+const { commit, committedAt } = NIP_INDEX.source;
+
+// Only the two spec facts the list needs, not the specs themselves (they stay build-time).
+const specs: Record<string, SpecSummary> = Object.fromEntries(
+  nips.map((n) => [n.id, { variant: n.variant, todo: n.todo }]),
+);
+const course = await loadCourseMap(locale);
+---
+
+<BaseLayout locale={locale} title={ui.title} description={ui.intro}>
+  <header class="head">
+    <p class="eyebrow">{plural(locale, nips.length, ui.count)}</p>
+    <h1 data-testid="nips-title">{ui.title}</h1>
+    <p class="intro">{ui.intro}</p>
+  </header>
+  <NipBrowser client:load locale={locale} specs={specs} course={course} testid="nips" />
+  {/* Below the results, not above: on a phone every line above the search box pushes the first
+      result under the on-screen keyboard. */}
+  <footer class="source">
+    <p class="note" data-testid="nips-snapshot">
+      {ui.proseNote}
+      {" "}
+      {format(ui.snapshot, {
+        commit: commit.slice(0, 7),
+        date: formatDate(locale, Date.parse(committedAt)),
+      })}
+    </p>
+  </footer>
+</BaseLayout>
+
+<style>
+  .head {
+    margin-block-end: var(--space-lg);
+  }
+  .eyebrow {
+    margin: 0 0 var(--space-2xs);
+  }
+  h1 {
+    margin: 0 0 var(--space-xs);
+    padding-block-end: var(--space-xs);
+    border-block-end: var(--border-width-thick) solid var(--color-border-strong);
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-black);
+    letter-spacing: var(--font-letter-spacing-display);
+    line-height: var(--font-line-height-tight);
+    overflow-wrap: anywhere;
+  }
+  .intro {
+    margin: var(--space-sm) 0 0;
+    max-inline-size: var(--size-content);
+    font-size: var(--font-size-md);
+  }
+  /* md (tokens.breakpoint.md = 768px): the lead can grow once it no longer pushes results down. */
+  @media (min-width: 768px) {
+    .intro {
+      font-size: var(--font-size-lg);
+    }
+  }
+  .source {
+    margin-block-start: var(--space-xl);
+    padding-block-start: var(--space-sm);
+    border-block-start: var(--border-width-thin) solid var(--color-border);
+  }
+  .note {
+    margin: 0;
+    max-inline-size: var(--size-content);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+  }
+</style>

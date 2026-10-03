@@ -24,6 +24,23 @@
         "packages/test-relay/src/cli.ts"
       ],
       "port": 7447
+    },
+    {
+      "name": "site-preview-alt",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "run",
+        "--cwd",
+        "apps/site",
+        "preview",
+        "--",
+        "--ignore-lock",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "4399"
+      ],
+      "port": 4399
     }
   ]
 }

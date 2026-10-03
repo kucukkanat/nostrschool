@@ -1,0 +1,26 @@
+{
+  "name": "@nostrschool/nip-search",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Hybrid NIP search: instant lexical matching plus on-device semantic embeddings",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test",
+    "definitions": "bun src/write-definitions.ts"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.3.0",
+    "@nostrschool/nips": "workspace:*",
+    "@nostrschool/protocol": "workspace:*",
+    "minisearch": "^7.2.0",
+    "nanostores": "^1.5.4"
+  }
+}

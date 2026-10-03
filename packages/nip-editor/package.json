@@ -1,0 +1,38 @@
+{
+  "name": "@nostrschool/nip-editor",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Spec-driven Svelte editor and explainer for every NIP",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": "./src/*"
+  },
+  "svelte": "./src/index.ts",
+  "scripts": {
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json --threshold warning --fail-on-warnings",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/lint": "^6.9.7",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.13",
+    "@lezer/highlight": "^1.2.5",
+    "@nostrschool/diagrams": "workspace:*",
+    "@nostrschool/fixtures": "workspace:*",
+    "@nostrschool/i18n": "workspace:*",
+    "@nostrschool/nips": "workspace:*",
+    "@nostrschool/protocol": "workspace:*",
+    "@nostrschool/tokens": "workspace:*",
+    "@nostrschool/ui": "workspace:*",
+    "nostr-tools": "^2.25.2",
+    "svelte": "^5.57.1"
+  }
+}

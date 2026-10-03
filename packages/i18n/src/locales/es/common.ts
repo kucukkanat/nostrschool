@@ -13,6 +13,7 @@ export const common: typeof en = {
     home: "Inicio",
     learn: "Aprender",
     tools: "Herramientas",
+    nips: "NIPs",
     glossary: "Glosario",
     skipToContent: "Saltar al contenido",
     primary: "Navegación principal",
@@ -59,6 +60,7 @@ export const common: typeof en = {
     eventInspector: "Inspector de eventos",
     filterPlayground: "Laboratorio de filtros",
     kinds: "Tabla de kinds",
+    nips: "Referencia de NIPs",
   },
   glossary: {
     title: "Glosario",
@@ -87,7 +89,7 @@ export const common: typeof en = {
   home: {
     eyebrow: "Un curso de Nostr divertido y práctico",
     title: "Aprende Nostr experimentando con lo de verdad",
-    titleMark: "the real thing", // TODO(es)
+    titleMark: "lo de verdad",
     lead: "Genera claves, firma eventos y mira cómo vuelan los paquetes entre relays. Criptografía real, funcionando aquí mismo en tu navegador.",
     ctaTools: "Explorar las herramientas",
     ctaContinue: "Continuar: {title}",
@@ -139,6 +141,7 @@ export const common: typeof en = {
       "Construye un filtro REQ y mira qué eventos coinciden, con ejemplos o con relays en vivo.",
     kinds: "Una tabla periódica con buscador de los kinds de eventos y los NIPs que los definen.",
     glossary: "Todos los términos de Nostr de este sitio, en palabras sencillas.",
+    nips: "Busca cualquier NIP por significado y edita el JSON que define, con una explicación para cada campo.",
     open: "Abrir",
   },
   shell: {

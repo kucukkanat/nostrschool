@@ -1,0 +1,8389 @@
+{
+ "source": {
+  "repo": "https://github.com/nostr-protocol/nips",
+  "commit": "0046368a747c5c25ae2bec28bae0e537744c8f10",
+  "committedAt": "2026-09-27T14:18:24-03:00",
+  "snapshotAt": "2026-10-03T19:29:30.802Z"
+ },
+ "nips": [
+  {
+   "id": "01",
+   "title": "Basic protocol flow description",
+   "summary": "This NIP defines the basic protocol that should be implemented by everybody. New NIPs may add new optional (or mandatory) fields and messages and features to the structures and flows described here.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "mandatory",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "mandatory",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 0,
+     "description": "User Metadata"
+    }
+   ],
+   "exampleKinds": [],
+   "messages": [
+    {
+     "type": "EVENT",
+     "direction": "client-to-relay",
+     "description": "used to publish events"
+    },
+    {
+     "type": "REQ",
+     "direction": "client-to-relay",
+     "description": "used to request events and subscribe to new updates"
+    },
+    {
+     "type": "CLOSE",
+     "direction": "client-to-relay",
+     "description": "used to stop previous subscriptions"
+    },
+    {
+     "type": "EOSE",
+     "direction": "relay-to-client",
+     "description": "used to notify clients all stored events have been sent"
+    },
+    {
+     "type": "EVENT",
+     "direction": "relay-to-client",
+     "description": "used to send events requested to clients"
+    },
+    {
+     "type": "NOTICE",
+     "direction": "relay-to-client",
+     "description": "used to send human-readable messages to clients"
+    },
+    {
+     "type": "OK",
+     "direction": "relay-to-client",
+     "description": "used to notify clients if an EVENT was successful"
+    },
+    {
+     "type": "CLOSED",
+     "direction": "relay-to-client",
+     "description": "used to notify clients that a REQ was ended and why"
+    }
+   ],
+   "tags": [
+    "a",
+    "alt",
+    "e",
+    "p"
+   ],
+   "idents": [
+    "draft",
+    "mandatory",
+    "relay",
+    "secp256k1",
+    "event",
+    "event.id",
+    "sha256",
+    "0x0A",
+    "0x22",
+    "0x5C",
+    "0x0D",
+    "0x09",
+    "0x08",
+    "0x0C",
+    "kind:1",
+    "pubkey",
+    "kind",
+    "and",
+    "REQ",
+    "CLOSE",
+    "ids",
+    "authors",
+    "kinds",
+    "#e",
+    "#p",
+    "since",
+    "until",
+    "created_at",
+    "&&",
+    "limit",
+    "EOSE",
+    "EVENT",
+    "NOTICE",
+    "OK",
+    "true",
+    "false",
+    "CLOSED",
+    "duplicate",
+    "pow",
+    "blocked",
+    "rate-limited",
+    "invalid",
+    "restricted",
+    "mute",
+    "error"
+   ],
+   "mentions": [
+    "10",
+    "24"
+   ],
+   "mentionedBy": [
+    "10",
+    "11",
+    "12",
+    "13",
+    "16",
+    "19",
+    "20",
+    "24",
+    "32",
+    "33",
+    "44",
+    "45",
+    "57",
+    "5A",
+    "67",
+    "69",
+    "77",
+    "87",
+    "89",
+    "BE"
+   ],
+   "headings": [
+    "Events and signatures",
+    "Tags",
+    "Kinds",
+    "Communication between clients and relays",
+    "From client to relay: sending events and creating subscriptions",
+    "From relay to client: sending events and notices"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/01.md",
+   "updatedAt": "2026-09-04T01:19:51-03:00",
+   "wordCount": 2160
+  },
+  {
+   "id": "02",
+   "title": "Follow List",
+   "summary": "A special event with kind 3, meaning \"follow list\" is defined as having a list of p tags, one for each of the followed/known profiles one is following.",
+   "status": "final",
+   "maturity": "final",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "final",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 3,
+     "description": "Follows"
+    }
+   ],
+   "exampleKinds": [
+    3
+   ],
+   "messages": [],
+   "tags": [
+    "p"
+   ],
+   "idents": [
+    "final",
+    "optional",
+    ".content",
+    "erin",
+    "charlie"
+   ],
+   "mentions": [],
+   "mentionedBy": [
+    "24",
+    "51",
+    "54"
+   ],
+   "headings": [
+    "Uses",
+    "Follow list backup",
+    "Profile discovery and context augmentation",
+    "Relay sharing",
+    "Petname scheme"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/02.md",
+   "updatedAt": "2026-09-20T13:53:29-03:00",
+   "wordCount": 495
+  },
+  {
+   "id": "03",
+   "title": "OpenTimestamps Attestations for Events",
+   "summary": "This NIP defines an event with kind:1040 that can contain an OpenTimestamps proof for any other event:",
+   "status": "unrecommended",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "vulnerable to one specific attack, needs update",
+    "replacedBy": []
+   },
+   "kinds": [
+    {
+     "kind": 1040,
+     "description": "OpenTimestamps"
+    }
+   ],
+   "exampleKinds": [
+    1040
+   ],
+   "messages": [],
+   "tags": [
+    "e",
+    "k"
+   ],
+   "idents": [
+    "unrecommended",
+    "draft",
+    "optional",
+    "kind:1040",
+    "content",
+    ".ots",
+    "nak",
+    "jq",
+    "ots"
+   ],
+   "mentions": [],
+   "mentionedBy": [],
+   "headings": [
+    "Example OpenTimestamps proof verification flow"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/03.md",
+   "updatedAt": "2026-05-31T08:10:30-03:00",
+   "wordCount": 171
+  },
+  {
+   "id": "04",
+   "title": "Encrypted Direct Message",
+   "summary": "A special event with kind 4, meaning \"encrypted direct message\". It is supposed to have the following attributes:",
+   "status": "unrecommended",
+   "maturity": "final",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "final",
+    "unrecommended",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "deprecated in favor of NIP-17",
+    "replacedBy": [
+     "17"
+    ]
+   },
+   "kinds": [
+    {
+     "kind": 4,
+     "description": "Encrypted Direct Messages"
+    }
+   ],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [
+    "e",
+    "p"
+   ],
+   "idents": [
+    "unrecommended",
+    "final",
+    "optional",
+    "relay",
+    "content",
+    "tags",
+    "hashfp",
+    "secp256k1_ecdh",
+    "AUTH",
+    "kind:4",
+    ".content",
+    "@npub..."
+   ],
+   "mentions": [
+    "17"
+   ],
+   "mentionedBy": [
+    "07",
+    "15",
+    "23",
+    "44",
+    "47",
+    "51",
+    "90",
+    "EE"
+   ],
+   "headings": [
+    "Security Warning",
+    "Client Implementation Warning"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/04.md",
+   "updatedAt": "2025-12-23T14:53:38-03:00",
+   "wordCount": 407
+  },
+  {
+   "id": "05",
+   "title": "Mapping Nostr keys to DNS-based internet identifiers",
+   "summary": "On events of kind 0 (user metadata) one can specify the key \"nip05\" with an internet identifier (an email-like address) as the value. Although there is a link to a very liberal \"internet identifier\" specification above, the <local-part> part MUST only use characters a-z0-9-_..",
+   "status": "final",
+   "maturity": "final",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "final",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [
+    0
+   ],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "final",
+    "optional",
+    "a-z0-9-_.",
+    "pubkey",
+    "/.well-known/nostr.json",
+    "bob@bob.com",
+    "abc...def",
+    "npub",
+    "_@domain",
+    "bob.com",
+    "_@bob.com"
+   ],
+   "mentions": [
+    "19"
+   ],
+   "mentionedBy": [
+    "19",
+    "34",
+    "46",
+    "50"
+   ],
+   "headings": [
+    "Example",
+    "Finding users from their NIP-05 identifier",
+    "Notes",
+    "Identification, not verification",
+    "User discovery implementation suggestion",
+    "Clients must always follow public keys, not NIP-05 addresses",
+    "Public keys must be in hex format",
+    "Showing just the domain as an identifier",
+    "Reasoning for the /.well-known/nostr.json?name=<local-part> format",
+    "Allowing access from JavaScript apps",
+    "Security Constraints"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/05.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 922
+  },
+  {
+   "id": "06",
+   "title": "Basic key derivation from mnemonic seed phrase",
+   "summary": "BIP39 is used to generate mnemonic seed words and derive a binary seed from them.",
+   "status": "unrecommended",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "prefer a single nsec",
+    "replacedBy": []
+   },
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "unrecommended",
+    "draft",
+    "optional",
+    "account"
+   ],
+   "mentions": [],
+   "mentionedBy": [],
+   "headings": [
+    "Test vectors"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/06.md",
+   "updatedAt": "2026-05-31T08:10:30-03:00",
+   "wordCount": 170
+  },
+  {
+   "id": "07",
+   "title": "window.nostr capability for web browsers",
+   "summary": "The window.nostr object may be made available by web browsers or extensions and websites or web-apps may make use of it after checking its availability.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "window.nostr",
+    "draft",
+    "optional"
+   ],
+   "mentions": [
+    "04",
+    "44"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Recommendation to Extension Authors",
+    "Implementation"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/07.md",
+   "updatedAt": "2025-02-13T18:46:56-08:00",
+   "wordCount": 189
+  },
+  {
+   "id": "08",
+   "title": "Handling Mentions",
+   "summary": "This document standardizes the treatment given by clients of inline mentions of other events and pubkeys inside the content of text_notes.",
+   "status": "unrecommended",
+   "maturity": "final",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "final",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "deprecated in favor of NIP-27",
+    "replacedBy": [
+     "27"
+    ]
+   },
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "unrecommended",
+    "final",
+    "optional",
+    "text_note",
+    ".tags",
+    ".content",
+    "index",
+    "or"
+   ],
+   "mentions": [
+    "27"
+   ],
+   "mentionedBy": [],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/08.md",
+   "updatedAt": "2023-11-16T10:24:53-03:00",
+   "wordCount": 265
+  },
+  {
+   "id": "09",
+   "title": "Event Deletion Request",
+   "summary": "A special event with kind 5, meaning \"deletion request\" is defined as having a list of one or more e or a tags, each referencing an event the author is requesting to be deleted. Deletion requests SHOULD include a k tag for the kind of each event being requested for deletion.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 5,
+     "description": "Event Deletion Request"
+    }
+   ],
+   "exampleKinds": [
+    5
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "e",
+    "k"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "or",
+    "content",
+    "pubkey",
+    "created_at"
+   ],
+   "mentions": [],
+   "mentionedBy": [
+    "11",
+    "32",
+    "52",
+    "59",
+    "60",
+    "62",
+    "72"
+   ],
+   "headings": [
+    "Client Usage",
+    "Relay Usage",
+    "Deletion Request of a Deletion Request"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/09.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 454
+  },
+  {
+   "id": "10",
+   "title": "Text Notes and Threads",
+   "summary": "This NIP defines kind:1 as a simple plaintext note.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1,
+     "description": "Short Text Note"
+    }
+   ],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [
+    "e"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:1",
+    ".content",
+    "and",
+    "a1",
+    "p1",
+    "p2",
+    "p3",
+    "root-id",
+    "reply-id"
+   ],
+   "mentions": [
+    "01",
+    "21",
+    "22"
+   ],
+   "mentionedBy": [
+    "01",
+    "28",
+    "34",
+    "35"
+   ],
+   "headings": [
+    "Abstract",
+    "Marked \"e\" tags (PREFERRED)",
+    "The \"p\" tag",
+    "Deprecated Positional \"e\" tags"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/10.md",
+   "updatedAt": "2025-02-07T13:59:59-06:00",
+   "wordCount": 650
+  },
+  {
+   "id": "11",
+   "title": "Relay Information Document",
+   "summary": "Relays may provide server metadata to clients to inform them of capabilities, administrative contacts, and various server attributes. This is made available as a JSON document over HTTP, on the same URI as the relay's websocket.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "Accept",
+    "application/nostr+json",
+    "Access-Control-Allow-Origin",
+    "Access-Control-Allow-Headers",
+    "Access-Control-Allow-Methods",
+    "name",
+    "description",
+    "Description",
+    "pubkey",
+    "secp256k1",
+    "self",
+    "contact",
+    "mailto",
+    "https",
+    "NIP",
+    "and",
+    "software",
+    "max_message_length",
+    "to",
+    "max_subscriptions",
+    "max_subid_length",
+    "max_limit",
+    "limit",
+    "max_event_tags",
+    "tags",
+    "max_content_length",
+    "content",
+    "min_pow_difficulty",
+    "auth_required",
+    "payment_required",
+    "restricted_writes",
+    "true",
+    "created_at_lower_limit",
+    "created_at_upper_limit",
+    "default_limit"
+   ],
+   "mentions": [
+    "01",
+    "09",
+    "13",
+    "17",
+    "42"
+   ],
+   "mentionedBy": [
+    "29",
+    "43",
+    "66",
+    "67"
+   ],
+   "headings": [
+    "Field Descriptions",
+    "Name",
+    "Description",
+    "Banner",
+    "Icon",
+    "Pubkey",
+    "Self",
+    "Contact",
+    "Supported NIPs",
+    "Software",
+    "Version",
+    "Terms of Service",
+    "Extra Fields",
+    "Server Limitations",
+    "Pay-to-Relay",
+    "Examples"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/11.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 1430
+  },
+  {
+   "id": "12",
+   "title": "Generic Tag Queries",
+   "summary": "Moved to NIP-01.",
+   "status": "deprecated",
+   "maturity": "final",
+   "requirement": "mandatory",
+   "relay": false,
+   "statusTags": [
+    "final",
+    "mandatory"
+   ],
+   "listed": false,
+   "movedTo": "01",
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "final",
+    "mandatory"
+   ],
+   "mentions": [
+    "01"
+   ],
+   "mentionedBy": [],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/12.md",
+   "updatedAt": "2023-11-16T10:24:53-03:00",
+   "wordCount": 11
+  },
+  {
+   "id": "13",
+   "title": "Proof of Work",
+   "summary": "This NIP defines a way to generate and interpret Proof of Work for nostr notes. Proof of Work (PoW) is a way to add a proof of computational work to a note. This is a bearer proof that all relays and clients can universally validate with a small amount of code. This proof can be used as a means of spam deterrence.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [
+    1
+   ],
+   "messages": [],
+   "tags": [
+    "nonce"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "difficulty",
+    "NIP-01",
+    "with",
+    "002f...",
+    "nonce",
+    "created_at",
+    "SHOULD",
+    "MAY"
+   ],
+   "mentions": [
+    "01"
+   ],
+   "mentionedBy": [
+    "11",
+    "59"
+   ],
+   "headings": [
+    "Mining",
+    "Example mined note",
+    "Validating",
+    "Delegated Proof of Work"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/13.md",
+   "updatedAt": "2025-12-23T14:53:38-03:00",
+   "wordCount": 560
+  },
+  {
+   "id": "14",
+   "title": "Subject tag in text events",
+   "summary": "This NIP defines the use of the \"subject\" tag in text (kind: 1) events. (implemented in more-speech)",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "draft",
+    "optional"
+   ],
+   "mentions": [],
+   "mentionedBy": [],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/14.md",
+   "updatedAt": "2023-11-18T09:13:12-03:00",
+   "wordCount": 132
+  },
+  {
+   "id": "15",
+   "title": "Nostr Marketplace (for resilient marketplaces)",
+   "summary": "Implemented in NostrMarket and Plebeian Market.",
+   "status": "unrecommended",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "too complicated, try 99 instead",
+    "replacedBy": [
+     "99"
+    ]
+   },
+   "kinds": [
+    {
+     "kind": 1021,
+     "description": "Bid"
+    },
+    {
+     "kind": 1022,
+     "description": "Bid confirmation"
+    },
+    {
+     "kind": 30017,
+     "description": "Create or update a stall"
+    },
+    {
+     "kind": 30018,
+     "description": "Create or update a product"
+    },
+    {
+     "kind": 30019,
+     "description": "Marketplace UI/UX"
+    },
+    {
+     "kind": 30020,
+     "description": "Product sold as an auction"
+    }
+   ],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [
+    "d",
+    "e",
+    "t"
+   ],
+   "idents": [
+    "unrecommended",
+    "draft",
+    "optional",
+    "merchant",
+    "customer",
+    "product",
+    "stall",
+    "marketplace",
+    "stalls",
+    "products",
+    "customers",
+    "convenience",
+    "Marketplace",
+    "merchants",
+    "Marketplaces",
+    "Merchant",
+    "nostr",
+    "set_stall",
+    "set_product",
+    "shipping",
+    "id",
+    "quantity",
+    "specs",
+    "spec",
+    "tags",
+    "food",
+    "fruits",
+    "JSON",
+    "MUST",
+    "type",
+    "contact.nostr",
+    "content",
+    "payment_options",
+    "url",
+    "btc",
+    "ln",
+    "lnurl",
+    "naddr",
+    "start_date",
+    "duration",
+    "status",
+    "winner",
+    "rejected",
+    "pending",
+    "message",
+    "duration_extended"
+   ],
+   "mentions": [
+    "04",
+    "19",
+    "99"
+   ],
+   "mentionedBy": [
+    "99"
+   ],
+   "headings": [
+    "Terms",
+    "Nostr Marketplace Clients",
+    "Merchant admin",
+    "Marketplace",
+    "Merchant publishing/updating products (event)",
+    "Event 30017: Create or update a stall.",
+    "Event 30018: Create or update a product",
+    "Checkout events",
+    "Step 1: customer order (event)",
+    "Step 2: merchant request payment (event)",
+    "Step 3: merchant verify payment/shipped (event)",
+    "Customize Marketplace",
+    "Event 30019: Create or update marketplace UI/UX",
+    "Auctions",
+    "Event 30020: Create or update a product sold as an auction",
+    "Event 1021: Bid",
+    "Event 1022: Bid confirmation",
+    "Customer support events",
+    "Additional"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/15.md",
+   "updatedAt": "2026-07-26T06:40:19-03:00",
+   "wordCount": 2148
+  },
+  {
+   "id": "16",
+   "title": "Event Treatment",
+   "summary": "Moved to NIP-01.",
+   "status": "deprecated",
+   "maturity": "final",
+   "requirement": "mandatory",
+   "relay": false,
+   "statusTags": [
+    "final",
+    "mandatory"
+   ],
+   "listed": false,
+   "movedTo": "01",
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "final",
+    "mandatory"
+   ],
+   "mentions": [
+    "01"
+   ],
+   "mentionedBy": [
+    "28"
+   ],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/16.md",
+   "updatedAt": "2023-11-16T10:24:53-03:00",
+   "wordCount": 10
+  },
+  {
+   "id": "17",
+   "title": "Private Direct Messages",
+   "summary": "This NIP defines an encrypted chat scheme which uses NIP-44 encryption and NIP-59 gift-wrapping.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 14,
+     "description": "Direct Message"
+    },
+    {
+     "kind": 15,
+     "description": "File Message"
+    },
+    {
+     "kind": 10050,
+     "description": "Relay list to receive DMs"
+    }
+   ],
+   "exampleKinds": [
+    13,
+    14,
+    15,
+    1059,
+    10050
+   ],
+   "messages": [],
+   "tags": [
+    "decryption-key",
+    "decryption-nonce",
+    "e",
+    "encryption-algorithm",
+    "file-type",
+    "p",
+    "relay",
+    "x"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "pubkey",
+    "subject",
+    "kind:13",
+    "kind:1059",
+    "unsignedMessageRumor",
+    "kind:14",
+    "wrapperPrivateKey",
+    "wrappedPublicKey",
+    "created_at",
+    "kind:10050",
+    "kind:5",
+    "expiration",
+    ".content",
+    "id",
+    "file-type",
+    "image/jpeg",
+    "audio/mpeg",
+    "encryption-algorithm",
+    "aes-gcm",
+    "decryption-key",
+    "decryption-nonce",
+    "content",
+    "ox",
+    "size",
+    "dim",
+    "thumbhash",
+    "blurhash",
+    "thumb",
+    "fallback",
+    "url",
+    "to"
+   ],
+   "mentions": [
+    "21",
+    "25",
+    "42",
+    "44",
+    "59"
+   ],
+   "mentionedBy": [
+    "04",
+    "11",
+    "51",
+    "59",
+    "A4",
+    "EE"
+   ],
+   "headings": [
+    "Chat Rooms",
+    "Encrypting",
+    "Publishing",
+    "Relays",
+    "Delete, edit and disappearing messages",
+    "Benefits & Limitations",
+    "Spam",
+    "Message Rumor Definitions",
+    "Chat Message",
+    "File Message",
+    "Examples"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/17.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 1259
+  },
+  {
+   "id": "18",
+   "title": "Reposts",
+   "summary": "A repost is a kind 6 event that is used to signal to followers that a kind 1 text note is worth reading.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 6,
+     "description": "Repost"
+    },
+    {
+     "kind": 16,
+     "description": "Generic Repost"
+    }
+   ],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [
+    "q"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "content",
+    "nevent",
+    "note",
+    "naddr",
+    "kind:pubkey:d-tag"
+   ],
+   "mentions": [
+    "21",
+    "70"
+   ],
+   "mentionedBy": [
+    "27",
+    "72",
+    "A4",
+    "C7"
+   ],
+   "headings": [
+    "Quote Reposts",
+    "Generic Reposts"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/18.md",
+   "updatedAt": "2025-12-04T00:59:58+09:00",
+   "wordCount": 285
+  },
+  {
+   "id": "19",
+   "title": "bech32-encoded entities",
+   "summary": "This NIP standardizes bech32-formatted strings that can be used to display keys, ids and other information in clients. These formats are not meant to be used anywhere in the core protocol, they are only meant for displaying to users, copy-pasting, sharing, rendering QR codes and inputting data.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "draft",
+    "optional",
+    "npub",
+    "nsec",
+    "note",
+    "TLV",
+    "and",
+    "nprofile",
+    "nevent",
+    "naddr",
+    "nrelay",
+    "wss://r.x.com",
+    "wss://djbas.sadkb.com"
+   ],
+   "mentions": [
+    "01",
+    "05"
+   ],
+   "mentionedBy": [
+    "05",
+    "15",
+    "21",
+    "23",
+    "27",
+    "53",
+    "59",
+    "89",
+    "A4",
+    "CC"
+   ],
+   "headings": [
+    "Bare keys and ids",
+    "Shareable identifiers with extra metadata",
+    "Examples",
+    "Notes"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/19.md",
+   "updatedAt": "2026-03-12T13:34:49-03:00",
+   "wordCount": 562
+  },
+  {
+   "id": "20",
+   "title": "Command Results",
+   "summary": "Moved to NIP-01.",
+   "status": "deprecated",
+   "maturity": "final",
+   "requirement": "mandatory",
+   "relay": false,
+   "statusTags": [
+    "final",
+    "mandatory"
+   ],
+   "listed": false,
+   "movedTo": "01",
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "final",
+    "mandatory"
+   ],
+   "mentions": [
+    "01"
+   ],
+   "mentionedBy": [],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/20.md",
+   "updatedAt": "2023-11-16T10:24:53-03:00",
+   "wordCount": 10
+  },
+  {
+   "id": "21",
+   "title": "nostr: URI scheme",
+   "summary": "This NIP standardizes the usage of a common URI scheme for maximum interoperability and openness in the network.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "nostr:",
+    "draft",
+    "optional",
+    "nsec",
+    "kind:30023"
+   ],
+   "mentions": [
+    "19"
+   ],
+   "mentionedBy": [
+    "10",
+    "17",
+    "18",
+    "22",
+    "23",
+    "27",
+    "53",
+    "54",
+    "A4"
+   ],
+   "headings": [
+    "Linking HTML pages to Nostr entities"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/21.md",
+   "updatedAt": "2026-03-20T22:33:31-03:00",
+   "wordCount": 154
+  },
+  {
+   "id": "22",
+   "title": "Comment",
+   "summary": "A comment is a threading note always scoped to a root event or an I-tag.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1111,
+     "description": "Comment"
+    }
+   ],
+   "exampleKinds": [
+    1111
+   ],
+   "messages": [],
+   "tags": [
+    "k",
+    "p",
+    "P"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:1111",
+    ".content",
+    "or",
+    "and"
+   ],
+   "mentions": [
+    "21",
+    "73",
+    "94"
+   ],
+   "mentionedBy": [
+    "10",
+    "23",
+    "30",
+    "34",
+    "72",
+    "7D",
+    "A0",
+    "B0",
+    "CC"
+   ],
+   "headings": [
+    "Examples"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/22.md",
+   "updatedAt": "2026-08-24T11:54:49-05:00",
+   "wordCount": 735
+  },
+  {
+   "id": "23",
+   "title": "Long-form Content",
+   "summary": "This NIP defines kind:30023 (an addressable event) for long-form text content, generally referred to as \"articles\" or \"blog posts\".",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 30023,
+     "description": "Long-form Content"
+    },
+    {
+     "kind": 30024,
+     "description": "Draft Long-form Content"
+    }
+   ],
+   "exampleKinds": [
+    30023
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "d",
+    "e",
+    "published_at",
+    "t",
+    "title"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:30023",
+    "kind:30024",
+    "kind:1",
+    ".content",
+    ".created_at",
+    "naddr",
+    "nostr:..."
+   ],
+   "mentions": [
+    "04",
+    "19",
+    "21",
+    "22",
+    "27",
+    "37"
+   ],
+   "mentionedBy": [
+    "27",
+    "57",
+    "99"
+   ],
+   "headings": [
+    "Format",
+    "Metadata",
+    "Editability",
+    "Linking",
+    "References",
+    "Example Event",
+    "Replies & Comments"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/23.md",
+   "updatedAt": "2026-05-18T11:10:57+03:00",
+   "wordCount": 457
+  },
+  {
+   "id": "24",
+   "title": "Extra metadata fields and tags",
+   "summary": "This NIP keeps track of extra optional fields that can added to events which are not defined anywhere else but have become de facto standards and other minor implementation possibilities that do not deserve their own NIP and do not have a place in other NIPs.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "draft",
+    "optional",
+    "display_name",
+    "name",
+    "website",
+    "banner",
+    "bot",
+    "birthday",
+    "displayName",
+    "username",
+    "title"
+   ],
+   "mentions": [
+    "01",
+    "02",
+    "51",
+    "52",
+    "53",
+    "65",
+    "73",
+    "99"
+   ],
+   "mentionedBy": [
+    "01"
+   ],
+   "headings": [
+    "kind 0",
+    "kind 3",
+    "tags"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/24.md",
+   "updatedAt": "2025-08-11T19:37:53+09:00",
+   "wordCount": 341
+  },
+  {
+   "id": "25",
+   "title": "Reactions",
+   "summary": "A reaction is a kind 7 event that is used to indicate user reactions to other events. A reaction's content field MUST include user-generated-content indicating the value of the reaction (conventionally +, -, or an emoji).",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 7,
+     "description": "Reaction"
+    },
+    {
+     "kind": 17,
+     "description": "Reaction to a website"
+    }
+   ],
+   "exampleKinds": [
+    7,
+    17
+   ],
+   "messages": [],
+   "tags": [
+    "emoji",
+    "i",
+    "k"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "content",
+    "id",
+    "pubkey",
+    "kind:pubkey:d-tag",
+    "and",
+    ":shortcode:"
+   ],
+   "mentions": [
+    "30",
+    "73"
+   ],
+   "mentionedBy": [
+    "17",
+    "30",
+    "54",
+    "A4"
+   ],
+   "headings": [
+    "Tags",
+    "External Content Reactions",
+    "Custom Emoji Reaction"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/25.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 479
+  },
+  {
+   "id": "26",
+   "title": "Delegated Event Signing",
+   "summary": "This NIP defines how events can be delegated so that they can be signed by other keypairs.",
+   "status": "unrecommended",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "unrecommended",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "adds unnecessary burden for little gain",
+    "replacedBy": []
+   },
+   "kinds": [],
+   "exampleKinds": [
+    1
+   ],
+   "messages": [],
+   "tags": [
+    "delegation"
+   ],
+   "idents": [
+    "unrecommended",
+    "draft",
+    "optional",
+    "relay",
+    "delegation",
+    "kind",
+    "created_at",
+    "kind=1",
+    "pubkey"
+   ],
+   "mentions": [],
+   "mentionedBy": [],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/26.md",
+   "updatedAt": "2026-05-31T08:10:30-03:00",
+   "wordCount": 569
+  },
+  {
+   "id": "27",
+   "title": "Text Note References",
+   "summary": "This document standardizes the treatment given by clients of inline references of other events and profiles inside the .content of any event that has readable text in its .content (such as kinds 1 and 30023).",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [
+    1
+   ],
+   "messages": [],
+   "tags": [
+    "e",
+    "p",
+    "q"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    ".content",
+    "nostr:...",
+    "@mattn",
+    "nostr:npub1...",
+    "nostr:",
+    "nevent1...",
+    "nostr:nevent1...",
+    "kind:1",
+    "kind:30023",
+    "nostr:naddr1...",
+    "mattn"
+   ],
+   "mentions": [
+    "18",
+    "19",
+    "21",
+    "23"
+   ],
+   "mentionedBy": [
+    "08",
+    "23"
+   ],
+   "headings": [
+    "Example of a profile mention process",
+    "Verbose and probably unnecessary considerations"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/27.md",
+   "updatedAt": "2026-03-20T22:33:31-03:00",
+   "wordCount": 655
+  },
+  {
+   "id": "28",
+   "title": "Public Chat",
+   "summary": "This NIP defines new event kinds for public chat channels, channel messages, and basic client-side moderation.",
+   "status": "unrecommended",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "try NIP-29 instead",
+    "replacedBy": [
+     "29"
+    ]
+   },
+   "kinds": [
+    {
+     "kind": 40,
+     "description": "Channel Creation"
+    },
+    {
+     "kind": 41,
+     "description": "Channel Metadata"
+    },
+    {
+     "kind": 42,
+     "description": "Channel Message"
+    },
+    {
+     "kind": 43,
+     "description": "Channel Hide Message"
+    },
+    {
+     "kind": 44,
+     "description": "Channel Mute User"
+    }
+   ],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [
+    "e",
+    "p",
+    "t"
+   ],
+   "idents": [
+    "unrecommended",
+    "draft",
+    "optional",
+    "content",
+    "name",
+    "about",
+    "picture",
+    "relays",
+    "reason",
+    "id",
+    "pubkey"
+   ],
+   "mentions": [
+    "10",
+    "16",
+    "29"
+   ],
+   "mentionedBy": [
+    "32",
+    "51"
+   ],
+   "headings": [
+    "Kind 40: Create channel",
+    "Kind 41: Set channel metadata",
+    "Kind 42: Create channel message",
+    "Kind 43: Hide message",
+    "Kind 44: Mute user",
+    "Relay recommendations",
+    "Motivation",
+    "Additional info"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/28.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 699
+  },
+  {
+   "id": "29",
+   "title": "Relay-based Groups",
+   "summary": "This NIP defines a standard for groups that are only writable by a closed set of users. They can be public for reading by external users or not.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 9000,
+     "to": 9030,
+     "description": "Group Control Events"
+    },
+    {
+     "kind": 10009,
+     "description": "User groups"
+    },
+    {
+     "kind": 39000,
+     "to": 39009,
+     "description": "Group metadata events"
+    }
+   ],
+   "exampleKinds": [
+    9002,
+    9021,
+    9022,
+    39000,
+    39001,
+    39002,
+    39003,
+    39004,
+    39005
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "about",
+    "banner",
+    "child",
+    "closed",
+    "code",
+    "d",
+    "e",
+    "h",
+    "name",
+    "p",
+    "parent",
+    "participant",
+    "picture",
+    "previous",
+    "private",
+    "role",
+    "supported_kinds",
+    "u"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "kind:39000",
+    "kind:39001",
+    "kind:10009",
+    "naddr1...",
+    "self",
+    "code",
+    "kind:9021",
+    "previous",
+    "kind:39003",
+    "kind:9000",
+    "livekit",
+    "supported_kinds",
+    "Authorization",
+    "sub",
+    "duplicate:",
+    "kind:9009",
+    "create-invite",
+    "kind:9022",
+    "kind:9001",
+    "kinds:9000-9020",
+    "put-user",
+    "remove-user",
+    "edit-metadata",
+    "delete-event",
+    "create-group",
+    "delete-group",
+    "update-pin-list",
+    "name",
+    "picture",
+    "banner",
+    "about",
+    "private",
+    "restricted",
+    "hidden",
+    "closed",
+    "kind:39002",
+    "kind:39004",
+    "participant",
+    "kind:39005",
+    "kind:9010",
+    "parent",
+    "nip29",
+    "kind:9002",
+    "child",
+    "kind:9008"
+   ],
+   "mentions": [
+    "11",
+    "51",
+    "98"
+   ],
+   "mentionedBy": [
+    "28",
+    "51",
+    "72"
+   ],
+   "headings": [
+    "Group identity, migration and forking",
+    "Moving a group to another relay",
+    "Forking a group",
+    "Detecting migrations and forks",
+    "Replicating a group for resilience",
+    "Relay-generated events",
+    "Group referencing",
+    "The h tag",
+    "Timeline references",
+    "Example",
+    "Late publication",
+    "Group management",
+    "Live audio/video (AV) spaces",
+    "Event definitions",
+    "Normal user-created events",
+    "User-related group management events",
+    "Group state -- or moderation",
+    "Group metadata events",
+    "Subgroups",
+    "Relay support detection",
+    "Rules",
+    "Lifecycle example",
+    "Membership",
+    "Implementation quirks",
+    "Checking your own membership in a group",
+    "Adding yourself to a group",
+    "Storing your list of groups"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/29.md",
+   "updatedAt": "2026-08-08T20:01:32-03:00",
+   "wordCount": 3638
+  },
+  {
+   "id": "30",
+   "title": "Custom Emoji",
+   "summary": "Custom emoji may be added to kind 0, kind 1, kind 1111 (NIP-22), kind 7 (NIP-25) and kind 30315 (NIP-38) events by including one or more \"emoji\" tags, in the form:",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [
+    0,
+    1,
+    7,
+    1111
+   ],
+   "messages": [],
+   "tags": [
+    "emoji"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:pubkey:d-tag",
+    ":shortcode:",
+    "name",
+    "about",
+    "content"
+   ],
+   "mentions": [
+    "22",
+    "25",
+    "38",
+    "51"
+   ],
+   "mentionedBy": [
+    "25",
+    "38",
+    "51"
+   ],
+   "headings": [
+    "Kind 0 events",
+    "Kind 1 events",
+    "Kind 1111 events",
+    "Kind 7 events"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/30.md",
+   "updatedAt": "2026-08-25T07:58:34-03:00",
+   "wordCount": 285
+  },
+  {
+   "id": "31",
+   "title": "Dealing with Unknown Events",
+   "summary": "When creating a new custom event kind that is part of a custom protocol and isn't meant to be read as text (like kind:1), clients should use an alt tag to write a short human-readable plaintext summary of what that event is about.",
+   "status": "unrecommended",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "unnecessarily bloated",
+    "replacedBy": []
+   },
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "unrecommended",
+    "draft",
+    "optional",
+    "kind:1",
+    "alt"
+   ],
+   "mentions": [
+    "89"
+   ],
+   "mentionedBy": [
+    "64",
+    "89"
+   ],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/31.md",
+   "updatedAt": "2026-05-31T08:10:30-03:00",
+   "wordCount": 190
+  },
+  {
+   "id": "32",
+   "title": "Labeling",
+   "summary": "This NIP defines two new indexable tags to label events and a new event kind (kind:1985) to attach those labels to existing events. This supports several use cases, including distributed moderation, collection management, license assignment, and content classification.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1985,
+     "description": "Label"
+    }
+   ],
+   "exampleKinds": [
+    1,
+    1985
+   ],
+   "messages": [],
+   "tags": [
+    "e",
+    "l",
+    "L",
+    "p"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:1985",
+    "ugc",
+    "content",
+    "and",
+    "permies"
+   ],
+   "mentions": [
+    "01",
+    "09",
+    "28"
+   ],
+   "mentionedBy": [
+    "36",
+    "56"
+   ],
+   "headings": [
+    "Label Namespace Tag",
+    "Label Tag",
+    "Label Target",
+    "Content",
+    "Self-Reporting",
+    "Example events",
+    "Other Notes",
+    "Appendix: Known Ontologies"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/32.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 800
+  },
+  {
+   "id": "33",
+   "title": "Parameterized Replaceable Events",
+   "summary": "Renamed to \"Addressable events\" and moved to NIP-01.",
+   "status": "deprecated",
+   "maturity": "final",
+   "requirement": "mandatory",
+   "relay": false,
+   "statusTags": [
+    "final",
+    "mandatory"
+   ],
+   "listed": false,
+   "movedTo": "01",
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "final",
+    "mandatory"
+   ],
+   "mentions": [
+    "01"
+   ],
+   "mentionedBy": [],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/33.md",
+   "updatedAt": "2024-08-20T12:56:05-03:00",
+   "wordCount": 16
+  },
+  {
+   "id": "34",
+   "title": "git stuff",
+   "summary": "This NIP defines all the ways code collaboration using and adjacent to git can be done using Nostr.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1617,
+     "description": "Patches"
+    },
+    {
+     "kind": 1618,
+     "description": "Pull Requests"
+    },
+    {
+     "kind": 1619,
+     "description": "Pull Request Updates"
+    },
+    {
+     "kind": 1621,
+     "description": "Issues"
+    },
+    {
+     "kind": 1622,
+     "description": "Git Replies (deprecated)"
+    },
+    {
+     "kind": 1630,
+     "to": 1633,
+     "description": "Status"
+    },
+    {
+     "kind": 30617,
+     "description": "Repository announcements"
+    },
+    {
+     "kind": 30618,
+     "description": "Repository state announcements"
+    }
+   ],
+   "exampleKinds": [
+    1617,
+    1618,
+    1619,
+    1621,
+    1630,
+    1631,
+    1632,
+    1633,
+    10317,
+    30617,
+    30618
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "c",
+    "commit-pgp-sig",
+    "d",
+    "description",
+    "e",
+    "g",
+    "maintainers",
+    "p",
+    "P",
+    "r",
+    "t",
+    "u",
+    "web"
+   ],
+   "idents": [
+    "git",
+    "draft",
+    "optional",
+    "web",
+    "clone",
+    "relays",
+    "maintainers",
+    "nostr://",
+    "wss://",
+    "refs",
+    "reply",
+    "subject",
+    "kind:1621",
+    "kind:1617",
+    "kind:1618",
+    "created_at"
+   ],
+   "mentions": [
+    "05",
+    "10",
+    "22",
+    "65",
+    "B7"
+   ],
+   "mentionedBy": [
+    "51",
+    "5A",
+    "C0"
+   ],
+   "headings": [
+    "Repository announcements",
+    "Nostr Clone URL format",
+    "Repository state announcements",
+    "Patches and Pull Requests (PRs)",
+    "Patches",
+    "Pull Requests",
+    "Pull Request Updates",
+    "Issues",
+    "Replies",
+    "Status",
+    "User grasp list",
+    "Possible things to be added later"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/34.md",
+   "updatedAt": "2026-07-26T17:42:03-03:00",
+   "wordCount": 1293
+  },
+  {
+   "id": "35",
+   "title": "Torrents",
+   "summary": "This NIP defined a new kind 2003 which is a Torrent.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 2003,
+     "description": "Torrent"
+    },
+    {
+     "kind": 2004,
+     "description": "Torrent Comment"
+    }
+   ],
+   "exampleKinds": [
+    2003
+   ],
+   "messages": [],
+   "tags": [
+    "file",
+    "i",
+    "t",
+    "title",
+    "tracker",
+    "x"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "magnet:?xt=urn:btih:HASH",
+    "file",
+    "info/example.txt",
+    "tracker",
+    "movie",
+    "tv",
+    "HD",
+    "UHD",
+    "tcat",
+    "newznab",
+    "tmdb",
+    "ttvdb",
+    "imdb",
+    "mal",
+    "anilist",
+    "tmdb:movie:693134",
+    "themoviedb.org/movie/693134",
+    "ttvdb:movie:290272",
+    "thetvdb.com/movies/dune-part-two",
+    "mal:anime:9253",
+    "myanimelist.net/anime/9253",
+    "mal:manga:17517",
+    "myanimelist.net/manga/17517",
+    "NIP-10"
+   ],
+   "mentions": [
+    "10"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Tags",
+    "Tag prefixes",
+    "Torrent Comments",
+    "Implementations"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/35.md",
+   "updatedAt": "2024-09-03T20:41:31+03:30",
+   "wordCount": 327
+  },
+  {
+   "id": "36",
+   "title": "Sensitive Content",
+   "summary": "The content-warning tag enables users to specify if the event's content needs to be approved by readers to be shown. Clients can hide the content until the user acts on it.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [
+    1
+   ],
+   "messages": [],
+   "tags": [
+    "content-warning",
+    "l",
+    "L",
+    "t"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "content-warning",
+    "and"
+   ],
+   "mentions": [
+    "32"
+   ],
+   "mentionedBy": [],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/36.md",
+   "updatedAt": "2023-11-18T09:13:12-03:00",
+   "wordCount": 113
+  },
+  {
+   "id": "37",
+   "title": "Draft Events",
+   "summary": "This NIP defines kind 31234 as an encrypted storage for unsigned draft events of any other kind.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1234,
+     "description": "Draft Checkpoint"
+    },
+    {
+     "kind": 10013,
+     "description": "Private event relay list"
+    },
+    {
+     "kind": 31234,
+     "description": "Draft Event"
+    }
+   ],
+   "exampleKinds": [
+    1234,
+    10013,
+    31234
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "d",
+    "k",
+    "relay"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    ".content",
+    "expiration",
+    "kind:1234",
+    "kind:31234",
+    "relay",
+    "write"
+   ],
+   "mentions": [
+    "40",
+    "42",
+    "44",
+    "65"
+   ],
+   "mentionedBy": [
+    "23",
+    "51"
+   ],
+   "headings": [
+    "Checkpoints",
+    "Relay List for Private Content"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/37.md",
+   "updatedAt": "2026-05-18T11:10:57+03:00",
+   "wordCount": 245
+  },
+  {
+   "id": "38",
+   "title": "User Statuses",
+   "summary": "This NIP enables a way for users to share live statuses such as what music they are listening to, as well as what they are currently doing: work, play, out of office, etc.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 30315,
+     "description": "User Statuses"
+    }
+   ],
+   "exampleKinds": [
+    30315
+   ],
+   "messages": [],
+   "tags": [
+    "d",
+    "expiration",
+    "r"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:30315",
+    "general",
+    "music",
+    "or",
+    "content"
+   ],
+   "mentions": [
+    "30"
+   ],
+   "mentionedBy": [
+    "30"
+   ],
+   "headings": [
+    "Abstract",
+    "Live Statuses",
+    "Client behavior",
+    "Use Cases"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/38.md",
+   "updatedAt": "2025-08-13T09:52:51-04:00",
+   "wordCount": 313
+  },
+  {
+   "id": "39",
+   "title": "Linking Profiles to Other Platforms",
+   "summary": "Users can declare their control over one or more online identities such as usernames, profile pages, keypairs in kind 10011 using i tags.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 10011,
+     "description": "External Identities"
+    }
+   ],
+   "exampleKinds": [
+    10011
+   ],
+   "messages": [],
+   "tags": [
+    "i"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "platform:identity",
+    "github",
+    "semisol",
+    "proof",
+    "a-z",
+    "._-/",
+    "twitter",
+    "mastodon",
+    "telegram",
+    "bluesky",
+    "discord"
+   ],
+   "mentions": [],
+   "mentionedBy": [],
+   "headings": [
+    "Abstract",
+    "Verification text",
+    "Claim types",
+    "github",
+    "twitter",
+    "mastodon",
+    "telegram",
+    "bluesky",
+    "discord"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/39.md",
+   "updatedAt": "2026-09-27T14:18:24-03:00",
+   "wordCount": 497
+  },
+  {
+   "id": "40",
+   "title": "Expiration Timestamp",
+   "summary": "The expiration tag enables users to specify a unix timestamp at which the message SHOULD be considered expired (by relays and clients) and SHOULD be deleted by relays.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [
+    1
+   ],
+   "messages": [],
+   "tags": [
+    "expiration"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "expiration",
+    "supported_nips"
+   ],
+   "mentions": [],
+   "mentionedBy": [
+    "37",
+    "60",
+    "69",
+    "A4"
+   ],
+   "headings": [
+    "Client Behavior",
+    "Relay Behavior",
+    "Suggested Use Cases"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/40.md",
+   "updatedAt": "2025-12-23T14:53:38-03:00",
+   "wordCount": 316
+  },
+  {
+   "id": "42",
+   "title": "Authentication of clients to relays",
+   "summary": "This NIP defines a way for clients to authenticate to relays by signing an ephemeral event.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 22242,
+     "description": "Client Authentication"
+    }
+   ],
+   "exampleKinds": [
+    22242
+   ],
+   "messages": [
+    {
+     "type": "AUTH",
+     "direction": "client-to-relay",
+     "description": "used to send authentication events"
+    },
+    {
+     "type": "AUTH",
+     "direction": "relay-to-client",
+     "description": "used to send authentication challenges"
+    }
+   ],
+   "tags": [
+    "challenge",
+    "relay"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "AUTH",
+    "OK",
+    "EVENT",
+    "created_at",
+    "CLOSED",
+    "auth-required",
+    "REQ",
+    "auth",
+    "EOSE",
+    "kind"
+   ],
+   "mentions": [
+    "67"
+   ],
+   "mentionedBy": [
+    "11",
+    "17",
+    "37",
+    "43",
+    "59",
+    "67",
+    "70",
+    "78"
+   ],
+   "headings": [
+    "Motivation",
+    "Definitions",
+    "New client-relay protocol messages",
+    "Canonical authentication event",
+    "OK and CLOSED machine-readable prefixes",
+    "Protocol flow",
+    "auth-required in response to a REQ message",
+    "auth hint in EOSE",
+    "auth-required in response to an EVENT message",
+    "Signed Event Verification"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/42.md",
+   "updatedAt": "2026-09-01T09:32:55-03:00",
+   "wordCount": 841
+  },
+  {
+   "id": "43",
+   "title": "Relay Access Metadata and Requests",
+   "summary": "This NIP defines a way for relays to advertise membership lists, and for clients to request admission to relays on behalf of users.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 8000,
+     "description": "Add User"
+    },
+    {
+     "kind": 8001,
+     "description": "Remove User"
+    },
+    {
+     "kind": 13534,
+     "description": "Membership Lists"
+    },
+    {
+     "kind": 28934,
+     "description": "Join Request"
+    },
+    {
+     "kind": 28935,
+     "description": "Invite Request"
+    },
+    {
+     "kind": 28936,
+     "description": "Leave Request"
+    },
+    {
+     "kind": 33534,
+     "description": "Role Definition"
+    }
+   ],
+   "exampleKinds": [
+    8000,
+    8001,
+    13534,
+    28934,
+    28936,
+    33534
+   ],
+   "messages": [],
+   "tags": [
+    "-",
+    "claim",
+    "color",
+    "d",
+    "description",
+    "label",
+    "member",
+    "order",
+    "p"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "self",
+    "label",
+    "description",
+    "color",
+    "hue",
+    "to",
+    "order",
+    "member",
+    "claim",
+    "created_at",
+    "OK",
+    "createclaim",
+    "supported_nips"
+   ],
+   "mentions": [
+    "11",
+    "42",
+    "70",
+    "86"
+   ],
+   "mentionedBy": [
+    "86"
+   ],
+   "headings": [
+    "Role Definitions",
+    "Membership Lists",
+    "Add User",
+    "Remove User",
+    "Join Request",
+    "Leave Request",
+    "Implementation"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/43.md",
+   "updatedAt": "2026-09-23T22:14:11-03:00",
+   "wordCount": 736
+  },
+  {
+   "id": "44",
+   "title": "Encrypted Payloads (Versioned)",
+   "summary": "The NIP introduces a new data format for keypair-based encryption. This NIP is versioned to allow multiple algorithm choices to exist simultaneously. This format may be used for many things, but MUST be used in the context of a signed event as described in NIP-01.",
+   "status": "draft",
+   "maturity": null,
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "optional",
+    "kind",
+    "0x00",
+    "0x01",
+    "0x02",
+    "created_at",
+    "shared_x",
+    "IKM=shared_x",
+    "conversation_key",
+    "nonce",
+    "PRK=conversation_key",
+    "info=nonce",
+    "L=76",
+    "chacha_key",
+    "chacha_nonce",
+    "hmac_key",
+    "u16",
+    "u32",
+    "ciphertext",
+    "decode_payload",
+    "calc_padded_len",
+    "secp256k1_ec_pubkey_tweak_mul",
+    "min_plaintext_size",
+    "max_plaintext_size",
+    "extended_prefix_threshold",
+    "concat",
+    "valid.get_conversation_key",
+    "valid.get_message_keys",
+    "valid.calc_padded_len",
+    "valid.encrypt_decrypt",
+    "valid.encrypt_decrypt_long_msg",
+    "invalid.encrypt_msg_lengths",
+    "invalid.get_conversation_key",
+    "invalid.decrypt",
+    "encrypt_decrypt_long_msg",
+    "0x61",
+    "padded_len"
+   ],
+   "mentions": [
+    "01",
+    "04"
+   ],
+   "mentionedBy": [
+    "07",
+    "17",
+    "37",
+    "46",
+    "47",
+    "51",
+    "59",
+    "60",
+    "85",
+    "EE"
+   ],
+   "headings": [
+    "Versions",
+    "Limitations",
+    "Version 2",
+    "Encryption",
+    "Decryption",
+    "Implementation considerations",
+    "Details",
+    "Implementation pseudocode",
+    "Audit",
+    "Tests and code"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/44.md",
+   "updatedAt": "2026-06-28T16:58:39-03:00",
+   "wordCount": 2531
+  },
+  {
+   "id": "45",
+   "title": "Counting results",
+   "summary": "Relays may support the verb COUNT, which provides a mechanism for obtaining event counts.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [
+    {
+     "type": "COUNT",
+     "direction": "client-to-relay",
+     "description": "used to request event counts"
+    },
+    {
+     "type": "COUNT",
+     "direction": "relay-to-client",
+     "description": "used to send requested event counts to clients"
+    }
+   ],
+   "tags": [],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "COUNT",
+    "REQ",
+    "approximate",
+    "CLOSED",
+    "offset",
+    "pubkey",
+    "ri",
+    "offset+1",
+    "hll"
+   ],
+   "mentions": [
+    "01",
+    "65"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Motivation",
+    "Filters and return values",
+    "HyperLogLog",
+    "Algorithm",
+    "offset computation",
+    "Rationale",
+    "Common filters",
+    "Attack vectors",
+    "hll encoding",
+    "Client-side usage",
+    "Examples",
+    "Count notes and reactions",
+    "Count notes approximately",
+    "Followers count with HyperLogLog",
+    "Reaction counts with HyperLogLog",
+    "Relay refuses to count"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/45.md",
+   "updatedAt": "2026-02-06T17:26:02-03:00",
+   "wordCount": 1376
+  },
+  {
+   "id": "46",
+   "title": "Nostr Remote Signing",
+   "summary": "Private keys should be exposed to as few systems - apps, operating systems, devices - as possible as each system adds to the attack surface.",
+   "status": "draft",
+   "maturity": null,
+   "requirement": null,
+   "relay": false,
+   "statusTags": [],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 24133,
+     "description": "Nostr Connect"
+    }
+   ],
+   "exampleKinds": [
+    24133
+   ],
+   "messages": [],
+   "tags": [
+    "p"
+   ],
+   "idents": [
+    "remote-signer-key",
+    "remote-signer-pubkey",
+    "user-pubkey",
+    "get_public_key",
+    "sign_event",
+    "client-keypair",
+    "client-pubkey",
+    "connect",
+    "optional_client_metadata",
+    "nostrconnect://",
+    "relay",
+    "secret",
+    "result",
+    "perms",
+    "name",
+    "url",
+    "image",
+    "content",
+    "id",
+    "method",
+    "params",
+    "OR",
+    "ping",
+    "nip04_encrypt",
+    "nip04_decrypt",
+    "nip44_encrypt",
+    "nip44_decrypt",
+    "switch_relays",
+    "null",
+    "logout",
+    "optional_requested_perms",
+    "kind:4",
+    "metadata",
+    "bunker://",
+    "remote-signer",
+    "kind:24133",
+    "results",
+    "error",
+    "relays",
+    "nostrconnect_url",
+    "and",
+    "nostr.json?name=_"
+   ],
+   "mentions": [
+    "05",
+    "44",
+    "89"
+   ],
+   "mentionedBy": [
+    "55"
+   ],
+   "headings": [
+    "Changes",
+    "Rationale",
+    "Terminology",
+    "Overview",
+    "Initiating a connection",
+    "Direct connection initiated by remote-signer",
+    "Direct connection initiated by the client",
+    "Request Events kind: 24133",
+    "Methods/Commands",
+    "Requested permissions",
+    "Client metadata",
+    "Switching relays",
+    "Ending a session",
+    "Response Events kind:24133",
+    "Example flow for signing an event",
+    "Signature request",
+    "Response event",
+    "Diagram",
+    "Auth Challenges",
+    "Example event signing request with auth challenge",
+    "Appendix",
+    "Announcing remote-signer metadata",
+    "Remote signer discovery via NIP-89"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/46.md",
+   "updatedAt": "2026-07-15T16:40:51-03:00",
+   "wordCount": 1739
+  },
+  {
+   "id": "47",
+   "title": "Nostr Wallet Connect",
+   "summary": "This NIP describes a way for clients to access a remote lightning wallet through a standardized protocol. Custodians may implement this, or the user may run a bridge that bridges their wallet/node and the Nostr Wallet Connect protocol.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 13194,
+     "description": "Wallet Info"
+    },
+    {
+     "kind": 23194,
+     "description": "Wallet Request"
+    },
+    {
+     "kind": 23195,
+     "description": "Wallet Response"
+    }
+   ],
+   "exampleKinds": [
+    13194,
+    23194
+   ],
+   "messages": [],
+   "tags": [
+    "encryption",
+    "extensions",
+    "p"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "info",
+    "pay_invoice",
+    "response",
+    "extensions",
+    "expiration",
+    "encryption",
+    "result_type",
+    "error",
+    "message",
+    "code",
+    "RATE_LIMITED",
+    "NOT_IMPLEMENTED",
+    "INSUFFICIENT_BALANCE",
+    "QUOTA_EXCEEDED",
+    "RESTRICTED",
+    "UNAUTHORIZED",
+    "INTERNAL",
+    "UNSUPPORTED_ENCRYPTION",
+    "OTHER",
+    "nostr+walletconnect://",
+    "pubkey",
+    "relay",
+    "secret",
+    "lud16",
+    "PAYMENT_FAILED",
+    "make_invoice",
+    "lookup_invoice",
+    "NOT_FOUND",
+    "get_balance",
+    "get_info",
+    "01.md",
+    "02.md",
+    "nip44_v2",
+    "nip04"
+   ],
+   "mentions": [
+    "04",
+    "44"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Rationale",
+    "Terms",
+    "Theory of Operation",
+    "Events",
+    "Info Event",
+    "Request and Response Events",
+    "Error codes",
+    "Nostr Wallet Connect URI",
+    "Example connection string",
+    "Commands",
+    "pay_invoice",
+    "make_invoice",
+    "lookup_invoice",
+    "get_balance",
+    "get_info",
+    "Extensions",
+    "Example pay invoice flow",
+    "Encryption",
+    "Request events",
+    "Using a dedicated relay",
+    "Appendix",
+    "Example NIP-47 info event"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/47.md",
+   "updatedAt": "2026-08-01T10:53:23-04:00",
+   "wordCount": 2674
+  },
+  {
+   "id": "48",
+   "title": "Bridged Events",
+   "summary": "Nostr events bridged from other protocols such as ActivityPub can link back to the source object by including a \"proxy\" tag, in the form:",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [
+    1
+   ],
+   "messages": [],
+   "tags": [
+    "proxy"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "activitypub",
+    "atproto",
+    "rss",
+    "web",
+    "https://twitter.com/jack/status/20"
+   ],
+   "mentions": [],
+   "mentionedBy": [],
+   "headings": [
+    "Supported protocols",
+    "Examples",
+    "See also"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/48.md",
+   "updatedAt": "2026-05-28T17:16:07-03:00",
+   "wordCount": 224
+  },
+  {
+   "id": "49",
+   "title": "Private Key Encryption (ncryptsec)",
+   "summary": "This NIP defines a method by which clients can encrypt (and decrypt) a user's private key with a password.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "ncryptsec",
+    "draft",
+    "optional"
+   ],
+   "mentions": [],
+   "mentionedBy": [],
+   "headings": [
+    "Symmetric Encryption Key derivation",
+    "Encrypting a private key",
+    "Test Data",
+    "Password Unicode Normalization",
+    "Encryption",
+    "Decryption",
+    "Discussion",
+    "On Key Derivation",
+    "On the symmetric encryption algorithm",
+    "Recommendations"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/49.md",
+   "updatedAt": "2026-06-02T18:54:15-03:00",
+   "wordCount": 652
+  },
+  {
+   "id": "50",
+   "title": "Search Capability",
+   "summary": "Many Nostr use cases require some form of general search feature, in addition to structured queries by tags or ids. Specifics of the search algorithms will differ between event kinds, this NIP only describes a general extensible framework for performing such queries.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "search",
+    "REQ",
+    "content",
+    ".created_at",
+    "limit",
+    "key:value",
+    "kinds",
+    "ids",
+    "include:spam"
+   ],
+   "mentions": [
+    "05"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Abstract",
+    "search filter field",
+    "Extensions"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/50.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 406
+  },
+  {
+   "id": "51",
+   "title": "Lists",
+   "summary": "This NIP defines lists of things that users can create. Lists can contain references to anything, and these references can be public or private.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 10000,
+     "description": "Mute list"
+    },
+    {
+     "kind": 10001,
+     "description": "Pin list"
+    },
+    {
+     "kind": 10002,
+     "description": "Relay List Metadata"
+    },
+    {
+     "kind": 10003,
+     "description": "Bookmark list"
+    },
+    {
+     "kind": 10004,
+     "description": "Communities list"
+    },
+    {
+     "kind": 10005,
+     "description": "Public chats list"
+    },
+    {
+     "kind": 10006,
+     "description": "Blocked relays list"
+    },
+    {
+     "kind": 10007,
+     "description": "Search relays list"
+    },
+    {
+     "kind": 10008,
+     "description": "Profile Badges"
+    },
+    {
+     "kind": 10009,
+     "description": "User groups"
+    },
+    {
+     "kind": 10012,
+     "description": "Favorite relays list"
+    },
+    {
+     "kind": 10015,
+     "description": "Interests list"
+    },
+    {
+     "kind": 10020,
+     "description": "Media follows"
+    },
+    {
+     "kind": 10021,
+     "description": "Favorite follow sets"
+    },
+    {
+     "kind": 10030,
+     "description": "User emoji list"
+    },
+    {
+     "kind": 10050,
+     "description": "Relay list to receive DMs"
+    },
+    {
+     "kind": 10054,
+     "description": "Favorite podcasts list"
+    },
+    {
+     "kind": 10064,
+     "description": "Authored podcasts list"
+    },
+    {
+     "kind": 30000,
+     "description": "Follow sets"
+    },
+    {
+     "kind": 30002,
+     "description": "Relay sets"
+    },
+    {
+     "kind": 30003,
+     "description": "Bookmark sets"
+    },
+    {
+     "kind": 30004,
+     "description": "Curation sets"
+    },
+    {
+     "kind": 30005,
+     "description": "Video sets"
+    },
+    {
+     "kind": 30006,
+     "description": "Picture sets"
+    },
+    {
+     "kind": 30007,
+     "description": "Kind mute sets"
+    },
+    {
+     "kind": 30008,
+     "description": "Badge sets"
+    },
+    {
+     "kind": 30015,
+     "description": "Interest sets"
+    },
+    {
+     "kind": 30030,
+     "description": "Emoji sets"
+    },
+    {
+     "kind": 30063,
+     "description": "Release artifact sets"
+    },
+    {
+     "kind": 30267,
+     "description": "App curation sets"
+    },
+    {
+     "kind": 39089,
+     "description": "Starter packs"
+    },
+    {
+     "kind": 39092,
+     "description": "Media starter packs"
+    }
+   ],
+   "exampleKinds": [
+    10000,
+    30004,
+    30063,
+    30267
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "d",
+    "description",
+    "e",
+    "image",
+    "p",
+    "title"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "tags",
+    ".content"
+   ],
+   "mentions": [
+    "02",
+    "04",
+    "17",
+    "28",
+    "29",
+    "30",
+    "34",
+    "37",
+    "44",
+    "54",
+    "58",
+    "65",
+    "72",
+    "94",
+    "B7",
+    "F4"
+   ],
+   "mentionedBy": [
+    "24",
+    "29",
+    "30",
+    "54",
+    "58",
+    "F4"
+   ],
+   "headings": [
+    "Types of lists",
+    "Standard lists",
+    "Sets",
+    "Deprecated standard lists",
+    "Examples",
+    "A mute list with some public items and some encrypted items",
+    "A curation set of articles and notes about yaks",
+    "A release artifact set of an Example App",
+    "An app curation set",
+    "Encryption process pseudocode"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/51.md",
+   "updatedAt": "2026-09-27T12:20:21-04:00",
+   "wordCount": 1581
+  },
+  {
+   "id": "52",
+   "title": "Calendar Events",
+   "summary": "This specification defines calendar events representing an occurrence at a specific moment or between moments. These calendar events are addressable and deletable per NIP-09.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 31922,
+     "description": "Date-Based Calendar Event"
+    },
+    {
+     "kind": 31923,
+     "description": "Time-Based Calendar Event"
+    },
+    {
+     "kind": 31924,
+     "description": "Calendar"
+    },
+    {
+     "kind": 31925,
+     "description": "Calendar Event RSVP"
+    }
+   ],
+   "exampleKinds": [
+    31922,
+    31923,
+    31924,
+    31925
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "d",
+    "D",
+    "e",
+    "end",
+    "end_tzid",
+    "fb",
+    "g",
+    "image",
+    "p",
+    "start_tzid",
+    "status",
+    "summary",
+    "title"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "event",
+    "title",
+    "summary",
+    "image",
+    "location",
+    "name",
+    "kind:31922",
+    ".content",
+    "start",
+    "end",
+    "kind:31923",
+    "start_tzid",
+    "America/Costa_Rica",
+    "end_tzid",
+    "or",
+    "kind:31925",
+    "status",
+    "accepted",
+    "declined",
+    "tentative",
+    "fb",
+    "free",
+    "busy"
+   ],
+   "mentions": [
+    "09"
+   ],
+   "mentionedBy": [
+    "24",
+    "66"
+   ],
+   "headings": [
+    "Calendar Events",
+    "Collaborative Calendar Event Requests",
+    "Date-Based Calendar Event",
+    "Time-Based Calendar Event",
+    "Calendar",
+    "Calendar Event RSVP",
+    "Intentionally Unsupported Scenarios",
+    "Recurring Calendar Events"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/52.md",
+   "updatedAt": "2026-02-13T08:45:38-08:00",
+   "wordCount": 1586
+  },
+  {
+   "id": "53",
+   "title": "Live Streaming and Spaces",
+   "summary": "This NIP introduces event kinds to advertise live spaces and the participation of pubkeys in them.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1311,
+     "description": "Live Chat Message"
+    },
+    {
+     "kind": 10312,
+     "description": "Room Presence"
+    },
+    {
+     "kind": 30311,
+     "description": "Live Event"
+    },
+    {
+     "kind": 30312,
+     "description": "Interactive Room"
+    },
+    {
+     "kind": 30313,
+     "description": "Conference Event"
+    }
+   ],
+   "exampleKinds": [
+    1311,
+    10312,
+    30311,
+    30312,
+    30313
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "current_participants",
+    "d",
+    "endpoint",
+    "ends",
+    "hand",
+    "image",
+    "p",
+    "pinned",
+    "recording",
+    "relays",
+    "room",
+    "service",
+    "starts",
+    "status",
+    "streaming",
+    "summary",
+    "t",
+    "title",
+    "total_participants"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:30311",
+    "Host",
+    "Speaker",
+    "Participant",
+    "status=live",
+    "ended",
+    "starts",
+    "ends",
+    "live",
+    "naddr",
+    "kind:1311",
+    ".content",
+    "pinned",
+    "kind:30312"
+   ],
+   "mentions": [
+    "19",
+    "21"
+   ],
+   "mentionedBy": [
+    "24"
+   ],
+   "headings": [
+    "Live Streaming",
+    "Proof of Agreement to Participate",
+    "Live Chat Message",
+    "Examples",
+    "Meeting Spaces",
+    "Meeting Space Event (kind:30312)",
+    "Meeting Room Events (kind:30313)",
+    "Examples",
+    "Room Presence"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/53.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 1242
+  },
+  {
+   "id": "54",
+   "title": "Wiki",
+   "summary": "This NIP defines kind:30818 (an addressable event) for descriptions (or encyclopedia entries) of particular subjects, and it's expected that multiple people will write articles about the exact same subjects, with either small variations or completely independent content.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 818,
+     "description": "Merge Requests"
+    },
+    {
+     "kind": 30818,
+     "description": "Wiki article"
+    },
+    {
+     "kind": 30819,
+     "description": "Redirects"
+    }
+   ],
+   "exampleKinds": [
+    818,
+    30819
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "d",
+    "e",
+    "p",
+    "title"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:30818",
+    "content",
+    "tag",
+    "nostr:",
+    "title",
+    "summary",
+    "and",
+    "kind:818",
+    ".content",
+    "or",
+    "kind:30819",
+    "fork",
+    "defer"
+   ],
+   "mentions": [
+    "02",
+    "21",
+    "25",
+    "51"
+   ],
+   "mentionedBy": [
+    "51"
+   ],
+   "headings": [
+    "Articles",
+    "d tag normalization rules",
+    "Content",
+    "Optional extra tags",
+    "Merge Requests",
+    "Redirects",
+    "How to decide what article to display",
+    "Reactions",
+    "Relays",
+    "Contact lists",
+    "Wiki-related contact lists",
+    "Forks",
+    "Deference",
+    "Why Djot?"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/54.md",
+   "updatedAt": "2026-03-17T09:32:56-03:00",
+   "wordCount": 1190
+  },
+  {
+   "id": "55",
+   "title": "Android Signer Application",
+   "summary": "This NIP describes a method for 2-way communication between an Android signer and any Nostr client running on the same device, so that the client never needs to handle the user's private key. The signer is an Android application; the client may be another Android application or a web page.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [
+    22242
+   ],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "draft",
+    "optional",
+    "get_public_key",
+    "com.example.signer",
+    "callbackUrl",
+    "nostrsigner",
+    "AndroidManifest.xml",
+    "user-pubkey",
+    "permissions",
+    "type",
+    "sign_event",
+    "kind",
+    "current_user",
+    "nip04_encrypt",
+    "pubkey",
+    "nip44_encrypt",
+    "nip04_decrypt",
+    "nip44_decrypt",
+    "decrypt_zap_event",
+    "id",
+    "nostrsigner:",
+    "registerForActivityResult",
+    "rememberLauncherForActivityResult",
+    "result",
+    "event",
+    "package",
+    "rejected",
+    "true",
+    "resultCode",
+    "Activity.RESULT_OK",
+    "RESULT_OK",
+    "SIGN_EVENT",
+    "NIP44_ENCRYPT",
+    "selectionArgs",
+    "null",
+    "returnType",
+    "signature",
+    "compressionType",
+    "none",
+    "gzip"
+   ],
+   "mentions": [
+    "46"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Rationale",
+    "Terminology",
+    "Communication methods",
+    "Setup",
+    "Initiating a connection",
+    "Methods",
+    "Using Intents",
+    "Using Content Resolver",
+    "Using Web Applications",
+    "Example"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/55.md",
+   "updatedAt": "2026-06-03T18:22:26-04:00",
+   "wordCount": 1194
+  },
+  {
+   "id": "56",
+   "title": "Reporting",
+   "summary": "A report is a kind 1984 event that signals to users and relays that some referenced content is objectionable. The definition of objectionable is obviously subjective and all agents on the network (users, apps, relays, etc.) may consume and take action on them as they see fit.",
+   "status": "draft",
+   "maturity": null,
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1984,
+     "description": "Reporting"
+    }
+   ],
+   "exampleKinds": [
+    1984
+   ],
+   "messages": [],
+   "tags": [
+    "e",
+    "l",
+    "L",
+    "p",
+    "server",
+    "x"
+   ],
+   "idents": [
+    "optional",
+    "content",
+    "or",
+    "nudity",
+    "malware",
+    "profanity",
+    "illegal",
+    "spam",
+    "impersonation",
+    "other",
+    "server",
+    "and"
+   ],
+   "mentions": [
+    "32"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Tags",
+    "Example events",
+    "Client behavior",
+    "Relay behavior"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/56.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 473
+  },
+  {
+   "id": "57",
+   "title": "Lightning Zaps",
+   "summary": "This NIP defines two new event types for recording lightning payments between users. 9734 is a zap request, representing a payer's request to a recipient's lightning wallet for an invoice.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 9734,
+     "description": "Zap Request"
+    },
+    {
+     "kind": 9735,
+     "description": "Zap"
+    }
+   ],
+   "exampleKinds": [
+    9734,
+    9735
+   ],
+   "messages": [],
+   "tags": [
+    "amount",
+    "bolt11",
+    "description",
+    "e",
+    "k",
+    "lnurl",
+    "p",
+    "P",
+    "preimage",
+    "relays",
+    "zap"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "zap",
+    "allowsNostr",
+    "true",
+    "nostrPubkey",
+    "callback",
+    "minSendable",
+    "maxSendable",
+    "nostr",
+    "relays",
+    "content",
+    "amount",
+    "lnurl",
+    "pr",
+    "pubkey",
+    "created_at",
+    "paid_at",
+    "tags",
+    "bolt11",
+    "description",
+    "preimage",
+    "invoiceAmount",
+    "hex"
+   ],
+   "mentions": [
+    "01",
+    "23"
+   ],
+   "mentionedBy": [
+    "75",
+    "A4"
+   ],
+   "headings": [
+    "Protocol flow",
+    "Reference and examples",
+    "Appendix A: Zap Request Event",
+    "Appendix B: Zap Request HTTP Request",
+    "Appendix C: LNURL Server Configuration",
+    "Appendix D: LNURL Server Zap Request Validation",
+    "Appendix E: Zap Receipt Event",
+    "Appendix F: Validating Zap Receipts",
+    "Appendix G: zap tag on other events",
+    "Future Work"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/57.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 1867
+  },
+  {
+   "id": "58",
+   "title": "Badges",
+   "summary": "Four special events are used to define, award, display and categorize badges in user profiles:",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 8,
+     "description": "Badge Award"
+    },
+    {
+     "kind": 10008,
+     "description": "Profile Badges"
+    },
+    {
+     "kind": 30008,
+     "description": "Badge sets"
+    },
+    {
+     "kind": 30009,
+     "description": "Badge Definition"
+    }
+   ],
+   "exampleKinds": [
+    8,
+    10008,
+    30009
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "d",
+    "description",
+    "e",
+    "image",
+    "name",
+    "p",
+    "thumb"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "bravery",
+    "and",
+    "name",
+    "image",
+    "width",
+    "height",
+    "description",
+    "thumb"
+   ],
+   "mentions": [
+    "51"
+   ],
+   "mentionedBy": [
+    "51",
+    "99"
+   ],
+   "headings": [
+    "Badge Definition event",
+    "Badge Award event",
+    "Profile Badges Event",
+    "Motivation",
+    "Recommendations",
+    "Example of a Badge Definition event",
+    "Example of Badge Award event",
+    "Example of a Profile Badges event",
+    "Deprecated Profile Badges event"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/58.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 798
+  },
+  {
+   "id": "59",
+   "title": "Gift Wrap",
+   "summary": "This NIP defines a protocol for encapsulating any nostr event. This makes it possible to obscure most metadata for a given event, perform collaborative signing, and more.",
+   "status": "draft",
+   "maturity": null,
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 13,
+     "description": "Seal"
+    },
+    {
+     "kind": 1059,
+     "description": "Gift Wrap"
+    },
+    {
+     "kind": 21059,
+     "description": "Ephemeral Gift Wrap"
+    }
+   ],
+   "exampleKinds": [
+    1,
+    13,
+    1059,
+    21059
+   ],
+   "messages": [],
+   "tags": [
+    "p"
+   ],
+   "idents": [
+    "optional",
+    "relay",
+    "rumor",
+    "seal",
+    "content",
+    "kind:13",
+    "kind:1059",
+    "tags",
+    "kind:21059",
+    ".content",
+    "auth-required",
+    "created_at",
+    "read"
+   ],
+   "mentions": [
+    "09",
+    "13",
+    "17",
+    "19",
+    "42",
+    "44",
+    "62"
+   ],
+   "mentionedBy": [
+    "17",
+    "62",
+    "EE"
+   ],
+   "headings": [
+    "Overview",
+    "Protocol Description",
+    "1. The Rumor Event Kind",
+    "2. The Seal Event Kind",
+    "3. Gift Wrap Event Kind",
+    "4. Ephemeral Gift Wrap Event Kind",
+    "Encrypting Payloads",
+    "Spam Protection",
+    "Other Considerations",
+    "An Example",
+    "1. Create an event",
+    "2. Seal the rumor",
+    "3. Wrap the seal",
+    "4. Broadcast Selectively",
+    "Code Samples",
+    "JavaScript"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/59.md",
+   "updatedAt": "2026-06-02T18:54:15-03:00",
+   "wordCount": 1476
+  },
+  {
+   "id": "5A",
+   "title": "Static Websites (nsites)",
+   "summary": "This NIP describes a method by which static websites can be hosted from Blossom assets.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 5128,
+     "description": "nsite manifest snapshot"
+    },
+    {
+     "kind": 15128,
+     "description": "Root nsite manifest"
+    },
+    {
+     "kind": 34128,
+     "description": "Legacy nsite manifest",
+     "deprecated": true
+    },
+    {
+     "kind": 35128,
+     "description": "Named nsite manifest"
+    }
+   ],
+   "exampleKinds": [
+    5128,
+    15128,
+    35128
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "app",
+    "d",
+    "description",
+    "path",
+    "server",
+    "source",
+    "title",
+    "x"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "pubkeyB36",
+    "path",
+    "server",
+    "title",
+    "description",
+    "source",
+    "nostr://",
+    "https://",
+    "created_at",
+    "app",
+    "and",
+    "or",
+    "a-z",
+    "snapshotIdB36",
+    "dTag",
+    "nsite-host.com",
+    "npub",
+    "index.html",
+    "Content-Type",
+    "Content-Length",
+    "/404.html"
+   ],
+   "mentions": [
+    "01",
+    "34",
+    "89"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Site Manifests",
+    "Named Sites",
+    "Manifest Snapshots",
+    "Aggregate Hash",
+    "Upstream App Descriptors",
+    "Copying nsites",
+    "Host server implementation",
+    "Examples"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/5A.md",
+   "updatedAt": "2026-06-16T13:10:10-03:00",
+   "wordCount": 2416
+  },
+  {
+   "id": "60",
+   "title": "Cashu Wallet",
+   "summary": "This NIP defines the operations of a cashu-based wallet.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 7374,
+     "description": "Reserved Cashu Wallet Tokens"
+    },
+    {
+     "kind": 7375,
+     "description": "Cashu Wallet Tokens"
+    },
+    {
+     "kind": 7376,
+     "description": "Cashu Wallet History"
+    },
+    {
+     "kind": 17375,
+     "description": "Cashu Wallet Event"
+    }
+   ],
+   "exampleKinds": [
+    7374,
+    7375,
+    7376,
+    17375
+   ],
+   "messages": [],
+   "tags": [
+    "amount",
+    "direction",
+    "e",
+    "expiration",
+    "k",
+    "mint",
+    "privkey",
+    "unit"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:17375",
+    "kind:7375",
+    "kind:7376",
+    "mint",
+    "privkey",
+    ".content",
+    "proofs",
+    "unit",
+    "sat",
+    "usd",
+    "eur",
+    "del",
+    "kind:5",
+    "direction",
+    "in",
+    "out",
+    "created",
+    "destroyed",
+    "redeemed",
+    "kind:10019",
+    "event-id-1"
+   ],
+   "mentions": [
+    "09",
+    "40",
+    "44",
+    "61",
+    "65"
+   ],
+   "mentionedBy": [
+    "61"
+   ],
+   "headings": [
+    "High-level flow",
+    "Wallet Event",
+    "Token Event",
+    "Spending History Event",
+    "Flow",
+    "Fetch wallet and token list",
+    "Fetch proofs",
+    "Spending token",
+    "Redeeming a quote (optional)",
+    "Appendix 1: Validating proofs"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/60.md",
+   "updatedAt": "2025-10-31T15:59:35+02:00",
+   "wordCount": 1044
+  },
+  {
+   "id": "61",
+   "title": "Nutzaps",
+   "summary": "A Nutzap is a P2PK Cashu token in which the payment itself is the receipt.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 9321,
+     "description": "Nutzap"
+    },
+    {
+     "kind": 10019,
+     "description": "Nutzap Mint Recommendation"
+    }
+   ],
+   "exampleKinds": [
+    7376,
+    9321,
+    10019
+   ],
+   "messages": [],
+   "tags": [
+    "direction",
+    "e",
+    "k",
+    "mint",
+    "p",
+    "proof",
+    "pubkey",
+    "relay",
+    "u",
+    "unit"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "event-id-1",
+    "kind:10019",
+    "kind:9321",
+    "relay",
+    "mint",
+    "pubkey",
+    "privkey",
+    ".content",
+    ".tags",
+    "proof",
+    "unit",
+    "sat",
+    "usd",
+    "eur",
+    "#u",
+    "since",
+    "kind:7376"
+   ],
+   "mentions": [
+    "60",
+    "65"
+   ],
+   "mentionedBy": [
+    "60"
+   ],
+   "headings": [
+    "High-level flow",
+    "Alice nutzaps Bob",
+    "Bob receives the nutzap",
+    "Nutzap informational event",
+    "Nutzap event",
+    "Sending a nutzap",
+    "Receiving nutzaps",
+    "Updating nutzap-redemption history",
+    "Verifying a Cashu Zap",
+    "Final Considerations"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/61.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 994
+  },
+  {
+   "id": "62",
+   "title": "Request to Vanish",
+   "summary": "This NIP offers a Nostr-native way to request a complete reset of a key's fingerprint on the web. This procedure is legally binding in some jurisdictions, and thus, supporters of this NIP should truly delete events from their database.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 62,
+     "description": "Request to Vanish"
+    }
+   ],
+   "exampleKinds": [
+    62
+   ],
+   "messages": [],
+   "tags": [
+    "relay"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    ".pubkey",
+    ".created_at",
+    "ALL_RELAYS"
+   ],
+   "mentions": [
+    "09",
+    "59"
+   ],
+   "mentionedBy": [
+    "59"
+   ],
+   "headings": [
+    "Request to Vanish from Relay",
+    "Global Request to Vanish"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/62.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 306
+  },
+  {
+   "id": "64",
+   "title": "Chess (PGN)",
+   "summary": "This NIP defines kind:64 notes representing chess games in PGN format, which can be read by humans and is also supported by most chess software.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 64,
+     "description": "Chess (PGN)"
+    }
+   ],
+   "exampleKinds": [
+    64
+   ],
+   "messages": [],
+   "tags": [
+    "alt"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:64",
+    ".content"
+   ],
+   "mentions": [
+    "31"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Note",
+    "Content",
+    "Notes",
+    "Client Behavior",
+    "Relay Behavior",
+    "Examples",
+    "Resources"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/64.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 771
+  },
+  {
+   "id": "65",
+   "title": "Relay List Metadata",
+   "summary": "Defines a replaceable event using kind:10002 to advertise relays where the user generally writes to and relays where the user generally reads mentions.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 10002,
+     "description": "Relay List Metadata"
+    }
+   ],
+   "exampleKinds": [
+    10002
+   ],
+   "messages": [],
+   "tags": [
+    "r"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:10002",
+    "read",
+    "write"
+   ],
+   "mentions": [],
+   "mentionedBy": [
+    "24",
+    "34",
+    "37",
+    "45",
+    "51",
+    "60",
+    "61",
+    "A4"
+   ],
+   "headings": [
+    "Size",
+    "Discoverability"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/65.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 230
+  },
+  {
+   "id": "66",
+   "title": "Relay Discovery and Liveness Monitoring",
+   "summary": "This NIP defines events for relay discovery and the announcement of relay monitors.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 10166,
+     "description": "Relay Monitor Announcement"
+    },
+    {
+     "kind": 30166,
+     "description": "Relay Discovery"
+    }
+   ],
+   "exampleKinds": [
+    30166
+   ],
+   "messages": [],
+   "tags": [
+    "c",
+    "d",
+    "frequency",
+    "g",
+    "l",
+    "n",
+    "N",
+    "R",
+    "rtt-open",
+    "t",
+    "timeout"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "content",
+    "rtt-open",
+    "rtt-read",
+    "rtt-write",
+    "clearnet",
+    "tor",
+    "i2p",
+    "loki",
+    "PascalCase",
+    "PrivateInbox",
+    "limitations",
+    "auth",
+    "writes",
+    "pow",
+    "payment",
+    "frequency",
+    "timeout",
+    "open",
+    "read",
+    "write",
+    "nip11",
+    "dns",
+    "geo"
+   ],
+   "mentions": [
+    "11",
+    "52"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Relay Discovery Events",
+    "Relay Monitor Announcements"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/66.md",
+   "updatedAt": "2026-05-28T17:16:07-03:00",
+   "wordCount": 598
+  },
+  {
+   "id": "67",
+   "title": "EOSE Completeness Hint",
+   "summary": "This NIP extends the EOSE message defined in NIP-01 with an optional third element that signals the client that the relay has sent every stored event matching the subscription's filters.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [
+    "auth",
+    "finish",
+    "more"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "EOSE",
+    "limit",
+    "REQ",
+    "until",
+    "created_at",
+    "AUTH",
+    "CLOSE",
+    "CLOSED",
+    "supported_nips"
+   ],
+   "mentions": [
+    "01",
+    "11",
+    "42"
+   ],
+   "mentionedBy": [
+    "42"
+   ],
+   "headings": [
+    "Motivation",
+    "Specification",
+    "Semantics around created_at ties",
+    "Relay advertisement",
+    "Examples"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/67.md",
+   "updatedAt": "2026-09-01T09:32:55-03:00",
+   "wordCount": 685
+  },
+  {
+   "id": "68",
+   "title": "Picture-first feeds",
+   "summary": "This NIP defines event kind 20 for picture-first clients. Images must be self-contained. They are hosted externally and referenced using imeta tags.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 20,
+     "description": "Picture"
+    }
+   ],
+   "exampleKinds": [
+    20
+   ],
+   "messages": [],
+   "tags": [
+    "content-warning",
+    "imeta",
+    "l",
+    "p",
+    "t",
+    "title"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "imeta",
+    "title",
+    ".content",
+    "annotate-user",
+    "image/apng",
+    "image/avif",
+    "image/gif",
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+   ],
+   "mentions": [
+    "71",
+    "94"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Picture Events"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/68.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 390
+  },
+  {
+   "id": "69",
+   "title": "Peer-to-peer Order events",
+   "summary": "Peer-to-peer (P2P) platforms have seen an upturn in recent years, while having more and more options is positive, in the specific case of p2p, having several options contributes to the liquidity split, meaning sometimes there's not enough assets available for trading.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 38383,
+     "description": "Peer-to-peer Order events"
+    }
+   ],
+   "exampleKinds": [
+    38383
+   ],
+   "messages": [],
+   "tags": [
+    "amt",
+    "bond",
+    "d",
+    "expiration",
+    "expires_at",
+    "f",
+    "fa",
+    "g",
+    "k",
+    "layer",
+    "name",
+    "network",
+    "pm",
+    "premium",
+    "rating",
+    "s",
+    "source",
+    "y",
+    "z"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "or",
+    "amt",
+    "fa",
+    "pm",
+    "premium",
+    "source",
+    "rating",
+    "network",
+    "mainnet",
+    "testnet",
+    "signet",
+    "layer",
+    "onchain",
+    "lightning",
+    "liquid",
+    "name",
+    "bond",
+    "expires_at",
+    "pending",
+    "expired",
+    "expiration"
+   ],
+   "mentions": [
+    "01",
+    "40"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Abstract",
+    "The event",
+    "Tags",
+    "Implementations",
+    "References"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/69.md",
+   "updatedAt": "2025-11-13T13:41:04-05:00",
+   "wordCount": 572
+  },
+  {
+   "id": "70",
+   "title": "Protected Events",
+   "summary": "When the \"-\" tag is present, that means the event is \"protected\".",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [
+    1
+   ],
+   "messages": [],
+   "tags": [
+    "-"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "AUTH"
+   ],
+   "mentions": [
+    "42"
+   ],
+   "mentionedBy": [
+    "18",
+    "43",
+    "EE"
+   ],
+   "headings": [
+    "The tag",
+    "Example flow",
+    "Why"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/70.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 404
+  },
+  {
+   "id": "71",
+   "title": "Video Events",
+   "summary": "This specification defines video events representing a dedicated post of externally hosted content.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 21,
+     "description": "Video Event"
+    },
+    {
+     "kind": 22,
+     "description": "Short-form Portrait Video Event"
+    },
+    {
+     "kind": 34235,
+     "description": "Addressable Video Event"
+    },
+    {
+     "kind": 34236,
+     "description": "Addressable Short Video Event"
+    }
+   ],
+   "exampleKinds": [
+    21,
+    34235
+   ],
+   "messages": [],
+   "tags": [
+    "alt",
+    "content-warning",
+    "d",
+    "duration",
+    "imeta",
+    "origin",
+    "p",
+    "published_at",
+    "r",
+    "segment",
+    "t",
+    "text-track",
+    "title"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:1",
+    ".content",
+    "imeta",
+    "dim",
+    "ov",
+    "duration",
+    "bitrate",
+    "waveform",
+    "url",
+    "fallback",
+    "image",
+    "title",
+    "published_at",
+    "text-track",
+    "content-warning",
+    "alt",
+    "segment",
+    "HH:MM:SS.sss",
+    "origin"
+   ],
+   "mentions": [
+    "92",
+    "94",
+    "96"
+   ],
+   "mentionedBy": [
+    "68"
+   ],
+   "headings": [
+    "Video Events",
+    "Addressable Video Events",
+    "Required tags for addressable events:",
+    "Other tags:",
+    "Optional tags for imported content:",
+    "Addressable Event Example",
+    "Referencing Addressable Events"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/71.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 1173
+  },
+  {
+   "id": "72",
+   "title": "Moderated Communities",
+   "summary": "The goal of this NIP is to enable public communities. It defines the replaceable event kind:34550 to define the community and the current list of moderators/administrators. Users that want to post into the community, simply tag any Nostr event with the community's a tag.",
+   "status": "unrecommended",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "try NIP-29 instead",
+    "replacedBy": [
+     "29"
+    ]
+   },
+   "kinds": [
+    {
+     "kind": 4550,
+     "description": "Community Post Approval"
+    },
+    {
+     "kind": 34550,
+     "description": "Community Definition"
+    }
+   ],
+   "exampleKinds": [
+    1111,
+    4550,
+    34550
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "A",
+    "d",
+    "description",
+    "e",
+    "image",
+    "k",
+    "K",
+    "name",
+    "p",
+    "P",
+    "relay"
+   ],
+   "idents": [
+    "unrecommended",
+    "draft",
+    "optional",
+    "kind:34550",
+    "kind:4550",
+    "Kind:34550",
+    "relay",
+    "and",
+    "or",
+    ".content",
+    "content"
+   ],
+   "mentions": [
+    "09",
+    "18",
+    "22",
+    "29"
+   ],
+   "mentionedBy": [
+    "51"
+   ],
+   "headings": [
+    "Community Definition",
+    "Posting to a community",
+    "Top-level posts",
+    "Nested replies",
+    "Backwards compatibility note",
+    "Moderation",
+    "Cross-posting"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/72.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 906
+  },
+  {
+   "id": "73",
+   "title": "External Content IDs",
+   "summary": "There are certain established global content identifiers such as Book ISBNs, Podcast GUIDs, and Movie ISANs that are useful to reference in nostr events so that clients can query all the events associated with these ids.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [
+    "i",
+    "k"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "bitcoin",
+    "ethereum",
+    "solana"
+   ],
+   "mentions": [],
+   "mentionedBy": [
+    "22",
+    "24",
+    "25",
+    "84",
+    "85"
+   ],
+   "headings": [
+    "Supported IDs",
+    "Examples",
+    "Webpages",
+    "Geohashes:",
+    "Countries:",
+    "Books:",
+    "Podcasts:",
+    "Movies:",
+    "Blockchain",
+    "Optional URL Hints"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/73.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 520
+  },
+  {
+   "id": "75",
+   "title": "Zap Goals",
+   "summary": "This NIP defines an event for creating fundraising goals. Users can contribute funds towards the goal by zapping the goal event.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 9041,
+     "description": "Zap Goal"
+    }
+   ],
+   "exampleKinds": [
+    9041
+   ],
+   "messages": [],
+   "tags": [
+    "amount",
+    "closed_at",
+    "goal",
+    "image",
+    "relays",
+    "summary"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:9041",
+    ".content",
+    "amount",
+    "relays",
+    "closed_at",
+    "image",
+    "summary",
+    "or",
+    "zap",
+    "goal"
+   ],
+   "mentions": [
+    "57"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Nostr Event",
+    "Client behavior",
+    "Use cases"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/75.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 333
+  },
+  {
+   "id": "77",
+   "title": "Negentropy Syncing",
+   "summary": "This document describes a protocol extension for syncing events. It works for both client-relay and relay-relay scenarios. If both sides of the sync have events in common, then this protocol will use less bandwidth than transferring the full set of events (or even just their IDs).",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [
+    {
+     "type": "NEG-OPEN",
+     "direction": "client-to-relay",
+     "description": "Initial message"
+    },
+    {
+     "type": "NEG-ERR",
+     "direction": "relay-to-client",
+     "description": "Error message"
+    },
+    {
+     "type": "NEG-MSG",
+     "direction": "client-to-relay",
+     "description": "Subsequent messages"
+    },
+    {
+     "type": "NEG-MSG",
+     "direction": "relay-to-client",
+     "description": "Subsequent messages"
+    },
+    {
+     "type": "NEG-CLOSE",
+     "direction": "client-to-relay",
+     "description": "Close message"
+    }
+   ],
+   "tags": [],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "NEG-OPEN",
+    "NEG-MSG",
+    "NEG-CLOSE",
+    "EVENT",
+    "REQ",
+    "initialMessage",
+    "blocked",
+    "closed",
+    "NEG-ERR",
+    "message",
+    "Varint",
+    "Id",
+    "Message",
+    "0x61",
+    "0x62",
+    "Skip",
+    "Range",
+    "Fingerprint",
+    "IdList",
+    "Bound",
+    "idPrefix",
+    "length",
+    "and"
+   ],
+   "mentions": [
+    "01"
+   ],
+   "mentionedBy": [
+    "BE"
+   ],
+   "headings": [
+    "High-Level Protocol Description",
+    "Nostr Messages",
+    "Initial message (client to relay):",
+    "Error message (relay to client):",
+    "Subsequent messages (bidirectional):",
+    "Close message (client to relay):",
+    "Appendix: Negentropy Protocol V1",
+    "Preparation",
+    "Varint",
+    "Id",
+    "Message",
+    "Range",
+    "Bound",
+    "Fingerprint Algorithm"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/77.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 1465
+  },
+  {
+   "id": "78",
+   "title": "Application-specific data",
+   "summary": "The goal of this NIP is to enable remoteStorage-like capabilities for custom applications that do not care about interoperability.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": true,
+   "statusTags": [
+    "draft",
+    "optional",
+    "relay"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 78,
+     "description": "Application-specific Data"
+    },
+    {
+     "kind": 30078,
+     "description": "Application-specific Data"
+    }
+   ],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "draft",
+    "optional",
+    "relay",
+    "content",
+    "tags",
+    "AUTH"
+   ],
+   "mentions": [
+    "42"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Nostr event",
+    "AUTH",
+    "Some use cases"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/78.md",
+   "updatedAt": "2026-09-03T17:10:12-03:00",
+   "wordCount": 328
+  },
+  {
+   "id": "7D",
+   "title": "Forum Threads",
+   "summary": "A thread is a kind 11 event. Threads SHOULD include a title.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 11,
+     "description": "Thread"
+    }
+   ],
+   "exampleKinds": [
+    11,
+    1111
+   ],
+   "messages": [],
+   "tags": [
+    "E",
+    "K",
+    "title"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "title"
+   ],
+   "mentions": [
+    "22"
+   ],
+   "mentionedBy": [],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/7D.md",
+   "updatedAt": "2026-05-28T17:16:07-03:00",
+   "wordCount": 76
+  },
+  {
+   "id": "84",
+   "title": "Highlights",
+   "summary": "This NIP defines kind:9802, a \"highlight\" event, to signal content a user finds valuable.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 9802,
+     "description": "Highlights"
+    }
+   ],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [
+    "p"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:9802",
+    ".content",
+    "and/or",
+    "context",
+    "comment",
+    "mention",
+    "source"
+   ],
+   "mentions": [
+    "73",
+    "94"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Format",
+    "References",
+    "Attribution",
+    "Context",
+    "Quote Highlights"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/84.md",
+   "updatedAt": "2026-09-01T20:12:31+03:00",
+   "wordCount": 322
+  },
+  {
+   "id": "85",
+   "title": "Trusted Assertions",
+   "summary": "Certain Webs of Trust calculations require access to a large volume of events and/or computing power, making it virtually impossible to perform them directly on clients.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 10040,
+     "description": "Trusted Service Providers"
+    },
+    {
+     "kind": 30382,
+     "description": "User Trusted Assertion"
+    },
+    {
+     "kind": 30383,
+     "description": "Event Trusted Assertion"
+    },
+    {
+     "kind": 30384,
+     "description": "Addressable Trusted Assertion"
+    }
+   ],
+   "exampleKinds": [
+    0,
+    10040,
+    30382
+   ],
+   "messages": [],
+   "tags": [
+    "d"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "followers",
+    "rank",
+    "first_created_at",
+    "post_cnt",
+    "reply_cnt",
+    "reactions_cnt",
+    "zap_amt_recd",
+    "zap_amt_sent",
+    "zap_cnt_recd",
+    "zap_cnt_sent",
+    "zap_avg_amt_day_recd",
+    "zap_avg_amt_day_sent",
+    "reports_cnt_recd",
+    "reports_cnt_sent",
+    "active_hours_start",
+    "active_hours_end",
+    "comment_cnt",
+    "quote_cnt",
+    "repost_cnt",
+    "reaction_cnt",
+    "zap_cnt",
+    "zap_amount",
+    "kind:tag",
+    "pubkey",
+    "relay",
+    ".content"
+   ],
+   "mentions": [
+    "44",
+    "73"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Assertion Events",
+    "Kind 30382: Users as Subject:",
+    "Kind 30383: Events as Subject",
+    "Kind 30384: Addressables as Subject",
+    "Kind 30385: External identifier as Subject",
+    "Declaring Trusted Service Providers",
+    "Final Considerations",
+    "Appendix 1: Service provider discoverability"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/85.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 1148
+  },
+  {
+   "id": "86",
+   "title": "Relay Management API",
+   "summary": "Relays may provide an API for performing management tasks. This is made available as a JSON-RPC-like request-response protocol over HTTP, on the same URI as the relay's websocket.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "draft",
+    "optional",
+    "Content-Type",
+    "application/nostr+json+rpc",
+    "supportedmethods",
+    "banpubkey",
+    "true",
+    "unbanpubkey",
+    "listbannedpubkeys",
+    "allowpubkey",
+    "unallowpubkey",
+    "listallowedpubkeys",
+    "createrole",
+    "editrole",
+    "deleterole",
+    "assignrole",
+    "unassignrole",
+    "listclaims",
+    "createclaim",
+    "deleteclaim",
+    "listeventsneedingmoderation",
+    "allowevent",
+    "unallowevent",
+    "banevent",
+    "unbanevent",
+    "listbannedevents",
+    "listallowedevents",
+    "changerelayname",
+    "changerelaydescription",
+    "changerelayicon",
+    "allowkind",
+    "disallowkind",
+    "listallowedkinds",
+    "listdisallowedkinds",
+    "blockip",
+    "unblockip",
+    "listblockedips",
+    "Authorization",
+    "payload"
+   ],
+   "mentions": [
+    "43",
+    "98"
+   ],
+   "mentionedBy": [
+    "43"
+   ],
+   "headings": [
+    "supportedmethods",
+    "banpubkey",
+    "unbanpubkey",
+    "listbannedpubkeys",
+    "allowpubkey",
+    "unallowpubkey",
+    "listallowedpubkeys",
+    "createrole",
+    "editrole",
+    "deleterole",
+    "assignrole",
+    "unassignrole",
+    "listclaims",
+    "createclaim",
+    "deleteclaim",
+    "listeventsneedingmoderation",
+    "allowevent",
+    "unallowevent",
+    "banevent",
+    "unbanevent",
+    "listbannedevents",
+    "listallowedevents",
+    "changerelayname",
+    "changerelaydescription",
+    "changerelayicon",
+    "allowkind",
+    "disallowkind",
+    "listallowedkinds",
+    "listdisallowedkinds",
+    "blockip",
+    "unblockip",
+    "listblockedips",
+    "Authorization"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/86.md",
+   "updatedAt": "2026-09-23T22:14:11-03:00",
+   "wordCount": 915
+  },
+  {
+   "id": "87",
+   "title": "Cashu and Fedimint Discoverability",
+   "summary": "This NIP describes kind:38173, kind:38172 and kind:38000: a way to discover ecash mints, their capabilities, and people who recommend them.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 38000,
+     "description": "Mint Recommendation"
+    },
+    {
+     "kind": 38172,
+     "description": "Cashu Mint Announcement"
+    },
+    {
+     "kind": 38173,
+     "description": "Fedimint Announcement"
+    }
+   ],
+   "exampleKinds": [
+    38000,
+    38172,
+    38173
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "d",
+    "k",
+    "modules",
+    "n",
+    "nuts",
+    "u"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:38173",
+    "kind:38172",
+    "kind:38000",
+    "/v1/info",
+    "mainnet",
+    "testnet",
+    "signet",
+    "regtest",
+    "content",
+    "metadata",
+    "kind:0"
+   ],
+   "mentions": [
+    "01"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Rationale",
+    "Parties involved",
+    "Events",
+    "Recommendation event",
+    "Mint Information",
+    "Example",
+    "User A recommends some mints",
+    "User B finds a mint",
+    "Alternative query bypassing kind:38000"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/87.md",
+   "updatedAt": "2026-06-02T18:54:15-03:00",
+   "wordCount": 784
+  },
+  {
+   "id": "88",
+   "title": "Polls",
+   "summary": "This NIP defines the event scheme that describe Polls on nostr.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1018,
+     "description": "Poll Response"
+    },
+    {
+     "kind": 1068,
+     "description": "Poll"
+    }
+   ],
+   "exampleKinds": [
+    1018,
+    1068
+   ],
+   "messages": [],
+   "tags": [
+    "e",
+    "endsAt",
+    "option",
+    "polltype",
+    "relay",
+    "response"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:1068",
+    "kind:1018",
+    "kind:30000"
+   ],
+   "mentions": [],
+   "mentionedBy": [],
+   "headings": [
+    "Events",
+    "Poll Event",
+    "Responses",
+    "Poll Types",
+    "Counting Results",
+    "Relays",
+    "Curation"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/88.md",
+   "updatedAt": "2025-12-30T10:04:37-08:00",
+   "wordCount": 517
+  },
+  {
+   "id": "89",
+   "title": "Recommended Application Handlers",
+   "summary": "This NIP describes kind:31989 and kind:31990: a way to discover applications that can handle unknown event-kinds.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 31989,
+     "description": "Handler recommendation"
+    },
+    {
+     "kind": 31990,
+     "description": "Handler information"
+    }
+   ],
+   "exampleKinds": [
+    1,
+    31989,
+    31990
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "client",
+    "d",
+    "ios",
+    "k",
+    "latest",
+    "next",
+    "web"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:31989",
+    "kind:31990",
+    "content",
+    "metadata",
+    "kind:0",
+    "latest",
+    "next",
+    "bech32",
+    "client",
+    "name",
+    "address",
+    "hint",
+    "kind:1",
+    "kind:31337",
+    "alt",
+    "kind"
+   ],
+   "mentions": [
+    "01",
+    "19",
+    "31"
+   ],
+   "mentionedBy": [
+    "31",
+    "46",
+    "5A",
+    "90"
+   ],
+   "headings": [
+    "Rationale",
+    "Parties involved",
+    "Events",
+    "Recommendation event",
+    "Handler information",
+    "Client tag",
+    "User flow",
+    "Example",
+    "User A recommends a kind:31337-handler",
+    "User B interacts with a kind:31337-handler",
+    "Alternative query bypassing kind:31989"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/89.md",
+   "updatedAt": "2026-06-16T13:10:10-03:00",
+   "wordCount": 923
+  },
+  {
+   "id": "90",
+   "title": "Data Vending Machines",
+   "summary": "This NIP defines the interaction between customers and Service Providers for performing on-demand computation.",
+   "status": "unrecommended",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "this got totally out of control, prefer use-case-specific microstandards",
+    "replacedBy": []
+   },
+   "kinds": [],
+   "exampleKinds": [
+    7000,
+    31990
+   ],
+   "messages": [],
+   "tags": [
+    "amount",
+    "bid",
+    "e",
+    "encrypted",
+    "i",
+    "k",
+    "output",
+    "p",
+    "param",
+    "relays",
+    "request",
+    "status",
+    "t"
+   ],
+   "idents": [
+    "unrecommended",
+    "draft",
+    "optional",
+    "kind:5001",
+    "kind:6001",
+    "kind:5000-5999",
+    "url",
+    "event",
+    "job",
+    "text",
+    "output",
+    "kind",
+    "param",
+    "bid",
+    "relays",
+    "and",
+    "encrypted",
+    "content",
+    "kind:6000-6999",
+    "request",
+    "amount",
+    "status",
+    "payment-required",
+    "processing",
+    "error",
+    "success",
+    "partial",
+    ".content",
+    "kind:5000",
+    "kind:7000",
+    "kind:6000",
+    "bolt11",
+    "kind:5"
+   ],
+   "mentions": [
+    "04",
+    "89"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Kinds",
+    "Rationale",
+    "Actors",
+    "Job request (kind:5000-5999)",
+    "Encrypted Params",
+    "Job result (kind:6000-6999)",
+    "Encrypted Output",
+    "Job feedback",
+    "Job feedback status",
+    "Protocol Flow",
+    "Notes about the protocol flow",
+    "Cancellation",
+    "Appendix 1: Job chaining",
+    "Appendix 2: Service provider discoverability"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/90.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 1599
+  },
+  {
+   "id": "92",
+   "title": "Media Attachments Metadata (imeta)",
+   "summary": "Media attachments (images, videos, and other files) may be added to events by including a URL in the event content, along with a matching imeta tag.",
+   "status": "draft",
+   "maturity": null,
+   "requirement": null,
+   "relay": false,
+   "statusTags": [],
+   "listed": true,
+   "kinds": [],
+   "exampleKinds": [
+    1
+   ],
+   "messages": [],
+   "tags": [
+    "imeta"
+   ],
+   "idents": [
+    "imeta",
+    "url"
+   ],
+   "mentions": [
+    "94"
+   ],
+   "mentionedBy": [
+    "71",
+    "A0",
+    "A4"
+   ],
+   "headings": [
+    "Example",
+    "Recommended client behavior"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/92.md",
+   "updatedAt": "2026-06-02T18:54:15-03:00",
+   "wordCount": 226
+  },
+  {
+   "id": "94",
+   "title": "File Metadata",
+   "summary": "The purpose of this NIP is to allow an organization and classification of shared files. So that relays can filter and organize in any way that is of interest. With that, multiple types of filesharing clients can be created.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1063,
+     "description": "File Metadata"
+    }
+   ],
+   "exampleKinds": [
+    1063
+   ],
+   "messages": [],
+   "tags": [
+    "alt",
+    "blurhash",
+    "dim",
+    "i",
+    "image",
+    "m",
+    "magnet",
+    "ox",
+    "size",
+    "summary",
+    "thumb",
+    "url",
+    "x"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:1",
+    "kind:30023",
+    "content",
+    "url",
+    "ox",
+    "size",
+    "dim",
+    "magnet",
+    "blurhash",
+    "thumb",
+    "image",
+    "summary",
+    "alt",
+    "fallback",
+    "service"
+   ],
+   "mentions": [
+    "96"
+   ],
+   "mentionedBy": [
+    "22",
+    "51",
+    "68",
+    "71",
+    "84",
+    "92",
+    "96"
+   ],
+   "headings": [
+    "Event format",
+    "Suggested use cases"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/94.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 369
+  },
+  {
+   "id": "96",
+   "title": "HTTP File Storage Integration",
+   "summary": "This NIP defines a REST API for HTTP file storage servers intended to be used in conjunction with the nostr network. The API will enable nostr users to upload files and later reference them by url on nostr notes.",
+   "status": "unrecommended",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "replaced by Blossom",
+    "replacedBy": []
+   },
+   "kinds": [
+    {
+     "kind": 10096,
+     "description": "File storage server list",
+     "deprecated": true
+    }
+   ],
+   "exampleKinds": [
+    10096
+   ],
+   "messages": [],
+   "tags": [
+    "alt",
+    "expiration",
+    "ox",
+    "server",
+    "size",
+    "x"
+   ],
+   "idents": [
+    "unrecommended",
+    "draft",
+    "optional",
+    "/.well-known/nostr/nip96.json",
+    "api_url",
+    "clients",
+    "Authorization",
+    "payload",
+    "multipart/form-data",
+    "file",
+    "caption",
+    "expiration",
+    "size",
+    "alt",
+    "media_type",
+    "content_type",
+    "no_transform",
+    "server",
+    "filename",
+    "download",
+    "delete",
+    "pubkey",
+    "servers",
+    "client",
+    "relays",
+    "nip94_event",
+    "imeta",
+    "processing_url",
+    "Content-Type",
+    "files",
+    "page",
+    "count"
+   ],
+   "mentions": [
+    "94",
+    "98",
+    "B7"
+   ],
+   "mentionedBy": [
+    "71",
+    "94"
+   ],
+   "headings": [
+    "Introduction",
+    "Server Adaptation",
+    "Relay Hints",
+    "List of Supporting File Storage Servers",
+    "Auth",
+    "Upload",
+    "Response codes",
+    "Delayed Processing",
+    "File compression",
+    "Download",
+    "Media Transformations",
+    "Deletion",
+    "Listing files",
+    "Query args",
+    "Selecting a Server"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/96.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 2203
+  },
+  {
+   "id": "98",
+   "title": "HTTP Auth",
+   "summary": "This NIP defines an ephemeral event used to authorize requests to HTTP servers using nostr events.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 27235,
+     "description": "HTTP Auth"
+    }
+   ],
+   "exampleKinds": [
+    27235
+   ],
+   "messages": [],
+   "tags": [
+    "method",
+    "payload",
+    "u"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "content",
+    "method",
+    "kind",
+    "created_at",
+    "payload",
+    "Authorization",
+    "base64",
+    "Nostr",
+    "AuthenticationHandler"
+   ],
+   "mentions": [],
+   "mentionedBy": [
+    "29",
+    "86",
+    "96"
+   ],
+   "headings": [
+    "Nostr event",
+    "Request Flow",
+    "Reference Implementations"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/98.md",
+   "updatedAt": "2023-12-08T13:19:54-03:00",
+   "wordCount": 269
+  },
+  {
+   "id": "99",
+   "title": "Classified Listings",
+   "summary": "This NIP defines kind:30402: an addressable event to describe classified listings that list any arbitrary product, service, or other thing for sale or offer and includes enough structured metadata to make them useful.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 30402,
+     "description": "Classified Listing"
+    },
+    {
+     "kind": 30403,
+     "description": "Draft Classified Listing"
+    }
+   ],
+   "exampleKinds": [
+    30402
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "d",
+    "e",
+    "image",
+    "location",
+    "price",
+    "published_at",
+    "summary",
+    "t",
+    "title"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:30402",
+    "kind:30403",
+    ".content",
+    ".pubkey",
+    "image",
+    "price"
+   ],
+   "mentions": [
+    "15",
+    "23",
+    "58"
+   ],
+   "mentionedBy": [
+    "15",
+    "24"
+   ],
+   "headings": [
+    "Draft / Inactive Listings",
+    "Content",
+    "Author",
+    "Metadata",
+    "Example Event"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/99.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 575
+  },
+  {
+   "id": "A0",
+   "title": "Voice Messages",
+   "summary": "This NIP defines new events kind: 1222 for root messages and kind: 1244 for reply messages to be used for short voice messages, typically up to 60 seconds in length.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": null,
+   "relay": false,
+   "statusTags": [
+    "draft"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1222,
+     "description": "Voice Message"
+    },
+    {
+     "kind": 1244,
+     "description": "Voice Message Comment"
+    }
+   ],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "content",
+    "audio/mp4",
+    "audio/ogg",
+    "audio/webm",
+    "audio/mpeg",
+    "tags",
+    "NIP-22",
+    "imeta",
+    "waveform",
+    "duration"
+   ],
+   "mentions": [
+    "22",
+    "92"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Specification",
+    "Event Kind 1222 and Kind 1244",
+    "Visual representation with imeta (NIP-92) tag (optional)",
+    "Examples",
+    "Root Voice Message Example"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/A0.md",
+   "updatedAt": "2025-07-27T16:23:50-03:00",
+   "wordCount": 466
+  },
+  {
+   "id": "A3",
+   "title": "payto: Payment Targets",
+   "summary": "This NIP standardizes how payment addresses are declared across any network or platform.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 10133,
+     "description": "Payment Targets"
+    }
+   ],
+   "exampleKinds": [
+    10133
+   ],
+   "messages": [],
+   "tags": [
+    "payto"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "payto",
+    "type",
+    "address",
+    "bip352",
+    "bip353",
+    "bitcoin",
+    "bitcoincash",
+    "cashme",
+    "ethereum",
+    "lightning",
+    "litecoin",
+    "monero",
+    "nano",
+    "paypal",
+    "revolut",
+    "solana",
+    "tron",
+    "venmo",
+    "zcash"
+   ],
+   "mentions": [],
+   "mentionedBy": [],
+   "headings": [
+    "NIP-A3",
+    "payto: Payment Targets",
+    "Example",
+    "Commonly Used Tags"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/A3.md",
+   "updatedAt": "2026-09-09T15:29:36-03:00",
+   "wordCount": 249
+  },
+  {
+   "id": "A4",
+   "title": "Public Messages",
+   "summary": "This NIP defines kind 24 as a simple plaintext message to one or more Nostr users.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 24,
+     "description": "Public Message"
+    }
+   ],
+   "exampleKinds": [
+    24
+   ],
+   "messages": [],
+   "tags": [
+    "p"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    ".content",
+    "expiration",
+    "nevent1",
+    "kind",
+    "kind:24",
+    "imeta"
+   ],
+   "mentions": [
+    "17",
+    "18",
+    "19",
+    "21",
+    "25",
+    "40",
+    "57",
+    "65",
+    "92"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Advanced Support",
+    "Warnings"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/A4.md",
+   "updatedAt": "2026-06-13T09:19:49-03:00",
+   "wordCount": 317
+  },
+  {
+   "id": "B0",
+   "title": "Web Bookmarks",
+   "summary": "This NIP defines kind:39701 for a URI as editable web bookmark.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 39701,
+     "description": "Web bookmarks"
+    }
+   ],
+   "exampleKinds": [
+    39701
+   ],
+   "messages": [],
+   "tags": [
+    "t",
+    "title"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:39701",
+    ".content",
+    "https"
+   ],
+   "mentions": [
+    "22"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Format",
+    "Metadata",
+    "Example",
+    "Replies & Comments"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/B0.md",
+   "updatedAt": "2026-07-31T10:45:10-03:00",
+   "wordCount": 205
+  },
+  {
+   "id": "B7",
+   "title": "Blossom",
+   "summary": "This NIP specifies how Nostr clients can use Blossom for handling media.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 10063,
+     "description": "User server list"
+    },
+    {
+     "kind": 24242,
+     "description": "Blobs stored on mediaservers"
+    }
+   ],
+   "exampleKinds": [
+    10063
+   ],
+   "messages": [],
+   "tags": [
+    "server"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:10063"
+   ],
+   "mentions": [],
+   "mentionedBy": [
+    "34",
+    "51",
+    "96"
+   ],
+   "headings": [
+    "More complex interactions"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/B7.md",
+   "updatedAt": "2025-04-24T13:53:56-03:00",
+   "wordCount": 277
+  },
+  {
+   "id": "BE",
+   "title": "Nostr BLE Communications Protocol",
+   "summary": "This NIP specifies how Nostr apps can use BLE to communicate and synchronize with each other. The BLE protocol follows a client-server pattern, so this NIP emulates the WS structure in a similar way, but with some adaptations to its limitations.",
+   "status": "unrecommended",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "only implemented once and unclear whether it works, requires review",
+    "replacedBy": []
+   },
+   "kinds": [],
+   "exampleKinds": [],
+   "messages": [],
+   "tags": [],
+   "idents": [
+    "unrecommended",
+    "draft",
+    "optional",
+    "0000180f-0000-1000-8000-00805f9b34fb",
+    "87654321-0000-1000-8000-00805f9b34fb",
+    "12345678-0000-1000-8000-00805f9b34fb",
+    "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF",
+    "write-success",
+    "read-message",
+    "EVENT",
+    "EOSE"
+   ],
+   "mentions": [
+    "01",
+    "77"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Device advertisement",
+    "GATT service",
+    "Role assignment",
+    "Messages",
+    "Examples",
+    "Workflows",
+    "Client to relay",
+    "Relay to client",
+    "Device synchronization"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/BE.md",
+   "updatedAt": "2026-05-31T08:10:30-03:00",
+   "wordCount": 978
+  },
+  {
+   "id": "C0",
+   "title": "Code Snippets",
+   "summary": "This NIP defines a new event kind for sharing and storing code snippets. Unlike regular text notes (kind:1), code snippets have specialized metadata like language, extension, and other code-specific attributes that enhance discoverability, syntax highlighting, and improved user experience.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 1337,
+     "description": "Code Snippet"
+    }
+   ],
+   "exampleKinds": [
+    1337
+   ],
+   "messages": [],
+   "tags": [
+    "description",
+    "extension",
+    "l",
+    "license",
+    "name",
+    "repo",
+    "runtime"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:1",
+    "kind:1337",
+    ".content",
+    "name",
+    "extension",
+    "description",
+    "runtime",
+    "license",
+    "dep",
+    "repo"
+   ],
+   "mentions": [
+    "34"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Abstract",
+    "Event Kind",
+    "Optional Tags",
+    "Format",
+    "Client Behavior"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/C0.md",
+   "updatedAt": "2025-12-30T10:04:37-08:00",
+   "wordCount": 466
+  },
+  {
+   "id": "C7",
+   "title": "Chats",
+   "summary": "A chat message is a kind 9 event.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 9,
+     "description": "Chat Message"
+    }
+   ],
+   "exampleKinds": [
+    9
+   ],
+   "messages": [],
+   "tags": [
+    "q"
+   ],
+   "idents": [
+    "draft",
+    "optional"
+   ],
+   "mentions": [
+    "18"
+   ],
+   "mentionedBy": [],
+   "headings": [],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/C7.md",
+   "updatedAt": "2026-05-28T18:20:11-03:00",
+   "wordCount": 98
+  },
+  {
+   "id": "CC",
+   "title": "Geocaching",
+   "summary": "This NIP defines event kinds for geocaching on Nostr. These events allow users to create, share, and log geocaches in a decentralized manner.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 7516,
+     "description": "Geocache log"
+    },
+    {
+     "kind": 7517,
+     "description": "Geocache proof of find"
+    },
+    {
+     "kind": 37516,
+     "description": "Geocache Listing"
+    },
+    {
+     "kind": 37517,
+     "description": "Geocache Curation List"
+    }
+   ],
+   "exampleKinds": [
+    1111,
+    7516,
+    7517,
+    37516,
+    37517
+   ],
+   "messages": [],
+   "tags": [
+    "a",
+    "A",
+    "d",
+    "D",
+    "description",
+    "F",
+    "g",
+    "hint",
+    "image",
+    "k",
+    "K",
+    "map",
+    "mission",
+    "n",
+    "name",
+    "p",
+    "P",
+    "r",
+    "S",
+    "t",
+    "T",
+    "theme",
+    "title",
+    "verification"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "name",
+    "traditional",
+    "multi",
+    "mystery",
+    "hint",
+    "mission",
+    "image",
+    "verification",
+    "first-to-find",
+    "dnf",
+    "note",
+    "maintenance",
+    "archived",
+    "where",
+    "created_at",
+    "id",
+    "art",
+    "content",
+    "title",
+    "description",
+    "theme",
+    "adventure",
+    "mojave",
+    "map",
+    "original",
+    "dark",
+    "satellite"
+   ],
+   "mentions": [
+    "19",
+    "22"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Geocache Listing Event (Kind 37516)",
+    "Content",
+    "Tags",
+    "Found Log Event (Kind 7516)",
+    "Tags",
+    "Comment Log Events (Kind 1111)",
+    "Tags",
+    "Geocache Verification Event (Kind 7517)",
+    "Content",
+    "Tags",
+    "Usage",
+    "Verified Finds",
+    "Verification Process",
+    "Verification Validation",
+    "Type Modifiers",
+    "Rules",
+    "Categories and Modifiers",
+    "Forward Compatibility",
+    "Geocache Curation List Event (Kind 37517)",
+    "Content",
+    "Tags",
+    "Cross-Author References",
+    "Clients",
+    "Examples",
+    "Basic Cache",
+    "Verified Cache",
+    "Cache with Key Quest",
+    "First-to-Find Art",
+    "Found Log",
+    "DNF Log",
+    "Note Log",
+    "Verification Event",
+    "Verified Found Log",
+    "Geocache Curation List"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/CC.md",
+   "updatedAt": "2026-06-12T00:16:32-03:00",
+   "wordCount": 2475
+  },
+  {
+   "id": "EE",
+   "title": "E2EE Messaging using MLS Protocol",
+   "summary": "This NIP standardizes how to use the MLS Protocol with Nostr for efficient and E2EE (end-to-end encrypted) direct and group messaging.",
+   "status": "unrecommended",
+   "maturity": "final",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "final",
+    "unrecommended",
+    "optional"
+   ],
+   "listed": true,
+   "unrecommended": {
+    "reason": "superseded by the Marmot Protocol",
+    "replacedBy": []
+   },
+   "kinds": [],
+   "exampleKinds": [
+    443,
+    444,
+    445,
+    10051
+   ],
+   "messages": [],
+   "tags": [
+    "-",
+    "ciphersuite",
+    "client",
+    "e",
+    "extensions",
+    "h",
+    "mls_protocol_version",
+    "relay",
+    "relays"
+   ],
+   "idents": [
+    "unrecommended",
+    "final",
+    "optional",
+    "Epochs",
+    "Proposal",
+    "Commit",
+    "LeafNode",
+    "Client",
+    "Member",
+    "Clients",
+    "Welcome",
+    "Application",
+    "Credential",
+    "required_capabilities",
+    "ratchet_tree",
+    "nostr_group_data",
+    "last_resort",
+    "Credentials",
+    "BasicCredential",
+    "identity",
+    "nostr_group_id",
+    "name",
+    "description",
+    "admin_pubkeys",
+    "Commits",
+    "relays",
+    "content",
+    "KeyPackageBundle",
+    "mls_protocol_version",
+    "ciphersuite",
+    "extensions",
+    "client",
+    "MLSMessage",
+    "conversation_key",
+    "exporter_secret",
+    "nostr",
+    "pubkey",
+    "created_at",
+    "id"
+   ],
+   "mentions": [
+    "04",
+    "17",
+    "44",
+    "59",
+    "70"
+   ],
+   "mentionedBy": [],
+   "headings": [
+    "Context",
+    "Why is this important?",
+    "Goals of this NIP",
+    "Why MLS?",
+    "Core MLS Concepts",
+    "Groups",
+    "Clients",
+    "Messages",
+    "The focus of this NIP",
+    "Security Considerations",
+    "Forward Secrecy and Post-compromise Security",
+    "Leakage of various keys",
+    "Metadata",
+    "Device Compromise",
+    "Creating groups",
+    "MLS Credentials",
+    "Nostr Group Data Extension",
+    "KeyPackage Event and Signing Keys",
+    "Example KeyPackage Event",
+    "Deleting KeyPackage Events",
+    "Rotating Signing Keys",
+    "KeyPackage Relays List Event",
+    "Welcome Event",
+    "Group Events",
+    "Application Messages",
+    "Commit Message race conditions"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/EE.md",
+   "updatedAt": "2025-12-11T11:54:19-03:00",
+   "wordCount": 4041
+  },
+  {
+   "id": "F4",
+   "title": "Podcasts",
+   "summary": "This NIP defines how podcast episodes can be fetched from relays. It's intended to fit easily into existing podcast players.",
+   "status": "draft",
+   "maturity": "draft",
+   "requirement": "optional",
+   "relay": false,
+   "statusTags": [
+    "draft",
+    "optional"
+   ],
+   "listed": true,
+   "kinds": [
+    {
+     "kind": 54,
+     "description": "Podcast Episode"
+    },
+    {
+     "kind": 10154,
+     "description": "Podcast Metadata"
+    }
+   ],
+   "exampleKinds": [
+    54,
+    10064,
+    10154
+   ],
+   "messages": [],
+   "tags": [
+    "audio",
+    "description",
+    "image",
+    "p",
+    "title",
+    "website"
+   ],
+   "idents": [
+    "draft",
+    "optional",
+    "kind:0",
+    "kind:1",
+    "kind:10154",
+    "kind:10164",
+    "kind:54",
+    "kind:10054"
+   ],
+   "mentions": [
+    "51"
+   ],
+   "mentionedBy": [
+    "51"
+   ],
+   "headings": [
+    "Rationale",
+    "Concept",
+    "Event definitions",
+    "Podcast Metadata",
+    "Authored Podcasts",
+    "Podcast Episodes",
+    "Favorite podcasts"
+   ],
+   "url": "https://github.com/nostr-protocol/nips/blob/0046368a747c5c25ae2bec28bae0e537744c8f10/F4.md",
+   "updatedAt": "2026-05-28T16:51:13-03:00",
+   "wordCount": 724
+  }
+ ],
+ "kinds": [
+  {
+   "kind": 0,
+   "description": "User Metadata",
+   "nips": [
+    "01"
+   ]
+  },
+  {
+   "kind": 1,
+   "description": "Short Text Note",
+   "nips": [
+    "10"
+   ]
+  },
+  {
+   "kind": 3,
+   "description": "Follows",
+   "nips": [
+    "02"
+   ]
+  },
+  {
+   "kind": 4,
+   "description": "Encrypted Direct Messages",
+   "nips": [
+    "04"
+   ]
+  },
+  {
+   "kind": 5,
+   "description": "Event Deletion Request",
+   "nips": [
+    "09"
+   ]
+  },
+  {
+   "kind": 6,
+   "description": "Repost",
+   "nips": [
+    "18"
+   ]
+  },
+  {
+   "kind": 7,
+   "description": "Reaction",
+   "nips": [
+    "25"
+   ]
+  },
+  {
+   "kind": 8,
+   "description": "Badge Award",
+   "nips": [
+    "58"
+   ]
+  },
+  {
+   "kind": 9,
+   "description": "Chat Message",
+   "nips": [
+    "C7"
+   ]
+  },
+  {
+   "kind": 11,
+   "description": "Thread",
+   "nips": [
+    "7D"
+   ]
+  },
+  {
+   "kind": 13,
+   "description": "Seal",
+   "nips": [
+    "59"
+   ]
+  },
+  {
+   "kind": 14,
+   "description": "Direct Message",
+   "nips": [
+    "17"
+   ]
+  },
+  {
+   "kind": 15,
+   "description": "File Message",
+   "nips": [
+    "17"
+   ]
+  },
+  {
+   "kind": 16,
+   "description": "Generic Repost",
+   "nips": [
+    "18"
+   ]
+  },
+  {
+   "kind": 17,
+   "description": "Reaction to a website",
+   "nips": [
+    "25"
+   ]
+  },
+  {
+   "kind": 20,
+   "description": "Picture",
+   "nips": [
+    "68"
+   ]
+  },
+  {
+   "kind": 21,
+   "description": "Video Event",
+   "nips": [
+    "71"
+   ]
+  },
+  {
+   "kind": 22,
+   "description": "Short-form Portrait Video Event",
+   "nips": [
+    "71"
+   ]
+  },
+  {
+   "kind": 24,
+   "description": "Public Message",
+   "nips": [
+    "A4"
+   ]
+  },
+  {
+   "kind": 30,
+   "description": "internal reference",
+   "nips": [],
+   "external": "NKBIP-03"
+  },
+  {
+   "kind": 31,
+   "description": "external web reference",
+   "nips": [],
+   "external": "NKBIP-03"
+  },
+  {
+   "kind": 32,
+   "description": "hardcopy reference",
+   "nips": [],
+   "external": "NKBIP-03"
+  },
+  {
+   "kind": 33,
+   "description": "prompt reference",
+   "nips": [],
+   "external": "NKBIP-03"
+  },
+  {
+   "kind": 40,
+   "description": "Channel Creation",
+   "nips": [
+    "28"
+   ]
+  },
+  {
+   "kind": 41,
+   "description": "Channel Metadata",
+   "nips": [
+    "28"
+   ]
+  },
+  {
+   "kind": 42,
+   "description": "Channel Message",
+   "nips": [
+    "28"
+   ]
+  },
+  {
+   "kind": 43,
+   "description": "Channel Hide Message",
+   "nips": [
+    "28"
+   ]
+  },
+  {
+   "kind": 44,
+   "description": "Channel Mute User",
+   "nips": [
+    "28"
+   ]
+  },
+  {
+   "kind": 54,
+   "description": "Podcast Episode",
+   "nips": [
+    "F4"
+   ]
+  },
+  {
+   "kind": 62,
+   "description": "Request to Vanish",
+   "nips": [
+    "62"
+   ]
+  },
+  {
+   "kind": 64,
+   "description": "Chess (PGN)",
+   "nips": [
+    "64"
+   ]
+  },
+  {
+   "kind": 78,
+   "description": "Application-specific Data",
+   "nips": [
+    "78"
+   ]
+  },
+  {
+   "kind": 443,
+   "description": "KeyPackage",
+   "nips": [],
+   "external": "Marmot"
+  },
+  {
+   "kind": 444,
+   "description": "Welcome Message",
+   "nips": [],
+   "external": "Marmot"
+  },
+  {
+   "kind": 445,
+   "description": "Group Event",
+   "nips": [],
+   "external": "Marmot"
+  },
+  {
+   "kind": 818,
+   "description": "Merge Requests",
+   "nips": [
+    "54"
+   ]
+  },
+  {
+   "kind": 1018,
+   "description": "Poll Response",
+   "nips": [
+    "88"
+   ]
+  },
+  {
+   "kind": 1021,
+   "description": "Bid",
+   "nips": [
+    "15"
+   ]
+  },
+  {
+   "kind": 1022,
+   "description": "Bid confirmation",
+   "nips": [
+    "15"
+   ]
+  },
+  {
+   "kind": 1234,
+   "description": "Draft Checkpoint",
+   "nips": [
+    "37"
+   ]
+  },
+  {
+   "kind": 1040,
+   "description": "OpenTimestamps",
+   "nips": [
+    "03"
+   ]
+  },
+  {
+   "kind": 1059,
+   "description": "Gift Wrap",
+   "nips": [
+    "59"
+   ]
+  },
+  {
+   "kind": 1063,
+   "description": "File Metadata",
+   "nips": [
+    "94"
+   ]
+  },
+  {
+   "kind": 1068,
+   "description": "Poll",
+   "nips": [
+    "88"
+   ]
+  },
+  {
+   "kind": 1111,
+   "description": "Comment",
+   "nips": [
+    "22"
+   ]
+  },
+  {
+   "kind": 1222,
+   "description": "Voice Message",
+   "nips": [
+    "A0"
+   ]
+  },
+  {
+   "kind": 1244,
+   "description": "Voice Message Comment",
+   "nips": [
+    "A0"
+   ]
+  },
+  {
+   "kind": 1311,
+   "description": "Live Chat Message",
+   "nips": [
+    "53"
+   ]
+  },
+  {
+   "kind": 1337,
+   "description": "Code Snippet",
+   "nips": [
+    "C0"
+   ]
+  },
+  {
+   "kind": 1617,
+   "description": "Patches",
+   "nips": [
+    "34"
+   ]
+  },
+  {
+   "kind": 1618,
+   "description": "Pull Requests",
+   "nips": [
+    "34"
+   ]
+  },
+  {
+   "kind": 1619,
+   "description": "Pull Request Updates",
+   "nips": [
+    "34"
+   ]
+  },
+  {
+   "kind": 1621,
+   "description": "Issues",
+   "nips": [
+    "34"
+   ]
+  },
+  {
+   "kind": 1622,
+   "description": "Git Replies (deprecated)",
+   "nips": [
+    "34"
+   ]
+  },
+  {
+   "kind": 1630,
+   "to": 1633,
+   "description": "Status",
+   "nips": [
+    "34"
+   ]
+  },
+  {
+   "kind": 1971,
+   "description": "Problem Tracker",
+   "nips": [],
+   "external": "nostrocket"
+  },
+  {
+   "kind": 1984,
+   "description": "Reporting",
+   "nips": [
+    "56"
+   ]
+  },
+  {
+   "kind": 1985,
+   "description": "Label",
+   "nips": [
+    "32"
+   ]
+  },
+  {
+   "kind": 1987,
+   "description": "AI Embeddings / Vector lists",
+   "nips": [],
+   "external": "NKBIP-02"
+  },
+  {
+   "kind": 2003,
+   "description": "Torrent",
+   "nips": [
+    "35"
+   ]
+  },
+  {
+   "kind": 2004,
+   "description": "Torrent Comment",
+   "nips": [
+    "35"
+   ]
+  },
+  {
+   "kind": 2022,
+   "description": "Coinjoin Pool",
+   "nips": [],
+   "external": "joinstr"
+  },
+  {
+   "kind": 4550,
+   "description": "Community Post Approval",
+   "nips": [
+    "72"
+   ]
+  },
+  {
+   "kind": 7374,
+   "description": "Reserved Cashu Wallet Tokens",
+   "nips": [
+    "60"
+   ]
+  },
+  {
+   "kind": 7375,
+   "description": "Cashu Wallet Tokens",
+   "nips": [
+    "60"
+   ]
+  },
+  {
+   "kind": 7376,
+   "description": "Cashu Wallet History",
+   "nips": [
+    "60"
+   ]
+  },
+  {
+   "kind": 7516,
+   "description": "Geocache log",
+   "nips": [
+    "CC"
+   ]
+  },
+  {
+   "kind": 7517,
+   "description": "Geocache proof of find",
+   "nips": [
+    "CC"
+   ]
+  },
+  {
+   "kind": 8000,
+   "description": "Add User",
+   "nips": [
+    "43"
+   ]
+  },
+  {
+   "kind": 8001,
+   "description": "Remove User",
+   "nips": [
+    "43"
+   ]
+  },
+  {
+   "kind": 9000,
+   "to": 9030,
+   "description": "Group Control Events",
+   "nips": [
+    "29"
+   ]
+  },
+  {
+   "kind": 9041,
+   "description": "Zap Goal",
+   "nips": [
+    "75"
+   ]
+  },
+  {
+   "kind": 9321,
+   "description": "Nutzap",
+   "nips": [
+    "61"
+   ]
+  },
+  {
+   "kind": 9734,
+   "description": "Zap Request",
+   "nips": [
+    "57"
+   ]
+  },
+  {
+   "kind": 9735,
+   "description": "Zap",
+   "nips": [
+    "57"
+   ]
+  },
+  {
+   "kind": 9802,
+   "description": "Highlights",
+   "nips": [
+    "84"
+   ]
+  },
+  {
+   "kind": 10000,
+   "description": "Mute list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10001,
+   "description": "Pin list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10002,
+   "description": "Relay List Metadata",
+   "nips": [
+    "65",
+    "51"
+   ]
+  },
+  {
+   "kind": 10003,
+   "description": "Bookmark list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10004,
+   "description": "Communities list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10005,
+   "description": "Public chats list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10006,
+   "description": "Blocked relays list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10007,
+   "description": "Search relays list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10008,
+   "description": "Profile Badges",
+   "nips": [
+    "51",
+    "58"
+   ]
+  },
+  {
+   "kind": 10009,
+   "description": "User groups",
+   "nips": [
+    "51",
+    "29"
+   ]
+  },
+  {
+   "kind": 10011,
+   "description": "External Identities",
+   "nips": [
+    "39"
+   ]
+  },
+  {
+   "kind": 10012,
+   "description": "Favorite relays list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10013,
+   "description": "Private event relay list",
+   "nips": [
+    "37"
+   ]
+  },
+  {
+   "kind": 10015,
+   "description": "Interests list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10019,
+   "description": "Nutzap Mint Recommendation",
+   "nips": [
+    "61"
+   ]
+  },
+  {
+   "kind": 10020,
+   "description": "Media follows",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10021,
+   "description": "Favorite follow sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10030,
+   "description": "User emoji list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10040,
+   "description": "Trusted Service Providers",
+   "nips": [
+    "85"
+   ]
+  },
+  {
+   "kind": 10050,
+   "description": "Relay list to receive DMs",
+   "nips": [
+    "51",
+    "17"
+   ]
+  },
+  {
+   "kind": 10051,
+   "description": "KeyPackage Relays List",
+   "nips": [],
+   "external": "Marmot"
+  },
+  {
+   "kind": 10054,
+   "description": "Favorite podcasts list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10063,
+   "description": "User server list",
+   "nips": [
+    "B7"
+   ]
+  },
+  {
+   "kind": 10064,
+   "description": "Authored podcasts list",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 10096,
+   "description": "File storage server list",
+   "nips": [
+    "96"
+   ]
+  },
+  {
+   "kind": 10133,
+   "description": "Payment Targets",
+   "nips": [
+    "A3"
+   ]
+  },
+  {
+   "kind": 10154,
+   "description": "Podcast Metadata",
+   "nips": [
+    "F4"
+   ]
+  },
+  {
+   "kind": 10166,
+   "description": "Relay Monitor Announcement",
+   "nips": [
+    "66"
+   ]
+  },
+  {
+   "kind": 10312,
+   "description": "Room Presence",
+   "nips": [
+    "53"
+   ]
+  },
+  {
+   "kind": 13194,
+   "description": "Wallet Info",
+   "nips": [
+    "47"
+   ]
+  },
+  {
+   "kind": 13534,
+   "description": "Membership Lists",
+   "nips": [
+    "43"
+   ]
+  },
+  {
+   "kind": 5128,
+   "description": "nsite manifest snapshot",
+   "nips": [
+    "5A"
+   ]
+  },
+  {
+   "kind": 15128,
+   "description": "Root nsite manifest",
+   "nips": [
+    "5A"
+   ]
+  },
+  {
+   "kind": 17375,
+   "description": "Cashu Wallet Event",
+   "nips": [
+    "60"
+   ]
+  },
+  {
+   "kind": 21059,
+   "description": "Ephemeral Gift Wrap",
+   "nips": [
+    "59"
+   ]
+  },
+  {
+   "kind": 22242,
+   "description": "Client Authentication",
+   "nips": [
+    "42"
+   ]
+  },
+  {
+   "kind": 23194,
+   "description": "Wallet Request",
+   "nips": [
+    "47"
+   ]
+  },
+  {
+   "kind": 23195,
+   "description": "Wallet Response",
+   "nips": [
+    "47"
+   ]
+  },
+  {
+   "kind": 24133,
+   "description": "Nostr Connect",
+   "nips": [
+    "46"
+   ]
+  },
+  {
+   "kind": 24242,
+   "description": "Blobs stored on mediaservers",
+   "nips": [
+    "B7"
+   ]
+  },
+  {
+   "kind": 27235,
+   "description": "HTTP Auth",
+   "nips": [
+    "98"
+   ]
+  },
+  {
+   "kind": 28934,
+   "description": "Join Request",
+   "nips": [
+    "43"
+   ]
+  },
+  {
+   "kind": 28935,
+   "description": "Invite Request",
+   "nips": [
+    "43"
+   ]
+  },
+  {
+   "kind": 28936,
+   "description": "Leave Request",
+   "nips": [
+    "43"
+   ]
+  },
+  {
+   "kind": 30000,
+   "description": "Follow sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30002,
+   "description": "Relay sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30003,
+   "description": "Bookmark sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30004,
+   "description": "Curation sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30005,
+   "description": "Video sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30006,
+   "description": "Picture sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30007,
+   "description": "Kind mute sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30008,
+   "description": "Badge sets",
+   "nips": [
+    "51",
+    "58"
+   ]
+  },
+  {
+   "kind": 30009,
+   "description": "Badge Definition",
+   "nips": [
+    "58"
+   ]
+  },
+  {
+   "kind": 30015,
+   "description": "Interest sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30017,
+   "description": "Create or update a stall",
+   "nips": [
+    "15"
+   ]
+  },
+  {
+   "kind": 30018,
+   "description": "Create or update a product",
+   "nips": [
+    "15"
+   ]
+  },
+  {
+   "kind": 30019,
+   "description": "Marketplace UI/UX",
+   "nips": [
+    "15"
+   ]
+  },
+  {
+   "kind": 30020,
+   "description": "Product sold as an auction",
+   "nips": [
+    "15"
+   ]
+  },
+  {
+   "kind": 30023,
+   "description": "Long-form Content",
+   "nips": [
+    "23"
+   ]
+  },
+  {
+   "kind": 30024,
+   "description": "Draft Long-form Content",
+   "nips": [
+    "23"
+   ]
+  },
+  {
+   "kind": 30030,
+   "description": "Emoji sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30040,
+   "description": "Curated Publication Index",
+   "nips": [],
+   "external": "NKBIP-01"
+  },
+  {
+   "kind": 30041,
+   "description": "Curated Publication Content",
+   "nips": [],
+   "external": "NKBIP-01"
+  },
+  {
+   "kind": 30063,
+   "description": "Release artifact sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30078,
+   "description": "Application-specific Data",
+   "nips": [
+    "78"
+   ]
+  },
+  {
+   "kind": 30166,
+   "description": "Relay Discovery",
+   "nips": [
+    "66"
+   ]
+  },
+  {
+   "kind": 30267,
+   "description": "App curation sets",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 30311,
+   "description": "Live Event",
+   "nips": [
+    "53"
+   ]
+  },
+  {
+   "kind": 30312,
+   "description": "Interactive Room",
+   "nips": [
+    "53"
+   ]
+  },
+  {
+   "kind": 30313,
+   "description": "Conference Event",
+   "nips": [
+    "53"
+   ]
+  },
+  {
+   "kind": 30315,
+   "description": "User Statuses",
+   "nips": [
+    "38"
+   ]
+  },
+  {
+   "kind": 30382,
+   "description": "User Trusted Assertion",
+   "nips": [
+    "85"
+   ]
+  },
+  {
+   "kind": 30383,
+   "description": "Event Trusted Assertion",
+   "nips": [
+    "85"
+   ]
+  },
+  {
+   "kind": 30384,
+   "description": "Addressable Trusted Assertion",
+   "nips": [
+    "85"
+   ]
+  },
+  {
+   "kind": 30402,
+   "description": "Classified Listing",
+   "nips": [
+    "99"
+   ]
+  },
+  {
+   "kind": 30403,
+   "description": "Draft Classified Listing",
+   "nips": [
+    "99"
+   ]
+  },
+  {
+   "kind": 30617,
+   "description": "Repository announcements",
+   "nips": [
+    "34"
+   ]
+  },
+  {
+   "kind": 30618,
+   "description": "Repository state announcements",
+   "nips": [
+    "34"
+   ]
+  },
+  {
+   "kind": 30818,
+   "description": "Wiki article",
+   "nips": [
+    "54"
+   ]
+  },
+  {
+   "kind": 30819,
+   "description": "Redirects",
+   "nips": [
+    "54"
+   ]
+  },
+  {
+   "kind": 31234,
+   "description": "Draft Event",
+   "nips": [
+    "37"
+   ]
+  },
+  {
+   "kind": 31922,
+   "description": "Date-Based Calendar Event",
+   "nips": [
+    "52"
+   ]
+  },
+  {
+   "kind": 31923,
+   "description": "Time-Based Calendar Event",
+   "nips": [
+    "52"
+   ]
+  },
+  {
+   "kind": 31924,
+   "description": "Calendar",
+   "nips": [
+    "52"
+   ]
+  },
+  {
+   "kind": 31925,
+   "description": "Calendar Event RSVP",
+   "nips": [
+    "52"
+   ]
+  },
+  {
+   "kind": 31989,
+   "description": "Handler recommendation",
+   "nips": [
+    "89"
+   ]
+  },
+  {
+   "kind": 31990,
+   "description": "Handler information",
+   "nips": [
+    "89"
+   ]
+  },
+  {
+   "kind": 32267,
+   "description": "Software Application",
+   "nips": []
+  },
+  {
+   "kind": 33534,
+   "description": "Role Definition",
+   "nips": [
+    "43"
+   ]
+  },
+  {
+   "kind": 34235,
+   "description": "Addressable Video Event",
+   "nips": [
+    "71"
+   ]
+  },
+  {
+   "kind": 34236,
+   "description": "Addressable Short Video Event",
+   "nips": [
+    "71"
+   ]
+  },
+  {
+   "kind": 34550,
+   "description": "Community Definition",
+   "nips": [
+    "72"
+   ]
+  },
+  {
+   "kind": 34128,
+   "description": "Legacy nsite manifest",
+   "nips": [
+    "5A"
+   ]
+  },
+  {
+   "kind": 35128,
+   "description": "Named nsite manifest",
+   "nips": [
+    "5A"
+   ]
+  },
+  {
+   "kind": 38000,
+   "description": "Mint Recommendation",
+   "nips": [
+    "87"
+   ]
+  },
+  {
+   "kind": 38172,
+   "description": "Cashu Mint Announcement",
+   "nips": [
+    "87"
+   ]
+  },
+  {
+   "kind": 38173,
+   "description": "Fedimint Announcement",
+   "nips": [
+    "87"
+   ]
+  },
+  {
+   "kind": 37516,
+   "description": "Geocache Listing",
+   "nips": [
+    "CC"
+   ]
+  },
+  {
+   "kind": 37517,
+   "description": "Geocache Curation List",
+   "nips": [
+    "CC"
+   ]
+  },
+  {
+   "kind": 38383,
+   "description": "Peer-to-peer Order events",
+   "nips": [
+    "69"
+   ]
+  },
+  {
+   "kind": 39000,
+   "to": 39009,
+   "description": "Group metadata events",
+   "nips": [
+    "29"
+   ]
+  },
+  {
+   "kind": 39089,
+   "description": "Starter packs",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 39092,
+   "description": "Media starter packs",
+   "nips": [
+    "51"
+   ]
+  },
+  {
+   "kind": 39701,
+   "description": "Web bookmarks",
+   "nips": [
+    "B0"
+   ]
+  }
+ ],
+ "messages": [
+  {
+   "type": "EVENT",
+   "direction": "client-to-relay",
+   "description": "used to publish events",
+   "nips": [
+    "01"
+   ]
+  },
+  {
+   "type": "REQ",
+   "direction": "client-to-relay",
+   "description": "used to request events and subscribe to new updates",
+   "nips": [
+    "01"
+   ]
+  },
+  {
+   "type": "CLOSE",
+   "direction": "client-to-relay",
+   "description": "used to stop previous subscriptions",
+   "nips": [
+    "01"
+   ]
+  },
+  {
+   "type": "AUTH",
+   "direction": "client-to-relay",
+   "description": "used to send authentication events",
+   "nips": [
+    "42"
+   ]
+  },
+  {
+   "type": "COUNT",
+   "direction": "client-to-relay",
+   "description": "used to request event counts",
+   "nips": [
+    "45"
+   ]
+  },
+  {
+   "type": "EOSE",
+   "direction": "relay-to-client",
+   "description": "used to notify clients all stored events have been sent",
+   "nips": [
+    "01"
+   ]
+  },
+  {
+   "type": "EVENT",
+   "direction": "relay-to-client",
+   "description": "used to send events requested to clients",
+   "nips": [
+    "01"
+   ]
+  },
+  {
+   "type": "NOTICE",
+   "direction": "relay-to-client",
+   "description": "used to send human-readable messages to clients",
+   "nips": [
+    "01"
+   ]
+  },
+  {
+   "type": "OK",
+   "direction": "relay-to-client",
+   "description": "used to notify clients if an EVENT was successful",
+   "nips": [
+    "01"
+   ]
+  },
+  {
+   "type": "CLOSED",
+   "direction": "relay-to-client",
+   "description": "used to notify clients that a REQ was ended and why",
+   "nips": [
+    "01"
+   ]
+  },
+  {
+   "type": "AUTH",
+   "direction": "relay-to-client",
+   "description": "used to send authentication challenges",
+   "nips": [
+    "42"
+   ]
+  },
+  {
+   "type": "COUNT",
+   "direction": "relay-to-client",
+   "description": "used to send requested event counts to clients",
+   "nips": [
+    "45"
+   ]
+  },
+  {
+   "type": "NEG-OPEN",
+   "direction": "client-to-relay",
+   "description": "Initial message",
+   "nips": [
+    "77"
+   ]
+  },
+  {
+   "type": "NEG-ERR",
+   "direction": "relay-to-client",
+   "description": "Error message",
+   "nips": [
+    "77"
+   ]
+  },
+  {
+   "type": "NEG-MSG",
+   "direction": "client-to-relay",
+   "description": "Subsequent messages",
+   "nips": [
+    "77"
+   ]
+  },
+  {
+   "type": "NEG-MSG",
+   "direction": "relay-to-client",
+   "description": "Subsequent messages",
+   "nips": [
+    "77"
+   ]
+  },
+  {
+   "type": "NEG-CLOSE",
+   "direction": "client-to-relay",
+   "description": "Close message",
+   "nips": [
+    "77"
+   ]
+  }
+ ]
+}

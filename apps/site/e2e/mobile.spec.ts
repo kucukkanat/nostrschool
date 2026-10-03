@@ -36,6 +36,14 @@ const PAGES = [
   "tools/filter-playground",
   "tools/kinds",
   "glossary",
+  "nips",
+  // One NIP per editor variant: event, encoding, document, message, http, process.
+  "nips/01",
+  "nips/19",
+  "nips/11",
+  "nips/45",
+  "nips/98",
+  "nips/07",
 ] as const;
 
 const VIEWPORTS = [
@@ -262,6 +270,7 @@ for (const vp of VIEWPORTS) {
         for (const id of [
           "nav-learn",
           "nav-tools",
+          "nav-nips",
           "nav-glossary",
           "live-toggle",
           "theme-toggle",

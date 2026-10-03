@@ -12,6 +12,8 @@ optional read-only **live mode** points the same widgets at public relays.
 - WCAG 2.1 AA checked with axe in E2E; every widget is keyboard operable and narrated
 - A glossary with hover cards, standalone tools (`/tools/keys`, `event-inspector`,
   `filter-playground`, `kinds`), and Nos the ostrich as a guide
+- A NIP reference (`/nips/`): search every NIP by meaning or keyword, filter and browse, and
+  open any NIP in an editor that shows, validates and explains the JSON it defines (see below)
 
 See [PLAN.md](./PLAN.md) for the product plan and [CONTRACTS.md](./CONTRACTS.md) for package APIs,
 conventions and ownership.
@@ -42,6 +44,8 @@ bun run dev        # http://localhost:4321/understanding-nostr/en/
 | `bun run test:e2e` | Build, then Playwright against the preview server + an in-memory test relay (4 projects: desktop, dark, reduced motion, mobile) |
 | `bun run tokens` | Regenerate CSS/TS from the design tokens |
 | `bun run snapshot:ecosystem` | Refresh chapter 11's ecosystem data (see below) |
+| `bun run snapshot:nips` | Refresh the NIP reference corpus from nostr-protocol/nips (`-- --commit <sha>` to pin) |
+| `bun run embed:nips` | Rebuild the NIP search embeddings (after a NIP snapshot) |
 
 Unit/integration and E2E are deliberately separate commands. Scoped runs:
 
@@ -67,6 +71,48 @@ with the raw error in `lastError`. That error is only for maintainers and is nev
 previous snapshot itself is unreadable or invalid, the script exits with code 1 instead of
 silently starting from scratch. Review the diff and commit the JSON.
 
+## The NIP reference
+
+`/<locale>/nips/` lists every NIP in the pinned snapshot (99 at
+`0046368a`): a static list that works without JavaScript, upgraded to instant keyword search,
+search by meaning, filters (status, what it defines, kind, relay, has an editor, taught in the
+course), sort and grid/list layouts, all mirrored in the query string (`?q=zaps&status=final`).
+Query shortcuts: `57`, `nip-5a`, `kind:9735` or `kind 9735`, a bare registered kind (`9735`),
+`#imeta`, and upper-case wire messages (`AUTH`, `NEG-OPEN`).
+
+`/<locale>/nips/<id>/` shows one NIP: facts (status, kinds, tags, messages, related NIPs,
+chapters that teach it), an interactive editor, and the specification text below it. The editor
+is driven by a hand-written `NipSpec` per NIP (`packages/nips/src/specs/nip-<id>.ts`):
+
+- **Form | JSON | Explain**: edit through typed inputs (relay URLs, pubkeys, kinds, timestamps,
+  tag rows from templates) or directly in CodeMirror; both stay in sync. Validation runs on
+  every change, lints the JSON in place, and each issue jumps to its field.
+- **Explain** describes whatever the cursor is on (tag, field, content) in plain words.
+- **How it works** walks through the NIP step by step and highlights the JSON each step talks
+  about; flows chain parts (zap request → receipt).
+- Events are signed with demo persona keys, never a real nsec; the state is shareable via
+  `#edit=…`.
+
+Every NIP has a spec (99, none left as `todo`): event 76, process 8, encoding 5, message 5, http 3, document 2 (variant =
+what the NIP primarily defines; some add secondary parts such as NIP-42's kind 22242 event).
+
+### Refreshing the NIP snapshot and search model
+
+```bash
+bun run snapshot:nips -- --commit <sha>   # clone nostr-protocol/nips → packages/nips/src/data/{corpus,index}.json
+bun test packages/nips                    # new NIP ids fail until they get a spec + strings
+bun run embed:nips                        # re-embed passages with the same model (needed after a snapshot or summary edit)
+bun run embed:nips -- --check             # CI-style: exits 1 when model files or embeddings are stale
+```
+
+**Model hosting.** Search by meaning runs `Xenova/all-MiniLM-L6-v2` (quantized ONNX) in a Web
+Worker on the visitor's device. The model (~23 MB) and the CPU-only ONNX runtime wasm (~14 MB)
+are committed under `apps/site/public/models/` and served from the site itself: no third-party
+network calls, `allowRemoteModels = false`. `embed:nips` downloads missing model files once at a
+pinned revision (SHA-256 checked) and embeds with the same model in Bun, so query and passage
+vectors match. The model loads on first search or focus, never on page load, and is skipped
+offline or with Save-Data; keyword search always works.
+
 ## Architecture
 
 A Bun-workspace monorepo. Packages are scoped `@nostrschool/*`, and under Bun's isolated linker a
@@ -85,8 +131,11 @@ packages/ui          Svelte 5 primitives (Term, Quiz, Drawer, Tabs, JsonView, Vi
 packages/diagrams    Animated protocol diagrams (SequenceDiagram, Swimlane, Pipeline, ForceGraph, Packet)
 packages/charts      Token-themed, keyboard-explorable charts (bar, line, donut, treemap, stat tile)
 packages/mascot      Nos the ostrich: Rive when an asset is present, SVG otherwise
+packages/nips        NIP corpus snapshot, NipSpec schema + one spec per NIP, validator, browse helpers
+packages/nip-search  Hybrid NIP search: instant keyword + on-device semantic (self-hosted model)
+packages/nip-editor  Spec-driven NIP editor: form, CodeMirror JSON with lint, explanations, walkthrough
 tooling/             bun test preload (happy-dom + Svelte compiler plugin)
-scripts/             Build-time scripts (ecosystem snapshot)
+scripts/             Build-time scripts (ecosystem and NIP snapshots, NIP embeddings)
 ```
 
 How a page is built: an MDX chapter (`apps/site/src/content/chapters/<locale>/NN-slug.mdx`)

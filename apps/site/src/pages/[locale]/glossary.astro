@@ -14,6 +14,7 @@ import {
   getGlossary,
   LOCALE_TAGS,
 } from "@nostrschool/i18n";
+import { NIP_IDS } from "@nostrschool/nips";
 import { nipUrl } from "@nostrschool/protocol";
 import BaseLayout from "~/layouts/BaseLayout.astro";
 import { CHAPTERS } from "~/lib/chapters";
@@ -196,8 +197,9 @@ const chapterLabel = (c: (typeof CHAPTERS)[number]) =>
                         {entry.nips.map((n) => (
                           <a
                             class="pill"
-                            href={nipUrl(n)}
-                            rel="external noopener"
+                            {...(NIP_IDS.includes(n)
+                              ? { href: href(locale, `nips/${n}`) }
+                              : { href: nipUrl(n), rel: "external noopener" })}
                             data-testid={`glossary-term-${id}-nip-${n}`}
                           >
                             NIP-{n}

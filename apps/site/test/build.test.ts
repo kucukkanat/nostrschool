@@ -5,6 +5,7 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { NIP_IDS } from "@nostrschool/nips";
 import { CHAPTERS } from "../src/lib/chapters.ts";
 
 const dist = join(import.meta.dir, "..", "dist");
@@ -32,6 +33,17 @@ describe.skipIf(!hasDist)("built site", () => {
     const html = page("es");
     expect(html).toContain('<html lang="es-ES"');
     expect(html).toContain('href="/understanding-nostr/es/learn/"');
+  });
+  test.each(["en", "es"])("the %s NIP reference lists and renders every NIP", (locale) => {
+    const list = page(`${locale}/nips`);
+    for (const id of NIP_IDS) {
+      expect(list).toContain(`data-testid="nips-item-${id}"`);
+      const html = page(`${locale}/nips/${id}`);
+      expect(html).toContain('data-testid="nip-title"');
+      expect(html).toContain('data-testid="nip-spec"');
+    }
+    // Spec cross-links stay on the site (NIP-17 links NIP-44 and NIP-59).
+    expect(page(`${locale}/nips/17`)).toContain(`href="/understanding-nostr/${locale}/nips/44/"`);
   });
   test("404 and sitemap exist", () => {
     expect(existsSync(join(dist, "404.html"))).toBe(true);

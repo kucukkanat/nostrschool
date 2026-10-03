@@ -18,12 +18,15 @@
     "test:coverage": "bun test --coverage",
     "test:e2e": "bun run build && bun run --cwd apps/site test:e2e",
     "snapshot:ecosystem": "bun run scripts/snapshot-ecosystem.ts",
+    "snapshot:nips": "bun run scripts/snapshot-nips.ts",
+    "embed:nips": "bun run scripts/embed-nips.ts",
     "brand:images": "bun run scripts/brand-images.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@biomejs/biome": "^2.5.15",
     "@happy-dom/global-registrator": "^20.14.5",
+    "@huggingface/transformers": "^4.3.0",
     "@playwright/test": "^1.63.0",
     "@testing-library/svelte": "^5.4.2",
     "@types/bun": "^1.4.2",
