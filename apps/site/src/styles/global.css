@@ -1,7 +1,8 @@
-/* Owner: shell agent. Global element styles — tokens only, no raw values. */
+/* Owner: brand/shell. Global element styles — tokens only, no raw values.
+   Brand: "riso field notebook" — paper, ink lines, hard offset shadows, one fluorescent orange. */
 @import "@nostrschool/tokens/tokens.css";
-@import "@fontsource-variable/fredoka";
-@import "@fontsource-variable/nunito";
+/* opsz.css = weight + optical-size axes, so big headings get Bricolage's tighter display cut. */
+@import "@fontsource-variable/bricolage-grotesque/opsz.css";
 @import "@fontsource-variable/jetbrains-mono";
 
 *,
@@ -14,6 +15,23 @@
   /* Height of the sticky one-row site header (row + bottom border). Anything that scrolls to an
      anchor or sticks below the header offsets by this. */
   --size-header: calc(var(--size-control-md) + var(--space-md) + var(--border-width-medium));
+  /* How far a pressed control travels: exactly the --shadow-pop offset (3px), so the shadow
+     collapses under it. Aliased here until the tokens package has a pop-offset size. */
+  --size-press: var(--border-width-thick);
+  /* Highlighter fill for marked text (always set in --color-on-highlight). On paper it is the
+     partial swipe; on dark paper the swipe would leave ink ascenders on a dark page, so the
+     whole line box is filled instead (overridden below). */
+  --highlight-fill: var(--pattern-highlight);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --highlight-fill: var(--color-highlight);
+  }
+}
+
+:root[data-theme="dark"] {
+  --highlight-fill: var(--color-highlight);
 }
 
 html {
@@ -21,19 +39,51 @@ html {
   scroll-padding-block-start: calc(var(--size-header) + var(--space-sm));
   font-family: var(--font-family-body);
   font-size: 100%;
+  font-optical-sizing: auto;
   line-height: var(--font-line-height-normal);
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Long npubs/hex ids must never push the page sideways on phones. Clipping on <html> too,
+     because on mobile an over-wide descendant otherwise widens the layout viewport that fixed
+     elements (the header sheet) are sized against. */
+  overflow-wrap: break-word;
+  overflow-x: clip;
 }
 
 body {
   display: flex;
   flex-direction: column;
   margin: 0;
-  min-height: 100vh;
-  background: var(--color-bg);
+  min-block-size: 100dvh;
+  overflow-x: clip;
+  /* Transparent so the grain layer (z-index below content) shows; <html> paints the paper. */
+  background: transparent;
   color: var(--color-text);
+}
+
+/* Paper grain: a fixed, non-interactive speckle layer. A mask (not an image) so the speckle
+   colour follows the theme. It sits under all content (negative z-index, body has no stacking
+   context), so cards and code blocks stay clean. Off in print and under reduced data. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-base) - 1);
+  pointer-events: none;
+  background-color: var(--color-grain);
+  opacity: var(--opacity-grain);
+  -webkit-mask-image: var(--pattern-grain);
+  mask-image: var(--pattern-grain);
+  -webkit-mask-size: var(--size-grain-tile);
+  mask-size: var(--size-grain-tile);
+}
+
+@media (prefers-reduced-data: reduce) {
+  body::before {
+    display: none;
+  }
 }
 
 h1,
@@ -43,25 +93,101 @@ h4 {
   font-family: var(--font-family-display);
   line-height: var(--font-line-height-tight);
   font-weight: var(--font-weight-bold);
+  letter-spacing: var(--font-letter-spacing-tight);
+  text-wrap: balance;
 }
 
+h1 {
+  font-weight: var(--font-weight-black);
+  letter-spacing: var(--font-letter-spacing-display);
+}
+
+p,
+li {
+  text-wrap: pretty;
+}
+
+/* Links: accent-ink text, underline thickens on hover. */
 a {
   color: var(--color-text-primary);
+  text-decoration-line: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: var(--border-width-medium);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-thickness var(--motion-duration-fast) var(--motion-easing-standard);
+}
+
+a:hover {
+  text-decoration-thickness: var(--border-width-thick);
 }
 
 code,
 pre,
-kbd {
+kbd,
+samp {
   font-family: var(--font-family-mono);
+  font-variant-ligatures: none;
+}
+
+pre {
+  max-inline-size: 100%;
+  overflow-x: auto;
+}
+
+kbd {
+  padding: 0 var(--space-2xs);
+  border: var(--border-width-medium) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  background: var(--color-surface-raised);
+  font-size: 0.9em;
+}
+
+hr {
+  block-size: 0;
+  margin-block: var(--space-xl);
+  border: 0;
+  border-block-start: var(--border-width-medium) dashed var(--color-border-strong);
 }
 
 ::selection {
   background: var(--color-selection);
+  color: var(--color-text);
 }
 
+/* Ring + offset: the gap shows the page, so the ring separates from fills too (tokens test it). */
 :focus-visible {
   outline: var(--border-width-thick) solid var(--color-focus-ring);
-  outline-offset: var(--space-3xs);
+  outline-offset: var(--size-focus-offset);
+}
+
+/* ── Brand marks ───────────────────────────────────────────────────────────────────────────── */
+
+/* Highlighter swipe behind a phrase: `<mark>` or `<span class="highlight">`. */
+mark,
+.highlight {
+  padding-inline: 0.15em;
+  margin-inline: -0.05em;
+  background: var(--highlight-fill);
+  color: var(--color-on-highlight);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Halftone dot fill for illustrations and empty states. */
+.halftone {
+  background-image: var(--pattern-halftone);
+  background-size: var(--size-halftone-cell) var(--size-halftone-cell);
+}
+
+/* Small-caps label used for eyebrows ("Chapter 03", "Field note"). */
+.eyebrow {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--font-letter-spacing-caps);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 /* The one screen-reader-only rule for the site (ui's <VisuallyHidden> mirrors it): chapter
@@ -130,8 +256,20 @@ main {
 }
 
 img,
-svg {
+svg,
+video,
+canvas {
   max-inline-size: 100%;
+}
+
+img,
+video {
+  block-size: auto;
+}
+
+/* Tables scroll inside themselves instead of widening the page on phones. */
+table {
+  border-collapse: collapse;
 }
 
 /* ── Chapter prose (MDX output is not scoped, so it is styled here). */
@@ -147,6 +285,9 @@ svg {
 .prose h2 {
   margin-block-start: var(--space-2xl);
   font-size: var(--font-size-3xl);
+  /* Editorial rule above section headings, like a notebook page break. */
+  padding-block-start: var(--space-sm);
+  border-block-start: var(--border-width-medium) solid var(--color-border-strong);
 }
 
 .prose h3 {
@@ -159,19 +300,81 @@ svg {
   border-radius: var(--radius-sm);
   background: var(--color-code-bg);
   color: var(--color-code-text);
-  font-size: var(--font-size-md);
+  font-size: 0.88em;
+  overflow-wrap: anywhere;
+}
+
+/* Tables already scroll inside themselves, so keywords like CLOSED must not break mid-word. */
+.prose td code,
+.prose th code {
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
 
 .prose blockquote {
   margin-inline: 0;
   padding-inline-start: var(--space-md);
-  border-inline-start: var(--border-width-thick) solid var(--color-primary);
+  border-inline-start: var(--border-width-thick) solid var(--color-text-primary);
   color: var(--color-text-muted);
 }
 
-.prose a {
-  text-decoration-thickness: var(--border-width-thin);
-  text-underline-offset: var(--space-3xs);
+.prose table {
+  display: block;
+  max-inline-size: 100%;
+  overflow-x: auto;
+  font-size: var(--font-size-md);
+}
+
+.prose th,
+.prose td {
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--border-width-thin) solid var(--color-border-strong);
+  text-align: start;
+}
+
+.prose th {
+  background: var(--color-surface);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Phones: slightly smaller prose so lines keep ~45–60 characters at 360px. */
+@media (max-width: 479px) {
+  /* 479 = tokens.breakpoint.sm - 1 */
+  .prose {
+    font-size: var(--font-size-md);
+    line-height: var(--font-line-height-normal);
+  }
+}
+
+/* ── Print: ink on white, no textures, no shadows, URLs after links. */
+@media print {
+  :root {
+    --color-bg: var(--color-surface-raised);
+    --color-surface: var(--color-surface-raised);
+  }
+  body::before {
+    display: none;
+  }
+  *,
+  *::before,
+  *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  .prose a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+  pre,
+  figure,
+  table {
+    break-inside: avoid;
+  }
+  h2,
+  h3 {
+    break-after: avoid;
+  }
 }
 
 .prose ul,

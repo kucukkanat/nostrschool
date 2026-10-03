@@ -185,7 +185,7 @@
   }
   .side:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
   }
   .scroll {
     overflow-x: auto;
@@ -237,17 +237,30 @@
   .show {
     min-block-size: var(--size-touch-target);
     padding: var(--space-2xs) var(--space-sm);
-    border: var(--border-width-medium) solid var(--color-primary);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface);
-    color: var(--color-text-primary);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
+    color: var(--color-text);
     font: inherit;
     font-weight: var(--font-weight-semibold);
     cursor: pointer;
+    box-shadow: var(--shadow-pop-sm);
+    transition:
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
+  }
+  .show:hover {
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .show:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
   .show[aria-pressed="true"] {
     background: var(--color-primary);
     color: var(--color-on-primary);
+    box-shadow: var(--shadow-accent);
   }
   .show:focus-visible,
   .back:focus-visible,
@@ -260,5 +273,13 @@
     padding: var(--space-md);
     text-align: center;
     color: var(--color-text-muted);
+  }
+  /* Touch screens: inline NIP links grow to a finger-sized hit area. */
+  @media (pointer: coarse) {
+    a {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--size-touch-target);
+    }
   }
 </style>

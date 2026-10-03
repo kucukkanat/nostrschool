@@ -219,7 +219,7 @@
     gap: var(--space-sm);
     margin-block: var(--space-lg);
     padding: var(--space-md);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-surface-sunken);
     min-block-size: var(--size-diagram-min-height);
   }
@@ -252,15 +252,22 @@
     cursor: pointer;
     transition:
       background-color var(--motion-duration-fast) var(--motion-easing-standard),
-      transform var(--motion-duration-fast) var(--motion-easing-bounce);
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .cat:hover {
-    transform: translateY(calc(-1 * var(--space-3xs)));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .cat:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
   .cat[aria-pressed="true"] {
+    border-color: var(--color-border-strong);
     background: var(--cat-color);
     color: var(--color-on-kind);
-    box-shadow: var(--shadow-pop-sm);
+    box-shadow: var(--shadow-accent);
   }
   .cat:focus-visible,
   .slot:focus-visible {
@@ -351,7 +358,8 @@
     background: var(--color-surface);
   }
   .shelf {
-    border: var(--border-width-thick) solid var(--cat-color);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    box-shadow: inset var(--border-width-thick) 0 0 var(--cat-color);
   }
   .feed {
     border: var(--border-width-medium) dashed var(--color-border-strong);

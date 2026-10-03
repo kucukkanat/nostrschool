@@ -138,7 +138,6 @@
             aria-label={peek ? t.hideLabel : t.peekLabel}
             onclick={() => (peek = !peek)}
           >
-            <span aria-hidden="true">{peek ? "🙈" : "👀"}</span>
             {peek ? t.hide : t.peek}
           </button>
         </div>
@@ -303,8 +302,8 @@
     gap: var(--space-md);
     min-height: var(--size-diagram-min-height);
     padding: var(--space-lg);
-    border: var(--border-width-thick) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-pop);
     min-inline-size: 0;
@@ -395,24 +394,33 @@
     min-height: var(--size-touch-target);
     padding: 0 var(--space-sm);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
     color: var(--color-text);
     font-family: var(--font-family-display);
     font-size: var(--font-size-sm);
     cursor: pointer;
+    box-shadow: var(--shadow-pop-sm);
     transition:
       background-color var(--motion-duration-fast) var(--motion-easing-standard),
-      transform var(--motion-duration-normal) var(--motion-easing-bounce);
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .peek:hover,
   .target:hover {
-    transform: translateY(calc(-1 * var(--space-3xs)));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
   }
+  .peek:active,
+  .target:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
+  }
+  /* Selected = orange fill + ink line + orange misregistration; never orange as the line itself. */
   .target[aria-pressed="true"] {
     background: var(--color-primary);
-    border-color: var(--color-primary);
     color: var(--color-on-primary);
+    box-shadow: var(--shadow-accent);
   }
   .peek:focus-visible,
   .target:focus-visible {
@@ -479,6 +487,7 @@
       transform var(--motion-duration-fast) var(--motion-easing-bounce);
   }
   .byte.active {
+    outline: var(--border-width-medium) solid var(--color-border-strong);
     background: var(--color-primary);
     color: var(--color-on-primary);
     transform: translateY(calc(-1 * var(--space-3xs)));
@@ -543,6 +552,7 @@
       transform var(--motion-duration-normal) var(--motion-easing-bounce);
   }
   .letter.hit {
+    outline: var(--border-width-medium) solid var(--color-border-strong);
     background: var(--color-accent);
     transform: scale(1.15);
   }
@@ -607,5 +617,11 @@
     font-size: var(--font-size-sm);
     /* Narration interpolates whole npub/nsec strings, which have no break opportunities. */
     overflow-wrap: anywhere;
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .forge {
+      padding: var(--space-md);
+    }
   }
 </style>

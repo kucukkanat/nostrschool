@@ -78,7 +78,7 @@
             use:pop
           >
             <span aria-hidden="true"
-              >{verdict === "danger" ? "🚨" : verdict === "safe" ? "✓" : "ℹ"}</span
+              >{verdict === "danger" ? "!" : verdict === "safe" ? "✓" : "ℹ"}</span
             >
             {t.verdicts[verdict]}
             {t.explain[request.asks]}
@@ -100,8 +100,8 @@
     display: grid;
     gap: var(--space-sm);
     padding: var(--space-lg);
-    border: var(--border-width-thick) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-pop-sm);
   }
@@ -142,10 +142,10 @@
       transform var(--motion-duration-normal) var(--motion-easing-bounce);
   }
   .card[data-verdict="safe"] {
-    border-color: var(--color-success-solid);
+    border-color: var(--color-success);
   }
   .card[data-verdict="danger"] {
-    border-color: var(--color-danger-solid);
+    border-color: var(--color-danger);
   }
   .card[data-verdict="overcautious"] {
     border-color: var(--color-info);
@@ -195,5 +195,11 @@
     font-family: var(--font-family-display);
     font-weight: var(--font-weight-bold);
     color: var(--color-text);
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .guard {
+      padding: var(--space-md);
+    }
   }
 </style>

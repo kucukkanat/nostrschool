@@ -11,7 +11,7 @@ takeaways:
   - "La solicitud de zap viaja por HTTP al servidor de la wallet, nunca a los relays; solo el recibo se publica en los relays."
   - "Las apps verifican la firma del recibo, quién lo firmó (el nostrPubkey de la wallet) y el monto de la factura antes de contarlo."
   - "Un recibo de zap es la palabra del servidor de la wallet, no una prueba de pago: confías en el proveedor de wallet de quien recibe."
-mascotIntro: "¿Listo para lanzar unos rayos? ⚡ ¡Sigamos una propina desde un toque hasta un contador brillante!"
+mascotIntro: "Sigamos una propina desde un solo toque, pasando por un servidor de wallet, Lightning y los relays, hasta el contador ⚡ de una publicación."
 ---
 import Term from "~/components/shell/Term.astro";
 import { Callout, Drawer, Quiz } from "@nostrschool/ui";
@@ -157,7 +157,7 @@ const { pr: invoice } = await (await fetch(url)).json();
 La wallet de Alice paga la factura por Lightning. Los relays no ven nada de esto: es Lightning puro.
 Cuando llega el pago, el servidor de la wallet de Erin escribe un **recibo de zap** (kind 9735), lo
 firma con su `nostrPubkey` y lo publica en los relays que indicó Alice. Cada app que carga la
-publicación de Erin encuentra el recibo, lo verifica y suma ⚡ 2.100 al contador. 🎉
+publicación de Erin encuentra el recibo, lo verifica y suma ⚡ 2.100 al contador.
 
 <Drawer client:visible testid="ch09-uth-receipt" locale="es" title="Bajo el capó: el recibo del zap">
 

@@ -38,18 +38,22 @@ const t = getDictionary(locale).common;
     padding-block: var(--space-2xl);
     text-align: center;
   }
+  /* A rubber stamp, slightly crooked, printed off-register in orange. */
   .code {
     margin: 0;
-    font-family: var(--font-family-display);
+    padding: 0 var(--space-md);
+    border: var(--border-width-thick) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-mono);
     font-size: var(--font-size-6xl);
-    font-weight: var(--font-weight-black);
+    font-weight: var(--font-weight-bold);
     line-height: var(--font-line-height-tight);
-    color: var(--color-text-primary);
+    box-shadow: var(--shadow-accent);
     rotate: -4deg;
   }
   h1 {
-    margin: 0;
-    font-size: var(--font-size-3xl);
+    margin: var(--space-md) 0 0;
+    font-size: var(--font-size-4xl);
   }
   .body {
     margin: 0;
@@ -60,21 +64,36 @@ const t = getDictionary(locale).common;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
     gap: var(--space-md);
     margin-block-start: var(--space-md);
   }
   .links a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--size-touch-target);
     color: var(--color-text);
     font-family: var(--font-family-display);
     font-weight: var(--font-weight-bold);
   }
   .links .home {
-    padding: var(--space-xs) var(--space-lg);
-    border: var(--border-width-thick) solid var(--color-text);
-    border-radius: var(--radius-pill);
+    padding: 0 var(--space-lg);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
     background: var(--color-primary);
     color: var(--color-on-primary);
     text-decoration: none;
     box-shadow: var(--shadow-pop);
+    transition:
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
+  }
+  .links .home:hover {
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .links .home:active {
+    translate: var(--size-press) var(--size-press);
+    box-shadow: var(--shadow-pressed);
   }
 </style>

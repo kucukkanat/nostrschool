@@ -1,8 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { CHAPTERS } from "~/lib/chapters";
 import {
-  courseStops,
-  curvePath,
   HERO_EDGES,
   HERO_NODES,
   lerp,
@@ -181,27 +179,6 @@ describe("geometry", () => {
     expect(readingProgress({ scrollTop: 5000, scrollHeight: 2000, clientHeight: 1000 })).toBe(1);
     expect(readingProgress({ scrollTop: 0, scrollHeight: 800, clientHeight: 1000 })).toBe(1);
     expect(readingProgress({ scrollTop: Number.NaN, scrollHeight: 2000, clientHeight: 1 })).toBe(0);
-  });
-
-  test("courseStops zigzag around the centre, one row each", () => {
-    expect(courseStops(5, 20)).toEqual([
-      { x: 50, y: 0.5 },
-      { x: 70, y: 1.5 },
-      { x: 50, y: 2.5 },
-      { x: 30, y: 3.5 },
-      { x: 50, y: 4.5 },
-    ]);
-    expect(courseStops(-2)).toEqual([]);
-  });
-
-  test("curvePath starts with a move and joins with cubic curves", () => {
-    expect(curvePath([])).toBe("");
-    expect(
-      curvePath([
-        { x: 50, y: 0.5 },
-        { x: 70, y: 1.5 },
-      ]),
-    ).toBe("M 50 0.5 C 50 1 70 1 70 1.5");
   });
 
   test("lerp and loopPhase", () => {

@@ -14,6 +14,7 @@ const title = dict.common.tools.kinds;
 ---
 
 <BaseLayout locale={locale} title={title} description={dict.chapters.ch06.tool.intro}>
+  <p class="eyebrow" data-testid="tool-eyebrow">{dict.common.tools.title}</p>
   <h1 data-testid="tool-title">{title}</h1>
   <p class="lede">
     <a href={href(locale, "learn/kinds")} data-testid="tool-chapter-link"
@@ -28,8 +29,15 @@ const title = dict.common.tools.kinds;
 <style>
   h1 {
     margin: 0 0 var(--space-xs);
+    font-family: var(--font-family-display);
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-black);
+    letter-spacing: var(--font-letter-spacing-display);
+    line-height: var(--font-line-height-tight);
+    color: var(--color-text);
+  }
+  .eyebrow {
+    margin: 0 0 var(--space-2xs);
   }
   .lede {
     margin: 0 0 var(--space-lg);

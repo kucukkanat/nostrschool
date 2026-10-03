@@ -387,8 +387,8 @@
     gap: var(--space-md);
     min-height: var(--size-diagram-min-height);
     padding: var(--space-lg);
-    border: var(--border-width-thick) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-pop);
   }
@@ -519,9 +519,10 @@
   .down .cross {
     opacity: 1;
   }
+  /* Orange is a fill only (2.7:1 on paper): the ink outline carries the shape. */
   .user .body {
     fill: var(--color-primary);
-    stroke: var(--color-primary-active);
+    stroke: var(--color-border-strong);
   }
   .initial {
     fill: var(--color-on-primary);
@@ -611,6 +612,7 @@
   .bar {
     display: block;
     block-size: var(--space-xs);
+    border: var(--border-width-thin) solid var(--color-border-strong);
     border-radius: var(--radius-pill);
     background: var(--color-surface-sunken);
     overflow: hidden;
@@ -625,11 +627,11 @@
   }
   .meter-fill.verdict-degraded,
   .voice-partial .bar-fill {
-    background: var(--color-warning);
+    background: var(--color-warning-solid);
   }
   .meter-fill.verdict-collapsed,
   .voice-silenced .bar-fill {
-    background: var(--color-danger);
+    background: var(--color-danger-solid);
   }
   .verdict {
     margin: 0;
@@ -685,6 +687,7 @@
     place-items: center;
     inline-size: var(--size-avatar-sm);
     block-size: var(--size-avatar-sm);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-round);
     background: var(--color-primary);
     color: var(--color-on-primary);
@@ -718,5 +721,11 @@
     background: var(--color-info-subtle);
     color: var(--color-text);
     font-size: var(--font-size-sm);
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .sandbox {
+      padding: var(--space-md);
+    }
   }
 </style>

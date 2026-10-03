@@ -79,10 +79,10 @@
     flex-direction: column;
     gap: var(--space-xs);
     padding: var(--space-md);
-    border: var(--border-width-medium) solid var(--color-primary);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-lg);
     background: var(--color-surface);
-    box-shadow: var(--shadow-pop-sm);
+    box-shadow: var(--shadow-accent);
   }
   .title,
   .sub {

@@ -101,10 +101,10 @@
     display: grid;
     gap: var(--space-lg);
     padding: var(--space-xl) var(--space-lg);
-    border: var(--border-width-thick) solid var(--color-primary);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-primary-subtle);
-    box-shadow: var(--shadow-pop);
+    box-shadow: var(--shadow-accent);
   }
   .hero {
     display: flex;
@@ -182,6 +182,12 @@
   @media (min-width: 768px) {
     .columns {
       grid-template-columns: 1fr 1fr;
+    }
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .finale {
+      padding: var(--space-md);
     }
   }
 </style>

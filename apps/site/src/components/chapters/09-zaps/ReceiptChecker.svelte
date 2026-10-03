@@ -190,21 +190,29 @@
     min-height: var(--size-touch-target);
     padding: var(--space-2xs) var(--space-md);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-md);
     background: var(--color-surface);
     color: var(--color-text);
     font-weight: var(--font-weight-semibold);
     cursor: pointer;
-    transition: transform var(--motion-duration-fast) var(--motion-easing-bounce);
+    box-shadow: var(--shadow-pop-sm);
+    transition:
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
+      background-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .chip:hover {
-    transform: translateY(calc(-1 * var(--space-3xs)));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .chip:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
   .chip.active {
     background: var(--color-primary);
-    border-color: var(--color-primary);
+    box-shadow: var(--shadow-accent);
     color: var(--color-on-primary);
-    box-shadow: var(--shadow-pop-sm);
   }
   .chip:has(input:focus-visible) {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
@@ -255,8 +263,9 @@
     place-items: center;
     width: var(--size-icon-md);
     height: var(--size-icon-md);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-round);
-    background: var(--color-danger);
+    background: var(--color-danger-solid);
     color: var(--color-on-danger);
     font-weight: var(--font-weight-black);
     flex: none;
@@ -277,12 +286,12 @@
     gap: var(--space-3xs);
     margin-top: var(--space-sm);
     padding: var(--space-sm);
-    border: var(--border-width-thick) solid var(--color-danger);
+    border: var(--border-width-medium) solid var(--color-danger);
     border-radius: var(--radius-md);
     background: var(--color-danger-subtle);
   }
   .verdict.valid {
-    border-color: var(--color-success-solid);
+    border-color: var(--color-success);
     background: var(--color-success-subtle);
   }
   .receipt {

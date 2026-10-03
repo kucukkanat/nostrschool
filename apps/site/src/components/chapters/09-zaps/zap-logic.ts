@@ -108,20 +108,19 @@ export interface ZapStepDef {
   readonly to?: ZapLane;
   /** Only relay traffic is a Nostr wire message; the rest is HTTP or Lightning. */
   readonly packet?: "EVENT";
-  readonly icon: string;
 }
 
 export const ZAP_STEPS: readonly ZapStepDef[] = [
-  { id: "profile", lane: "relays", to: "client", packet: "EVENT", icon: "🪪" },
-  { id: "lnurlp", lane: "client", to: "server", icon: "🚪" },
-  { id: "params", lane: "server", to: "client", icon: "🤝" },
-  { id: "sign", lane: "client", icon: "✍️" },
-  { id: "callback", lane: "client", to: "server", icon: "📨" },
-  { id: "invoice", lane: "server", to: "client", icon: "🧾" },
-  { id: "pay", lane: "client", to: "lightning", icon: "⚡" },
-  { id: "settle", lane: "lightning", to: "server", icon: "✅" },
-  { id: "receipt", lane: "server", to: "relays", packet: "EVENT", icon: "📣" },
-  { id: "tally", lane: "relays", to: "client", packet: "EVENT", icon: "🎉" },
+  { id: "profile", lane: "relays", to: "client", packet: "EVENT" },
+  { id: "lnurlp", lane: "client", to: "server" },
+  { id: "params", lane: "server", to: "client" },
+  { id: "sign", lane: "client" },
+  { id: "callback", lane: "client", to: "server" },
+  { id: "invoice", lane: "server", to: "client" },
+  { id: "pay", lane: "client", to: "lightning" },
+  { id: "settle", lane: "lightning", to: "server" },
+  { id: "receipt", lane: "server", to: "relays", packet: "EVENT" },
+  { id: "tally", lane: "relays", to: "client", packet: "EVENT" },
 ];
 
 export interface LnurlPayResponse {

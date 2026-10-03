@@ -237,28 +237,37 @@
   .chip {
     display: inline-flex;
     min-height: var(--size-touch-target);
+    min-inline-size: var(--size-touch-target);
     align-items: center;
+    justify-content: center;
     padding: var(--space-3xs);
     border: var(--border-width-medium) solid transparent;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-md);
     background: none;
     cursor: pointer;
     transition:
-      transform var(--motion-duration-fast) var(--motion-easing-bounce),
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
       border-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .chip:hover:not(:disabled) {
-    transform: translateY(calc(var(--space-3xs) * -1));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+  }
+  .chip:active:not(:disabled) {
+    translate: var(--size-lift) var(--size-lift);
   }
   .chip:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
     outline-offset: var(--space-3xs);
   }
   .chip[data-current="true"] {
-    border-color: var(--color-primary);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-accent);
   }
+  /* Not in this scenario: a dashed ink frame says so; the packet keeps full contrast (no fading). */
   .chip:disabled {
-    opacity: var(--opacity-disabled);
+    border-style: dashed;
+    border-color: var(--color-border-strong);
     cursor: not-allowed;
   }
   .stage {

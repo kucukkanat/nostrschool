@@ -85,32 +85,35 @@
     height: 100%;
     min-height: var(--size-touch-target);
     padding: var(--space-sm);
-    border: var(--border-width-medium) solid var(--color-border);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     color: var(--color-text);
     font: inherit;
     text-align: start;
     cursor: pointer;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-pop-sm);
     transition:
-      transform var(--motion-duration-normal) var(--motion-easing-bounce),
-      box-shadow var(--motion-duration-normal) var(--motion-easing-standard),
-      border-color var(--motion-duration-normal) var(--motion-easing-standard);
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
+      background-color var(--motion-duration-normal) var(--motion-easing-standard);
   }
   .face:hover {
-    transform: translateY(calc(-1 * var(--space-3xs))) rotate(-0.5deg);
-    box-shadow: var(--shadow-pop-sm);
-    border-color: var(--color-primary);
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .face:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
   .face:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
     outline-offset: var(--space-3xs);
   }
+  /* Selected: ink line stays, orange misregistration marks it. */
   .on .face {
-    border-color: var(--color-primary);
     background: var(--color-primary-subtle);
-    box-shadow: var(--shadow-pop-sm);
+    box-shadow: var(--shadow-accent);
   }
   .bad .face {
     border-color: var(--color-danger);
@@ -131,12 +134,9 @@
     color: var(--color-code-text);
     font-family: var(--font-family-mono);
     font-size: var(--font-size-xs);
+    /* Show the whole value: a clamp hid the p-tag pubkey with no way to reveal it. */
     overflow-wrap: anywhere;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    white-space: pre-wrap;
   }
   .short {
     color: var(--color-text-muted);
@@ -146,7 +146,7 @@
     align-self: flex-start;
     padding: var(--space-3xs) var(--space-xs);
     border-radius: var(--radius-pill);
-    background: var(--color-danger);
+    background: var(--color-danger-solid);
     color: var(--color-on-danger);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-bold);

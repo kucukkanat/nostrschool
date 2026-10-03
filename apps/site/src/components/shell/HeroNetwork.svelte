@@ -66,7 +66,7 @@
     {#each HERO_NODES as node (node.id)}
       <g class="node {node.kind}" transform="translate({node.x} {node.y})">
         {#if node.kind === "relay"}
-          <rect x="-6" y="-6" width="12" height="12" rx="3" />
+          <rect x="-6" y="-6" width="12" height="12" rx="1" />
           <path class="glyph" d="M-3 -1.5h6M-3 1.5h6" />
         {:else}
           <circle r="5" />
@@ -90,6 +90,7 @@
 </figure>
 
 <style>
+  /* Printed like a riso diagram: ink outlines on every fill, dashed ink links, no glow. */
   .hero-network {
     position: relative;
     margin: 0;
@@ -109,8 +110,8 @@
   }
   .node rect,
   .node circle:first-child {
-    stroke: var(--color-text);
-    stroke-width: 0.8;
+    stroke: var(--color-border-strong);
+    stroke-width: 0.9;
   }
   .relay rect {
     fill: var(--color-primary);
@@ -121,8 +122,8 @@
   .glyph {
     fill: none;
     stroke: var(--color-on-primary);
-    stroke-width: 0.8;
-    stroke-linecap: round;
+    stroke-width: 0.9;
+    stroke-linecap: square;
   }
   .user .glyph {
     stroke: var(--color-on-secondary);
@@ -131,8 +132,8 @@
     fill: var(--color-on-secondary);
   }
   .packet {
-    stroke: var(--color-text);
-    stroke-width: 0.4;
+    stroke: var(--color-border-strong);
+    stroke-width: 0.5;
   }
   .k0 {
     fill: var(--color-packet-event);
@@ -141,20 +142,32 @@
     fill: var(--color-packet-req);
   }
   .k2 {
-    fill: var(--color-accent);
+    fill: var(--color-highlight);
   }
+  /* Top-right, above the hero mascot (z-raised) that overlaps the bottom corner: the WCAG pause
+     control must stay fully visible and tappable. */
   .pause {
     position: absolute;
-    inset-block-end: 0;
+    inset-block-start: 0;
     inset-inline-end: 0;
-    min-block-size: var(--size-control-sm);
+    z-index: calc(var(--z-raised) + 1);
+    min-block-size: var(--size-touch-target);
     padding: 0 var(--space-sm);
-    border: var(--border-width-thin) solid var(--color-border-strong);
-    border-radius: var(--radius-pill);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
     background: var(--color-surface-raised);
     color: var(--color-text);
     font: inherit;
+    font-family: var(--font-family-mono);
     font-size: var(--font-size-xs);
+    box-shadow: var(--shadow-pop-sm);
     cursor: pointer;
+    transition:
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
+  }
+  .pause:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
 </style>

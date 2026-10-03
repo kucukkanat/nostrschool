@@ -14,6 +14,7 @@ const title = dict.common.tools.keys;
 
 <BaseLayout locale={locale} title={title} description={dict.chapters.ch02.tool.intro}>
   <div class="page">
+    <p class="eyebrow" data-testid="tool-eyebrow">{dict.common.tools.title}</p>
     <h1 data-testid="tool-title">{title}</h1>
     <KeyTool client:load locale={locale} />
     <p class="learn">
@@ -36,7 +37,13 @@ const title = dict.common.tools.keys;
     margin: 0;
     font-family: var(--font-family-display);
     font-size: var(--font-size-4xl);
-    color: var(--color-text-primary);
+    font-weight: var(--font-weight-black);
+    letter-spacing: var(--font-letter-spacing-display);
+    line-height: var(--font-line-height-tight);
+    color: var(--color-text);
+  }
+  .eyebrow {
+    margin: 0 0 calc(var(--space-lg) * -1 + var(--space-2xs));
   }
   .learn a {
     color: var(--color-text-primary);

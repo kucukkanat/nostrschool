@@ -251,14 +251,14 @@
     flex-direction: column;
     gap: var(--space-3xs);
     padding: var(--space-2xs) var(--space-xs);
-    border-left: var(--border-width-thick) solid var(--color-border-strong);
+    border-left: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-sm);
   }
   .frame.in {
-    border-left-color: var(--color-secondary);
+    border-left-color: var(--color-text-secondary);
   }
   .frame.out {
-    border-left-color: var(--color-primary);
+    border-left-color: var(--color-text-primary);
   }
   .meta {
     display: flex;

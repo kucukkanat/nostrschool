@@ -124,8 +124,8 @@
   .detail {
     min-block-size: var(--size-diagram-min-height);
     padding: var(--space-md);
-    border: var(--border-width-medium) solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-md);
     min-inline-size: 0;
@@ -164,6 +164,7 @@
     flex: none;
     inline-size: var(--size-avatar-lg);
     block-size: var(--size-avatar-lg);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-lg);
     background: var(--kind-color);
     color: var(--color-on-kind);
@@ -249,5 +250,13 @@
     margin: 0;
     font-size: var(--font-size-sm);
     color: var(--color-text-muted);
+  }
+  /* Touch screens: inline NIP links grow to a finger-sized hit area. */
+  @media (pointer: coarse) {
+    .nip {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--size-touch-target);
+    }
   }
 </style>

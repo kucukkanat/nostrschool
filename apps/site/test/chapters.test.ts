@@ -21,6 +21,9 @@ test("prev/next", () => {
 test.each(["en", "es"])("every chapter has %s MDX and a component dir", (locale) => {
   const mdx = readdirSync(join(root, "content/chapters", locale)).sort();
   expect(mdx).toEqual(CHAPTERS.map((c) => `${c.dir}.mdx`));
-  const dirs = readdirSync(join(root, "components/chapters")).sort();
+  // "_"-prefixed dirs hold code shared across chapters, not a chapter of their own.
+  const dirs = readdirSync(join(root, "components/chapters"))
+    .filter((d) => !d.startsWith("_"))
+    .sort();
   expect(dirs).toEqual(CHAPTERS.map((c) => c.dir));
 });

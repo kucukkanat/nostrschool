@@ -78,8 +78,8 @@
     flex-direction: column;
     gap: var(--space-sm);
     padding: var(--space-md);
-    border: var(--border-width-medium) solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
     color: var(--color-text);
     box-shadow: var(--shadow-md);
@@ -115,6 +115,7 @@
     background: var(--color-surface-raised);
     color: var(--color-text);
     font: inherit;
+    font-size: var(--font-size-md);
   }
   input:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
@@ -134,24 +135,24 @@
   }
   .track {
     block-size: var(--space-md);
-    border-radius: var(--radius-pill);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
     background: var(--color-surface-sunken);
     overflow: hidden;
   }
   .bar {
     display: block;
     block-size: 100%;
-    border-radius: var(--radius-pill);
     transition: inline-size var(--motion-duration-normal) var(--motion-easing-bounce);
   }
   .bar.real {
     background: var(--color-primary);
   }
   .bar.nip04 {
-    background: var(--color-danger);
+    background: var(--color-danger-solid);
   }
   .bar.nip44 {
-    background: var(--color-success);
+    background: var(--color-success-solid);
   }
   .bar-value {
     font-family: var(--font-family-mono);

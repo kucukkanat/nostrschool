@@ -184,7 +184,7 @@
     background: var(--color-surface-sunken);
     color: var(--color-text);
     font-family: var(--font-family-mono);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
     resize: vertical;
   }
   textarea:focus-visible {

@@ -54,42 +54,57 @@
 <style>
   .summary {
     margin: 0 0 var(--space-md);
-    font-family: var(--font-family-display);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-muted);
   }
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--size-rail) * 1.2)), 1fr));
-    gap: var(--space-md);
+    gap: var(--space-lg) var(--space-md);
     margin: 0;
     padding: 0;
     list-style: none;
   }
+  /* A notebook card: ink outline, hard shadow; hover lifts, press flattens. */
   .link {
     display: grid;
+    align-content: start;
     gap: var(--space-xs);
     block-size: 100%;
-    padding: var(--space-lg);
-    border: var(--border-width-medium) solid var(--color-text);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
+    padding: var(--space-md) var(--space-lg) var(--space-lg);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
     color: var(--color-text);
     text-decoration: none;
     box-shadow: var(--shadow-pop-sm);
     transition:
-      transform var(--motion-duration-normal) var(--motion-easing-bounce),
-      box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .link:hover,
   .link:focus-visible {
-    transform: translate(calc(var(--space-3xs) * -1), calc(var(--space-3xs) * -1)) rotate(-0.5deg);
-    box-shadow: var(--shadow-pop);
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .link:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
+  }
+  /* The next chapter is the featured card: orange misregistration instead of ink. */
+  [data-status="current"] .link {
+    box-shadow: var(--shadow-accent);
   }
   .top {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: var(--space-xs);
+    padding-block-end: var(--space-xs);
+    border-block-end: var(--border-width-thin) dashed var(--color-border-strong);
+    font-family: var(--font-family-mono);
     font-size: var(--font-size-xs);
     text-transform: uppercase;
     letter-spacing: var(--font-letter-spacing-caps);
@@ -100,8 +115,9 @@
   }
   .status {
     padding: 0 var(--space-xs);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface-sunken);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
     color: var(--color-text);
   }
   [data-status="done"] .status {
@@ -116,7 +132,7 @@
     font-family: var(--font-family-display);
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
-    line-height: var(--font-line-height-tight);
+    line-height: var(--font-line-height-snug);
   }
   .text {
     color: var(--color-text-muted);

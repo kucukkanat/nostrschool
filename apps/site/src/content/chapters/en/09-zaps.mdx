@@ -2,7 +2,7 @@
 order: 9
 slug: zaps
 title: "Zaps"
-summary: "Tip anyone, anywhere, in seconds: how Lightning payments and Nostr events shake hands — and what a zap receipt really proves."
+summary: "Tip anyone, anywhere, in seconds: how Lightning payments and Nostr events shake hands, and what a zap receipt really proves."
 estimatedMinutes: 14
 nips: ["57", "01"]
 takeaways:
@@ -11,7 +11,7 @@ takeaways:
   - "The zap request travels over HTTP to the wallet server, never to relays; only the receipt is published to relays."
   - "Apps check a receipt's signature, its signer (the wallet's nostrPubkey) and the invoice amount before counting it."
   - "A zap receipt is the wallet server's word, not a proof of payment: you trust the recipient's wallet provider."
-mascotIntro: "Ready to throw some lightning? ⚡ Let's follow a tip from one tap to a glowing counter!"
+mascotIntro: "Let's follow one tip from a single tap, through a wallet server, Lightning and the relays, to the ⚡ counter under a post."
 ---
 import Term from "~/components/shell/Term.astro";
 import { Callout, Drawer, Quiz } from "@nostrschool/ui";
@@ -34,12 +34,12 @@ players, and Nostr events are just the paperwork at the start and the finish lin
 
 ## The four players
 
-- **The sender's app** — the Nostr client you're tapping ⚡ in, connected to your Lightning wallet.
-- **The recipient's wallet server** — the company or self-hosted box that receives Lightning
+- **The sender's app:** the Nostr client you're tapping ⚡ in, connected to your Lightning wallet.
+- **The recipient's wallet server:** the company or self-hosted box that receives Lightning
   payments for the recipient. It speaks <Term id="lnurl" locale="en">LNURL</Term>, a simple
   web protocol for “how do I pay you?”.
-- **The Lightning network** — where the money actually moves.
-- **Relays** — where the zap gets *announced*, so every app can show it.
+- **The Lightning network:** where the money actually moves.
+- **Relays:** where the zap gets *announced*, so every app can show it.
 
 Press play (or step with the arrows) and watch Alice zap Erin's ostrich drawing. Each step shows
 exactly what travels between the players.
@@ -56,7 +56,7 @@ To tip someone you need to know where their hat is. On Nostr, it's in their prof
 <Lud16Lookup client:visible locale="en" />
 
 The app fetches that URL and the wallet server replies with its payment details. Two fields in the
-reply matter for zaps: `allowsNostr: true` (“yes, I understand zaps”) and `nostrPubkey` — the
+reply matter for zaps: `allowsNostr: true` (“yes, I understand zaps”) and `nostrPubkey`, the
 <Term id="pubkey" locale="en">public key</Term> the wallet server will use to sign receipts.
 Keep that key in mind; it's the star of the last section.
 
@@ -98,13 +98,13 @@ these relays.”* Alice <Term id="signature" locale="en">signs</Term> it with he
 event, using kind 9734.
 
 Surprise: this note is **not** posted to relays. The app hands it straight to Erin's wallet server
-in a web request. The wallet server checks it, then creates a Lightning **<Term id="invoice" locale="en">invoice</Term>** — a one-time
-bill for exactly 2,100 sats — and tucks the whole zap request into the invoice's description.
+in a web request. The wallet server checks it, then creates a Lightning **<Term id="invoice" locale="en">invoice</Term>**: a one-time
+bill for exactly 2,100 sats. It tucks the whole zap request into the invoice's description.
 Now the bill and the note are glued together.
 
 <Drawer client:visible testid="ch09-uth-request" locale="en" title="Under the hood: the zap request">
 
-**The zap request (kind 9734)** — required tags: `p` (recipient) and `relays` (where the receipt
+**The zap request (kind 9734).** Required tags: `p` (recipient) and `relays` (where the receipt
 should go). Recommended but optional: `amount` (msat, as a string) and `lnurl`. Optional: `e` (zapped event),
 `a` (zapped addressable event), `k` (its kind). `content` is an optional comment.
 
@@ -128,8 +128,8 @@ should go). Recommended but optional: `amount` (msat, as a string) and `lnurl`. 
 It is sent with an HTTP GET to the `callback`, URI-encoded in the `nostr` query parameter:
 `<callback>?amount=2100000&nostr=%7B%22kind%22%3A9734…&lnurl=<lnurl>`.
 The server must check: valid signature, tags present, exactly one `p`, zero or one `e`, a
-`relays` tag, `amount` equal to the query amount, at most one `P`. It replies `{ "pr": "<bolt11>" }`
-— a *description-hash* invoice whose description is the zap request JSON.
+`relays` tag, `amount` equal to the query amount, at most one `P`. It replies `{ "pr": "<bolt11>" }`:
+a *description-hash* invoice whose description is the zap request JSON.
 
 ```ts
 import { finalizeEvent, nip57 } from "nostr-tools";
@@ -149,10 +149,10 @@ const { pr: invoice } = await (await fetch(url)).json();
 
 ## Steps 7–10: money moves, then the announcement
 
-Alice's wallet pays the invoice over Lightning. Relays don't see this at all — it's pure
+Alice's wallet pays the invoice over Lightning. Relays don't see this at all; it's pure
 Lightning. When the payment arrives, Erin's wallet server writes a **zap receipt** (kind 9735),
 signs it with its `nostrPubkey`, and publishes it to the relays Alice listed. Every app that loads
-Erin's post finds the receipt, checks it, and adds ⚡ 2,100 to the counter. 🎉
+Erin's post finds the receipt, checks it, and adds ⚡ 2,100 to the counter.
 
 <Drawer client:visible testid="ch09-uth-receipt" locale="en" title="Under the hood: the zap receipt">
 
@@ -196,11 +196,11 @@ and the comment. Think “coin in the hat on a busy street”, not “private ba
 
 ## Can you trust a zap?
 
-Here's the honest part. Anyone can publish a kind 9735 event — it's just an event. So before an
+Here's the honest part. Anyone can publish a kind 9735 event. It's just an event. So before an
 app adds a zap to the counter it checks the receipt:
 
 1. Is the receipt's signature valid?
-2. Was it signed by the recipient's wallet server — the `nostrPubkey` we saw in step 1?
+2. Was it signed by the recipient's wallet server, the `nostrPubkey` we saw in step 1?
 3. Does it contain a real, signed zap request?
 4. Does the amount in the invoice match the amount Alice asked for?
 
@@ -212,8 +212,8 @@ check passes!
 
 That's the trust model in one sentence: **a zap receipt is the recipient's wallet provider
 saying “this was paid.”** It proves someone requested an invoice, and the wallet vouches for the
-rest. Usually that's fine — the wallet is chosen by the recipient, and lying would only fake
-their own income — but it's why zap counts are social signals, not accounting records. The only
+rest. Usually that's fine: the wallet is chosen by the recipient, and lying would only fake
+their own income. Still, it's why zap counts are social signals, not accounting records. The only
 people who know *for sure* a payment happened are the payer (who holds the preimage) and the
 recipient (whose balance went up).
 

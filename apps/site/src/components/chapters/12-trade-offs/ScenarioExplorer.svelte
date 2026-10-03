@@ -157,7 +157,7 @@
     gap: var(--space-lg);
     padding: var(--space-lg);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-pop);
     min-height: var(--size-diagram-min-height);
@@ -222,7 +222,8 @@
       box-shadow var(--motion-duration-normal) var(--motion-easing-standard);
   }
   .card.nostr {
-    border-color: var(--color-primary);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-accent);
   }
   .card.disaster {
     box-shadow: var(--shadow-pop-sm);
@@ -267,19 +268,20 @@
   }
   .seg {
     block-size: var(--space-xs);
-    border-radius: var(--radius-pill);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
     background: var(--color-surface-sunken);
     transition: background-color var(--motion-duration-normal) var(--motion-easing-standard);
   }
   .fine .seg.on,
   .bumpy .seg.on {
-    background: var(--color-info);
+    background: var(--color-info-solid);
   }
   .ouch .seg.on {
-    background: var(--color-warning);
+    background: var(--color-warning-solid);
   }
   .disaster .seg.on {
-    background: var(--color-danger);
+    background: var(--color-danger-solid);
   }
   .lines {
     display: grid;
@@ -325,6 +327,12 @@
     }
     .cards {
       grid-template-columns: 1fr 1fr;
+    }
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .scenarios {
+      padding: var(--space-md);
     }
   }
 </style>

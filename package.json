@@ -17,7 +17,8 @@
     "test": "bun test",
     "test:coverage": "bun test --coverage",
     "test:e2e": "bun run build && bun run --cwd apps/site test:e2e",
-    "snapshot:ecosystem": "bun run scripts/snapshot-ecosystem.ts"
+    "snapshot:ecosystem": "bun run scripts/snapshot-ecosystem.ts",
+    "brand:images": "bun run scripts/brand-images.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

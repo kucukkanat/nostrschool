@@ -146,8 +146,8 @@
     gap: var(--space-sm);
     margin: var(--space-xl) 0;
     padding: var(--space-lg);
-    border-radius: var(--radius-xl);
-    border: var(--border-width-thick) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     background: var(--color-surface);
     box-shadow: var(--shadow-pop);
     min-height: var(--size-diagram-min-height);
@@ -193,7 +193,8 @@
     transform: translateY(calc(-1 * var(--space-3xs)));
   }
   .chip[aria-pressed="true"] {
-    border-color: var(--color-primary);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-accent);
     background: var(--color-primary-subtle);
   }
   .chip:focus-visible,
@@ -222,6 +223,7 @@
     background: var(--color-surface);
     color: var(--color-text);
     min-height: var(--size-touch-target);
+    font-size: var(--font-size-md);
   }
   .outcome-slot {
     min-height: var(--size-touch-target);
@@ -243,5 +245,11 @@
   }
   .doc {
     overflow: auto;
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .nip05 {
+      padding: var(--space-md);
+    }
   }
 </style>

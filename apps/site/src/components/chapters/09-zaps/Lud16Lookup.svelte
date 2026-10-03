@@ -120,17 +120,26 @@
     gap: var(--space-2xs);
     min-height: var(--size-touch-target);
     padding: var(--space-3xs) var(--space-sm);
-    border: var(--border-width-thin) solid var(--color-border-strong);
-    border-radius: var(--radius-pill);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
     background: var(--color-surface);
     color: var(--color-text);
     font-family: var(--font-family-mono);
     font-size: var(--font-size-xs);
     cursor: pointer;
-    transition: transform var(--motion-duration-fast) var(--motion-easing-bounce);
+    box-shadow: var(--shadow-pop-sm);
+    transition:
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
+      background-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .example:hover {
-    transform: translateY(calc(-1 * var(--space-3xs)));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .example:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
   .example:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);

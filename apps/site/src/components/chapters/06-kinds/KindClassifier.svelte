@@ -86,7 +86,7 @@
     margin-block: var(--space-lg);
     padding: var(--space-md);
     border: var(--border-width-medium) dashed var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
   }
   .title {

@@ -156,12 +156,12 @@
     transition: background-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .chip:hover {
-    border-color: var(--color-secondary);
+    box-shadow: var(--shadow-pop-sm);
   }
   .chip[aria-pressed="true"] {
     background: var(--color-secondary);
-    border-color: var(--color-secondary);
     color: var(--color-on-secondary);
+    box-shadow: var(--shadow-accent);
   }
   .chip:focus-visible,
   .card a:focus-visible {

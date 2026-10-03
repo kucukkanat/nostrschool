@@ -87,8 +87,8 @@
     display: grid;
     gap: var(--space-sm);
     padding: var(--space-lg);
-    border: var(--border-width-thick) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-pop-sm);
   }
@@ -147,14 +147,20 @@
   }
   .verdict.valid {
     background: var(--color-success-subtle);
-    border-inline-start: var(--border-width-heavy) solid var(--color-success-solid);
+    border-inline-start: var(--border-width-heavy) solid var(--color-success);
   }
   .verdict.invalid {
     background: var(--color-danger-subtle);
-    border-inline-start: var(--border-width-heavy) solid var(--color-danger-solid);
+    border-inline-start: var(--border-width-heavy) solid var(--color-danger);
   }
   .error {
     margin: 0;
     color: var(--color-danger);
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .stamp {
+      padding: var(--space-md);
+    }
   }
 </style>

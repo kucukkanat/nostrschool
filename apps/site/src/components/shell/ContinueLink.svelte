@@ -35,36 +35,40 @@
 {/if}
 
 <style>
+  /* The main action: orange fill, ink outline and ink text, hard shadow. Hover lifts it off the
+     page; pressing pushes it into its shadow. */
   .cta {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-xs);
+    gap: var(--space-sm);
     min-block-size: var(--size-control-lg);
-    padding: var(--space-xs) var(--space-xl);
-    border: var(--border-width-thick) solid var(--color-text);
-    border-radius: var(--radius-pill);
+    padding: var(--space-xs) var(--space-lg);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
     background: var(--color-primary);
     color: var(--color-on-primary);
     font-family: var(--font-family-display);
     font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-black);
+    font-weight: var(--font-weight-bold);
     text-decoration: none;
     box-shadow: var(--shadow-pop);
     transition:
-      transform var(--motion-duration-normal) var(--motion-easing-bounce),
-      box-shadow var(--motion-duration-fast) var(--motion-easing-standard),
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
       background var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .cta:hover {
     background: var(--color-primary-hover);
-    transform: translate(calc(var(--space-3xs) * -1), calc(var(--space-3xs) * -1)) rotate(-1deg);
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
   }
   .cta:active {
     background: var(--color-primary-active);
-    transform: translate(var(--space-3xs), var(--space-3xs));
-    box-shadow: var(--shadow-pop-sm);
+    translate: var(--size-press) var(--size-press);
+    box-shadow: var(--shadow-pressed);
   }
   .arrow {
+    font-family: var(--font-family-mono);
     transition: translate var(--motion-duration-normal) var(--motion-easing-bounce);
   }
   .cta:hover .arrow {

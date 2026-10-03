@@ -219,8 +219,8 @@
     display: grid;
     gap: var(--space-lg);
     padding: var(--space-lg);
-    border: var(--border-width-thick) solid var(--color-primary);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-pop);
     min-height: var(--size-diagram-min-height);
@@ -240,7 +240,8 @@
   }
   .tiles {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* One column on the narrowest phones, then 2, up to 4 as width allows. */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--size-rail) / 2)), 1fr));
     gap: var(--space-sm);
   }
   .tour {
@@ -268,7 +269,7 @@
       transform var(--motion-duration-normal) var(--motion-easing-bounce);
   }
   .dot.seen {
-    background: var(--color-success);
+    background: var(--color-success-solid);
     transform: scale(1.3);
   }
   .relays {
@@ -278,7 +279,7 @@
   .fact {
     margin: 0;
     padding: var(--space-sm) var(--space-md);
-    border-left: var(--border-width-heavy) solid var(--color-accent);
+    border-left: var(--border-width-heavy) solid var(--color-text-accent);
     border-radius: var(--radius-sm);
     background: var(--color-accent-subtle);
   }
@@ -286,12 +287,6 @@
   @media (max-width: 767px) {
     .explorer {
       padding: var(--space-md);
-    }
-  }
-  /* lg breakpoint = tokens.breakpoint.lg (1024px): four tiles in a row. */
-  @media (min-width: 1024px) {
-    .tiles {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 </style>

@@ -92,9 +92,44 @@ test("ChapterRail marks the current chapter and shows completed checkmarks", asy
 
   const toggle = getByTestId("chapter-rail-toggle");
   expect(toggle.getAttribute("aria-expanded")).toBe("false");
+  expect(toggle.getAttribute("aria-controls")).toBe(getByTestId("chapter-rail-sheet").id);
   await fireEvent.click(toggle);
   expect(toggle.getAttribute("aria-expanded")).toBe("true");
   expect(getByTestId("chapter-rail").dataset["open"]).toBe("true");
+  await fireEvent.click(toggle);
+  expect(getByTestId("chapter-rail").dataset["open"]).toBe("false");
+});
+
+test("ChapterRail's bottom sheet closes on Escape, Close and outside taps, refocusing the toggle", async () => {
+  const { getByTestId } = render(ChapterRail, {
+    props: { locale: "en", chapters, current: "keys" },
+  });
+  const rail = getByTestId("chapter-rail");
+  const toggle = getByTestId("chapter-rail-toggle");
+  const open = async () => {
+    await fireEvent.click(toggle);
+    await tick();
+    expect(rail.dataset["open"]).toBe("true");
+  };
+
+  await open();
+  expect(document.activeElement).toBe(getByTestId("chapter-rail-close"));
+  await fireEvent.keyDown(document, { key: "Enter" });
+  expect(rail.dataset["open"]).toBe("true");
+  await fireEvent.keyDown(document, { key: "Escape" });
+  expect(rail.dataset["open"]).toBe("false");
+  expect(document.activeElement).toBe(toggle);
+
+  await open();
+  await fireEvent.click(getByTestId("chapter-rail-close"));
+  expect(rail.dataset["open"]).toBe("false");
+
+  await open();
+  // A tap inside the sheet keeps it open; one on the scrim (outside the sheet) closes it.
+  await fireEvent.click(getByTestId("chapter-rail-02"));
+  expect(rail.dataset["open"]).toBe("true");
+  await fireEvent.click(getByTestId("chapter-rail-scrim"));
+  expect(rail.dataset["open"]).toBe("false");
 });
 
 test("ChapterComplete persists completion, celebrates, and can be undone", async () => {
@@ -127,6 +162,10 @@ test("CourseMap shows done / current / upcoming stops linking to chapters", asyn
   expect(getByTestId("course-map-02").dataset["status"]).toBe("current");
   expect(getByTestId("course-map-12").dataset["status"]).toBe("upcoming");
   expect(getByTestId("course-map-02").getAttribute("href")).toBe("/en/learn/keys/");
+  // Notebook index: every entry shows its number (or a tick when done), title and summary.
+  expect(getByTestId("course-map-03").textContent).toContain("03");
+  expect(getByTestId("course-map-03").textContent).toContain(chapters[2]?.summary ?? "missing");
+  expect(getByTestId("course-map-01").querySelector("svg")).not.toBeNull();
 });
 
 test("ChapterGrid counts progress and congratulates when everything is done", async () => {

@@ -69,7 +69,8 @@
     transition: border-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .field.on {
-    border-color: var(--color-secondary);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-pop-sm);
   }
   .legend {
     padding-inline: var(--space-2xs);
@@ -88,7 +89,7 @@
   .enable input {
     inline-size: var(--size-icon-md);
     block-size: var(--size-icon-md);
-    accent-color: var(--color-secondary);
+    accent-color: var(--color-text-secondary);
   }
   .slider {
     display: grid;
@@ -97,7 +98,7 @@
   input[type="range"] {
     inline-size: 100%;
     min-block-size: var(--size-touch-target);
-    accent-color: var(--color-secondary);
+    accent-color: var(--color-text-secondary);
   }
   input:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);

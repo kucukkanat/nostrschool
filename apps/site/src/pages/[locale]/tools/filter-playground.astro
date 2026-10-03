@@ -15,6 +15,7 @@ const t = dict.chapters.ch05;
 
 <BaseLayout locale={locale} title={title} description={t.tool.intro}>
   <div class="tool">
+    <p class="eyebrow" data-testid="tool-eyebrow">{dict.common.tools.title}</p>
     <h1 data-testid="tool-title">{title}</h1>
     <p class="lede" data-testid="tool-lede">{t.tool.intro}</p>
     <FilterPlayground client:load locale={locale} />
@@ -34,7 +35,13 @@ const t = dict.chapters.ch05;
     margin: 0;
     font-family: var(--font-family-display);
     font-size: var(--font-size-4xl);
-    color: var(--color-text-primary);
+    font-weight: var(--font-weight-black);
+    letter-spacing: var(--font-letter-spacing-display);
+    line-height: var(--font-line-height-tight);
+    color: var(--color-text);
+  }
+  .eyebrow {
+    margin: 0 0 calc(var(--space-lg) * -1 + var(--space-2xs));
   }
   .lede {
     margin: 0;

@@ -250,7 +250,7 @@
     gap: var(--space-md);
     padding: var(--space-lg);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-pop);
     min-height: var(--size-diagram-min-height);
@@ -286,9 +286,10 @@
     background: var(--color-surface-raised);
     color: var(--color-text);
     font: inherit;
+    font-size: var(--font-size-md);
   }
   .range {
-    accent-color: var(--color-primary);
+    accent-color: var(--color-text-primary);
     min-block-size: var(--size-touch-target);
   }
   .text:focus-visible,
@@ -305,9 +306,13 @@
     flex-wrap: wrap;
     gap: var(--space-sm);
   }
+  /* Stack on the narrowest phones; three across once each tile has room for its number. */
   .stats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(min(100%, calc(var(--size-mascot-md) * 0.8)), 1fr)
+      );
     gap: var(--space-sm);
   }
   .ids {
@@ -367,6 +372,12 @@
   @media (min-width: 768px) {
     .inputs {
       grid-template-columns: 1fr 1fr;
+    }
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .pow {
+      padding: var(--space-md);
     }
   }
 </style>

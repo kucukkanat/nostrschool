@@ -406,7 +406,7 @@
     gap: var(--space-md);
     padding: var(--space-md);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-pop);
   }
@@ -439,6 +439,7 @@
     background: var(--color-surface-raised);
     color: var(--color-text);
     font: inherit;
+    font-size: var(--font-size-md);
   }
   select:focus-visible,
   .mode:focus-visible {
@@ -457,8 +458,8 @@
     min-height: var(--size-touch-target);
     padding: var(--space-2xs) var(--space-md);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
     color: var(--color-text);
     font: inherit;
     font-weight: var(--font-weight-bold);
@@ -472,7 +473,7 @@
   }
   .mode[aria-pressed="true"] {
     background: var(--color-primary);
-    border-color: var(--color-primary);
+    box-shadow: var(--shadow-accent);
     color: var(--color-on-primary);
   }
   .map {
@@ -496,7 +497,7 @@
     animation: draw var(--motion-duration-slow) var(--motion-easing-decelerate) both;
   }
   .edge.read {
-    stroke: var(--color-accent);
+    stroke: var(--color-text-accent);
     stroke-dasharray: 0.03 0.03;
     animation: fade var(--motion-duration-slow) var(--motion-easing-standard) both;
   }
@@ -524,7 +525,7 @@
   }
   .phone {
     fill: var(--color-surface-raised);
-    stroke: var(--color-primary);
+    stroke: var(--color-text-primary);
     stroke-width: var(--border-width-heavy);
   }
   .label {
@@ -556,17 +557,19 @@
     stroke-width: var(--border-width-heavy);
   }
   .relay.planned rect {
-    stroke: var(--color-secondary);
+    stroke: var(--color-text-secondary);
     stroke-width: var(--border-width-heavy);
   }
   .relay.active rect,
   .relay.publish rect {
     fill: var(--color-primary-subtle);
-    stroke: var(--color-primary);
+    stroke: var(--color-text-primary);
     stroke-width: var(--border-width-heavy);
   }
   .count circle {
     fill: var(--color-secondary);
+    stroke: var(--color-border-strong);
+    stroke-width: var(--border-width-medium);
   }
   .count text {
     fill: var(--color-on-secondary);
@@ -593,7 +596,7 @@
     stroke-width: var(--border-width-heavy);
   }
   .person.target .halo {
-    stroke: var(--color-accent);
+    stroke: var(--color-text-accent);
     stroke-width: var(--border-width-heavy);
   }
   .mark {
@@ -635,7 +638,7 @@
   }
   .swatch.read {
     border-top-style: dashed;
-    border-top-color: var(--color-accent);
+    border-top-color: var(--color-text-accent);
   }
   .swatch.link {
     border-top-color: var(--color-diagram-edge-active);
@@ -644,7 +647,7 @@
     margin: 0;
     min-height: calc(var(--font-size-md) * 3);
     padding: var(--space-sm) var(--space-md);
-    border-left: var(--border-width-heavy) solid var(--color-primary);
+    border-left: var(--border-width-heavy) solid var(--color-text-primary);
     border-radius: var(--radius-sm);
     background: var(--color-primary-subtle);
     font-weight: var(--font-weight-semibold);
@@ -687,7 +690,8 @@
   .relay-card.active,
   .relay-card.publish,
   .relay-card.planned {
-    border-color: var(--color-primary);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-accent);
   }
   .frames h4 {
     margin: 0 0 var(--space-xs);

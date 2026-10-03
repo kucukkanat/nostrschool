@@ -198,7 +198,7 @@
     gap: var(--space-lg);
     padding: var(--space-lg);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-pop);
     min-height: var(--size-diagram-min-height);
@@ -249,19 +249,20 @@
     cursor: pointer;
     transition:
       background-color var(--motion-duration-fast) var(--motion-easing-standard),
-      border-color var(--motion-duration-fast) var(--motion-easing-standard);
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .chip:hover {
-    border-color: var(--color-primary);
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-pop-sm);
   }
   .chip[aria-pressed="true"] {
     background: var(--color-primary);
-    border-color: var(--color-primary);
+    box-shadow: var(--shadow-accent);
     color: var(--color-on-primary);
   }
   .chip.preset[aria-pressed="true"] {
     background: var(--color-secondary);
-    border-color: var(--color-secondary);
     color: var(--color-on-secondary);
   }
   .chip:focus-visible,
@@ -291,6 +292,7 @@
     place-items: center;
     inline-size: var(--size-icon-lg);
     block-size: var(--size-icon-lg);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-round);
     background: var(--color-surface-sunken);
     font-weight: var(--font-weight-bold);
@@ -311,7 +313,8 @@
   }
   .track {
     block-size: var(--space-md);
-    border-radius: var(--radius-pill);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
     background: var(--color-surface-sunken);
     overflow: hidden;
   }
@@ -384,7 +387,8 @@
     border-color: var(--color-border-strong);
   }
   .cell-button[aria-pressed="true"] {
-    border-color: var(--color-primary);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-accent);
     background: var(--color-primary-subtle);
   }
   .detail {

@@ -146,7 +146,8 @@
     background: var(--color-surface-raised);
   }
   .field:focus-within {
-    border-color: var(--color-primary);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-pop-sm);
   }
   .legend {
     display: flex;
@@ -165,6 +166,7 @@
     min-inline-size: var(--size-icon-md);
     block-size: var(--size-icon-md);
     padding-inline: var(--space-3xs);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-pill);
     background: var(--color-primary);
     color: var(--color-on-primary);
@@ -198,21 +200,25 @@
     font: inherit;
     font-size: var(--font-size-sm);
     cursor: pointer;
+    box-shadow: var(--shadow-pop-sm);
     transition:
-      transform var(--motion-duration-fast) var(--motion-easing-bounce),
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
       background-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .chip:hover {
-    transform: translateY(calc(var(--space-3xs) * -1));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
   }
   .chip:active {
-    transform: scale(0.94);
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
-  .chip.on {
-    border-color: var(--color-primary);
+  .chip.on,
+  .chip.on:hover {
+    box-shadow: var(--shadow-accent);
     background: var(--color-primary);
     color: var(--color-on-primary);
-    box-shadow: var(--shadow-pop-sm);
   }
   .avatar {
     inline-size: var(--size-icon-md);
@@ -233,7 +239,7 @@
     background: var(--color-surface);
     color: var(--color-text);
     font-family: var(--font-family-mono);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
   }
   input[aria-invalid="true"] {
     border-color: var(--color-danger);
@@ -291,5 +297,16 @@
     block-size: var(--size-control-sm);
     border-radius: var(--radius-round);
     line-height: var(--font-line-height-tight);
+  }
+  /* Compact on desktop, finger-sized on touch screens. */
+  @media (pointer: coarse) {
+    .chip,
+    .add {
+      min-block-size: var(--size-touch-target);
+    }
+    .remove {
+      inline-size: var(--size-touch-target);
+      block-size: var(--size-touch-target);
+    }
   }
 </style>

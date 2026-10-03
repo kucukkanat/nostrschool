@@ -28,11 +28,14 @@ const chapters = chapterLinks(locale);
   }
   h1 {
     margin: 0 0 var(--space-xs);
-    font-size: var(--font-size-4xl);
+    padding-block-end: var(--space-xs);
+    border-block-end: var(--border-width-thick) solid var(--color-border-strong);
+    font-size: var(--font-size-5xl);
     font-weight: var(--font-weight-black);
   }
   .intro {
-    margin: 0 0 var(--space-lg);
+    margin: var(--space-sm) 0 var(--space-lg);
+    max-inline-size: var(--size-content);
     font-size: var(--font-size-lg);
     color: var(--color-text-muted);
   }

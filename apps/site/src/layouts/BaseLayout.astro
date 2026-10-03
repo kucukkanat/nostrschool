@@ -1,6 +1,7 @@
 ---
 /** Owner: shell agent. Every page renders inside this: head/meta, header, main, footer. */
 import { getDictionary, LOCALE_TAGS, type Locale } from "@nostrschool/i18n";
+import { themes } from "@nostrschool/tokens";
 import Footer from "~/components/shell/Footer.astro";
 import Header from "~/components/shell/Header.astro";
 import { alternateLinks } from "~/components/shell/lib/links";
@@ -33,6 +34,9 @@ const image = absolute(assetHref(ogImage));
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
+    <!-- Browser chrome matches the paper. Follows the OS theme (a forced data-theme can't reach it). -->
+    <meta name="theme-color" content={themes.light.color.bg} media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content={themes.dark.color.bg} media="(prefers-color-scheme: dark)">
     <title>{pageTitle}</title>
     <meta name="description" content={summary}>
     <link rel="canonical" href={canonical}>
@@ -86,10 +90,12 @@ const image = absolute(assetHref(ogImage));
     inset-inline-start: var(--space-xs);
     z-index: var(--z-toast);
     padding: var(--space-xs) var(--space-md);
-    border-radius: var(--radius-pill);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
     background: var(--color-primary);
     color: var(--color-on-primary);
     font-weight: var(--font-weight-bold);
+    box-shadow: var(--shadow-pop);
     translate: 0 -200%;
     transition: translate var(--motion-duration-fast) var(--motion-easing-standard);
   }

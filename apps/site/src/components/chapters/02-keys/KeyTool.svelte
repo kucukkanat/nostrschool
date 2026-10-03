@@ -319,8 +319,8 @@
   }
   .card {
     padding: var(--space-lg);
-    border: var(--border-width-thick) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-pop-sm);
     justify-items: start;
@@ -352,7 +352,7 @@
     background: var(--color-surface);
     color: var(--color-text);
     font-family: var(--font-family-mono);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
   }
   textarea:focus-visible,
   .text:focus-visible,
@@ -378,7 +378,7 @@
     font-family: var(--font-family-mono);
   }
   .radio input {
-    accent-color: var(--color-primary);
+    accent-color: var(--color-text-primary);
   }
   .rows {
     display: grid;
@@ -448,5 +448,11 @@
     border-block-end: var(--border-width-thin) solid var(--color-border);
     text-align: start;
     vertical-align: top;
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .card {
+      padding: var(--space-md);
+    }
   }
 </style>

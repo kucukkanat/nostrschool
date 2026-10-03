@@ -160,8 +160,8 @@
     display: grid;
     gap: var(--space-sm);
     padding: var(--space-lg);
-    border: var(--border-width-thick) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-pop-sm);
   }
@@ -215,9 +215,15 @@
   .spot.head {
     fill: var(--color-primary);
   }
+  /* Bright riso fills only read on paper through their ink outline. */
+  .spot.visited,
+  .spot.head {
+    stroke: var(--color-border-strong);
+    stroke-width: var(--border-width-medium);
+  }
   .target {
     fill: none;
-    stroke: var(--color-accent);
+    stroke: var(--color-text-accent);
     stroke-width: 3;
   }
   .center {
@@ -241,7 +247,7 @@
   .slider input {
     inline-size: 100%;
     min-block-size: var(--size-touch-target);
-    accent-color: var(--color-primary);
+    accent-color: var(--color-text-primary);
   }
   .slider input:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
@@ -253,5 +259,11 @@
     font-family: var(--font-family-display);
     font-weight: var(--font-weight-bold);
     color: var(--color-text);
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .clock {
+      padding: var(--space-md);
+    }
   }
 </style>

@@ -1,11 +1,10 @@
 <script lang="ts">
   /**
-   * The landing page's winding course path: twelve stops, finished ones checked, the next one
-   * bouncing. It is an ordered list of links underneath, so keyboard and screen readers get a
-   * plain course outline; the curve is decoration.
+   * The landing page's course map, drawn as a notebook table of contents: ruled rows, a margin
+   * rule, and an ink stamp per chapter (checked when done, orange for the next one). It is a plain
+   * ordered list of links, so keyboard and screen-reader users get the same outline.
    */
   import { getDictionary, type Locale } from "@nostrschool/i18n";
-  import { courseStops, curvePath } from "./lib/geometry.ts";
   import { type Completed, chapterStatus, progress } from "./lib/progress.ts";
   import type { ChapterLink } from "./types.ts";
 
@@ -23,169 +22,156 @@
     }),
   );
 
-  const stops = $derived(courseStops(chapters.length));
-  const path = $derived(curvePath(stops));
   const statusLabel = $derived({ done: t.done, current: t.current, upcoming: t.upcoming });
+  // Two notebook pages side by side on wide screens, filled column by column (1–6, 7–12).
+  const rows = $derived(Math.ceil(chapters.length / 2));
 </script>
 
-<div class="map" style:--rows={chapters.length} data-testid="course-map">
-  <svg
-    class="path"
-    viewBox="0 0 100 {chapters.length}"
-    preserveAspectRatio="none"
-    aria-hidden="true"
-    focusable="false"
-  >
-    <path class="trail" d={path} />
-  </svg>
-  <ol class="stops">
-    {#each chapters as chapter, i (chapter.slug)}
-      {@const stop = stops[i] ?? { x: 50, y: i + 0.5 }}
-      {@const status = chapterStatus(completed, chapter.slug)}
-      <li
-        class="stop"
+<ol class="map" style:--rows={rows} data-testid="course-map">
+  {#each chapters as chapter (chapter.slug)}
+    {@const status = chapterStatus(completed, chapter.slug)}
+    <li class="stop" data-status={status}>
+      <a
+        href={chapter.href}
+        class="node"
+        data-testid="course-map-{chapter.nn}"
         data-status={status}
-        data-side={stop.x > 50 ? "left" : "right"}
-        style:--x={stop.x}
-        style:--y={stop.y}
       >
-        <a
-          href={chapter.href}
-          class="node"
-          data-testid="course-map-{chapter.nn}"
-          data-status={status}
-        >
-          <span class="bubble" aria-hidden="true">
-            {#if status === "done"}
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M5 12.5l4.5 4.5L19 7.5" />
-              </svg>
-            {:else}
-              {chapter.order}
-            {/if}
-          </span>
-          <span class="label">
-            <span class="title">{chapter.title}</span>
-            <span class="status">{statusLabel[status]}</span>
-          </span>
-        </a>
-      </li>
-    {/each}
-  </ol>
-</div>
+        <span class="stamp" aria-hidden="true">
+          {#if status === "done"}
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          {:else}
+            {chapter.nn}
+          {/if}
+        </span>
+        <span class="body">
+          <span class="status">{statusLabel[status]}</span>
+          <span class="title">{chapter.title}</span>
+          <span class="summary">{chapter.summary}</span>
+        </span>
+      </a>
+    </li>
+  {/each}
+</ol>
 
 <style>
   .map {
-    --row: var(--space-4xl);
-    position: relative;
-    block-size: calc(var(--rows) * var(--row));
-    max-inline-size: var(--size-content);
-    margin-inline: auto;
-  }
-  .path {
-    position: absolute;
-    inset: 0;
-    inline-size: 100%;
-    block-size: 100%;
-    overflow: visible;
-  }
-  .trail {
-    fill: none;
-    stroke: var(--color-primary);
-    stroke-width: var(--border-width-heavy);
-    stroke-dasharray: var(--space-xs) var(--space-sm);
-    stroke-linecap: round;
-    vector-effect: non-scaling-stroke;
-    opacity: var(--opacity-muted);
-  }
-  .stops {
+    display: grid;
     margin: 0;
-    padding: 0;
+    padding: var(--space-xs) var(--space-md);
     list-style: none;
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
+    box-shadow: var(--shadow-pop);
   }
   .stop {
-    position: absolute;
-    inset-inline-start: calc(var(--x) * 1%);
-    inset-block-start: calc(var(--y) * var(--row));
-    translate: -50% -50%;
+    /* Ruled notebook lines (the last one too, like a page that keeps going). */
+    border-block-end: var(--border-width-thin) solid var(--color-border);
   }
   .node {
-    position: relative;
-    display: block;
+    display: grid;
+    grid-template-columns: var(--size-control-lg) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-sm);
+    padding-block: var(--space-sm);
     color: var(--color-text);
     text-decoration: none;
   }
-  .bubble {
+  .stamp {
     display: grid;
     place-items: center;
-    inline-size: var(--size-avatar-md);
-    block-size: var(--size-avatar-md);
-    border-radius: var(--radius-round);
-    border: var(--border-width-thick) solid var(--color-text);
+    inline-size: var(--size-control-lg);
+    block-size: var(--size-control-lg);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
     background: var(--color-surface);
-    font-family: var(--font-family-display);
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-black);
-    box-shadow: var(--shadow-pop);
-    transition: transform var(--motion-duration-normal) var(--motion-easing-bounce);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    box-shadow: var(--shadow-pop-sm);
+    transition:
+      translate var(--motion-duration-fast) var(--motion-easing-press),
+      box-shadow var(--motion-duration-fast) var(--motion-easing-press);
   }
-  [data-status="done"] .bubble {
+  [data-status="done"] .stamp {
     background: var(--color-success-solid);
     color: var(--color-on-success);
   }
-  [data-status="current"] .bubble {
+  [data-status="current"] .stamp {
     background: var(--color-primary);
     color: var(--color-on-primary);
-    animation: hop var(--motion-duration-step) var(--motion-easing-bounce) infinite alternate;
   }
-  .node:hover .bubble,
-  .node:focus-visible .bubble {
-    transform: scale(1.15) rotate(-6deg);
+  .node:hover .stamp,
+  .node:focus-visible .stamp {
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
   }
-  .label {
-    position: absolute;
-    inset-block-start: 50%;
-    translate: 0 -50%;
+  .node:active .stamp {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
+  }
+  /* The notebook's margin rule: one continuous accent-ink line down the entries. */
+  .body {
     display: grid;
-    inline-size: max-content;
-    max-inline-size: min(34vw, calc(var(--size-content) * 0.34));
-    overflow-wrap: anywhere;
-  }
-  [data-side="right"] .label {
-    inset-inline-start: calc(100% + var(--space-sm));
-  }
-  [data-side="left"] .label {
-    inset-inline-end: calc(100% + var(--space-sm));
-    text-align: end;
-  }
-  .title {
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-bold);
-    line-height: var(--font-line-height-tight);
+    gap: var(--space-3xs);
+    min-block-size: var(--size-control-lg);
+    padding-inline-start: var(--space-sm);
+    border-inline-start: var(--border-width-medium) solid var(--color-text-primary);
   }
   .status {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-muted);
-    text-transform: uppercase;
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-2xs);
+    font-weight: var(--font-weight-semibold);
     letter-spacing: var(--font-letter-spacing-caps);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
   }
-  svg:not(.path) {
+  [data-status="current"] .status {
+    color: var(--color-text-primary);
+  }
+  .title {
+    justify-self: start;
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--font-line-height-snug);
+    text-decoration: underline transparent var(--border-width-medium);
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color var(--motion-duration-fast) var(--motion-easing-standard);
+  }
+  /* The next chapter gets a highlighter swipe, like a note to self. */
+  [data-status="current"] .title {
+    padding-inline: var(--space-3xs);
+    margin-inline: calc(var(--space-3xs) * -1);
+    background: var(--highlight-fill);
+    color: var(--color-on-highlight);
+  }
+  .node:hover .title {
+    text-decoration-color: currentColor;
+  }
+  .summary {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+  svg {
     inline-size: var(--size-icon-md);
     block-size: var(--size-icon-md);
     fill: none;
     stroke: currentColor;
     stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
   }
-  @keyframes hop {
-    to {
-      translate: 0 calc(var(--space-2xs) * -1);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    [data-status="current"] .bubble {
-      animation: none;
+  /* >= tokens.breakpoint.md: two notebook pages, filled column by column. */
+  @media (min-width: 768px) {
+    .map {
+      grid-auto-flow: column;
+      grid-template-rows: repeat(var(--rows), auto);
+      column-gap: var(--space-xl);
+      padding-inline: var(--space-lg);
     }
   }
 </style>

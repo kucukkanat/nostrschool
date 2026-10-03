@@ -202,7 +202,7 @@
     gap: var(--space-md);
     margin-block: var(--space-lg);
     padding: var(--space-md);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-surface-sunken);
     min-block-size: var(--size-diagram-min-height);
   }
@@ -367,7 +367,8 @@
     font: inherit;
     text-align: start;
     cursor: pointer;
-    overflow: hidden;
+    /* No overflow clipping: aspect-ratio then acts as a minimum, so a multi-line name grows the
+       tile (and its grid row) instead of being cut off. */
     transition:
       transform var(--motion-duration-fast) var(--motion-easing-bounce),
       box-shadow var(--motion-duration-fast) var(--motion-easing-standard),
@@ -385,9 +386,10 @@
     outline-offset: var(--space-3xs);
   }
   .tile.selected {
+    border-color: var(--color-border-strong);
     background: var(--kind-color);
     color: var(--color-on-kind);
-    box-shadow: var(--shadow-pop);
+    box-shadow: var(--shadow-accent);
     transform: translateY(calc(-1 * var(--space-3xs)));
   }
   .num {
@@ -401,12 +403,19 @@
     font-weight: var(--font-weight-black);
     line-height: var(--font-line-height-tight);
   }
+  /* Never clamped: on a 320px phone a tile is ~62px wide and names like "Encrypted direct
+     message" need four lines. The tile grows instead (see .tile). */
   .lbl {
     max-inline-size: 100%;
-    overflow: hidden;
     font-size: var(--font-size-2xs);
     line-height: var(--font-line-height-tight);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .empty {
+      padding: var(--space-md);
+    }
   }
 </style>

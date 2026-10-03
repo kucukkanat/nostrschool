@@ -241,7 +241,7 @@ A real client would often keep the subscription open to receive new notes as the
   options={[
     { id: "a", label: "Quietly change a word in one of them.", correct: false, explanation: "The id and signature would no longer match. Every client would reject the edited copy." },
     { id: "b", label: "Refuse to store or serve them.", correct: true, explanation: "Right: relays choose what to keep. That's why Alice publishes to several." },
-    { id: "c", label: "Copy her notes to other relays on her behalf, as a favor.", correct: false, explanation: "Relays don't sync with each other. (Anyone could re-publish a signed event, but that's a client's choice, not relay magic.)" },
+    { id: "c", label: "Copy her notes to other relays on her behalf, as a favor.", correct: false, explanation: "Relays don't sync with each other. (Anyone could re-publish a signed event, but that's a client's choice, not something relays do on their own.)" },
   ]}
 />
 

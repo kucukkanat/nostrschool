@@ -43,52 +43,62 @@ const ICONS: Record<string, string> = {
   .tools {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--size-rail) * 1.1)), 1fr));
-    gap: var(--space-md);
+    gap: var(--space-lg) var(--space-md);
     margin: 0;
     padding: 0;
     list-style: none;
   }
+  /* Index-card look: ink outline, hard shadow; hover lifts, press flattens. */
   .card {
     display: grid;
+    grid-template-rows: auto auto 1fr auto;
     align-content: start;
     gap: var(--space-xs);
     block-size: 100%;
     padding: var(--space-lg);
-    border: var(--border-width-medium) solid var(--color-text);
-    border-radius: var(--radius-xl);
-    background: var(--color-surface);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
     color: var(--color-text);
     text-decoration: none;
     box-shadow: var(--shadow-pop-sm);
     transition:
-      transform var(--motion-duration-normal) var(--motion-easing-bounce),
-      box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .card:hover,
   .card:focus-visible {
-    transform: translate(calc(var(--space-3xs) * -1), calc(var(--space-3xs) * -1)) rotate(-0.6deg);
-    box-shadow: var(--shadow-pop);
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
   }
+  .card:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
+  }
+  /* Icon on a halftone spot-colour tile, rotating through the riso inks. */
   svg {
-    inline-size: var(--size-icon-xl);
-    block-size: var(--size-icon-xl);
-    padding: var(--space-2xs);
-    border-radius: var(--radius-md);
-    background: var(--color-accent-subtle);
+    inline-size: var(--size-control-lg);
+    block-size: var(--size-control-lg);
+    padding: var(--space-xs);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-accent-subtle);
+    background-image: var(--pattern-halftone);
+    background-size: var(--size-halftone-cell) var(--size-halftone-cell);
     fill: none;
     stroke: var(--color-text);
     stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
   }
   .tool:nth-child(3n + 2) svg {
-    background: var(--color-primary-subtle);
+    background-color: var(--color-primary-subtle);
   }
   .tool:nth-child(3n) svg {
-    background: var(--color-secondary-subtle);
+    background-color: var(--color-secondary-subtle);
   }
   .title {
-    margin: 0;
+    margin: var(--space-xs) 0 0;
     font-size: var(--font-size-xl);
   }
   .text {
@@ -97,7 +107,12 @@ const ICONS: Record<string, string> = {
   }
   .open {
     color: var(--color-text-primary);
-    font-family: var(--font-family-display);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-bold);
+  }
+  .card:hover .open {
+    text-decoration: underline;
+    text-decoration-thickness: var(--border-width-medium);
   }
 </style>

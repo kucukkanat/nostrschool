@@ -36,12 +36,29 @@ Persisted under `localStorage["nostrschool:completed"]` (JSON array of slugs); t
 
 ## Test ids
 
-`site-header`, `site-logo`, `nav-{learn,tools,glossary}`, `locale-{en,es}`, `theme-toggle`,
-`theme-{light,dark,system}` (+ `-input`), `live-toggle`, `live-badge`, `skip-link`, `main`,
-`site-footer`, `reading-progress`, `chapter-rail` (`-count`, `-toggle`, `-NN`), `chapter-title`,
-`chapter-takeaways`, `chapter-complete`, `chapter-prev`, `chapter-next`, `home-title`,
-`home-start`, `course-map-NN`, `hero-network` (`-pause`), `hero-mascot`, `chapter-list`,
-`chapter-link-NN`, `tool-list`, `tool-link-<id>`, `not-found-title`, `not-found-home`.
+`site-header`, `site-logo`, `header-menu-toggle`, `header-menu` (the menu sheet below lg; inline
+at lg), `header-menu-live`, `header-menu-close`, `nav-{learn,tools,glossary}`, `locale-{en,es}`,
+`theme-toggle`, `theme-{light,dark,system}` (+ `-input`), `live-toggle`, `live-badge`, `skip-link`,
+`main`, `site-footer`, `reading-progress`, `chapter-rail` (`-count`, `-toggle`, `-sheet`, `-close`,
+`-scrim`, `-NN`), `chapter-title`, `chapter-takeaways`, `chapter-complete`, `chapter-prev`,
+`chapter-next`, `home-title`, `home-start`, `course-map`, `course-map-NN`, `hero-network`
+(`-pause`), `hero-mascot`, `chapter-list`, `chapter-link-NN`, `tool-list`, `tool-link-<id>`,
+`not-found-title`, `not-found-home`.
+
+## Mobile behaviour
+
+- **Header**: below `lg` (1024px) one compact bar: logo + Menu button. The Menu button opens a
+  native popover sheet with the nav, live switch, theme and language. Escape, the Close button or
+  a tap on the scrim closes it. At `lg` the same element is laid out inline.
+- **Chapter rail**: below `lg` a progress card; "Show chapters" opens the list as a bottom sheet
+  (Escape, Close or a tap outside closes it and focus returns to the toggle). At `lg` it is a
+  sticky column.
+
+## Brand recipes used here
+
+Hover lifts (`translate: -var(--size-lift)` + `--shadow-lift`), press flattens (translate +
+`--shadow-pressed`). `--size-press` (3px, the pop-shadow offset) and `--highlight-fill` (the
+theme-aware highlighter) are defined in `src/styles/global.css`.
 
 ## Tests
 

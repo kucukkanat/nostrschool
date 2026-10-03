@@ -221,7 +221,7 @@
     background: var(--color-success-solid);
   }
   .card[data-online="false"] .dot {
-    background: var(--color-danger);
+    background: var(--color-danger-solid);
   }
   .check {
     display: flex;
@@ -234,19 +234,31 @@
   .check input {
     width: var(--size-icon-sm);
     height: var(--size-icon-sm);
-    accent-color: var(--color-primary);
+    accent-color: var(--color-text-primary);
   }
   .power {
     min-height: var(--size-touch-target);
     padding: var(--space-2xs) var(--space-sm);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-md);
     background: var(--color-surface);
     color: var(--color-text);
     font: inherit;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     cursor: pointer;
+    box-shadow: var(--shadow-pop-sm);
+    transition:
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
+  }
+  .power:hover {
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .power:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
   .power:focus-visible,
   .check input:focus-visible {
@@ -256,7 +268,8 @@
   .power[aria-pressed="true"] {
     background: var(--color-primary);
     color: var(--color-on-primary);
-    border-color: var(--color-primary);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-accent);
   }
   .actions {
     display: flex;

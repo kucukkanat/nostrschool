@@ -2,6 +2,7 @@
   import { format, getDictionary, type Locale } from "@nostrschool/i18n";
   import { encodeNsec } from "@nostrschool/protocol";
   import { Badge, Button, emit, JsonView, pop, shake } from "@nostrschool/ui";
+  import LockGlyph from "../_shared/LockGlyph.svelte";
   import {
     decide,
     demoKeys,
@@ -112,9 +113,6 @@
             onchange={() => choose(m)}
             data-testid="ch10-mode-{m}-input"
           >
-          <span class="mode-icon" aria-hidden="true"
-            >{m === "paste" ? "📋" : m === "nip07" ? "🧩" : "📱"}</span
-          >
           <span class="mode-text">
             <strong>{t.modes[m].label}</strong>
             <span class="blurb">{t.modes[m].blurb}</span>
@@ -122,7 +120,7 @@
         </label>
       {/each}
     </div>
-    <p class="demo-note" data-testid="ch10-demo-note">⚠️ {t.demoNote}</p>
+    <p class="demo-note" data-testid="ch10-demo-note">{t.demoNote}</p>
   </fieldset>
 
   {#if keys === undefined}
@@ -133,7 +131,7 @@
     <div class="stage" data-phase={sim.phase} data-mode={mode}>
       <!-- The app -->
       <div class="panel app" data-testid="ch10-app">
-        <h4 class="panel-title"><span aria-hidden="true">🌐</span> {t.app.title}</h4>
+        <h4 class="panel-title">{t.app.title}</h4>
         {#if mode === "paste"}
           <label class="field">
             <span>{t.memory.nsec}</span>
@@ -182,7 +180,7 @@
 
       <!-- The wire -->
       <div class="panel wire" data-testid="ch10-wire">
-        <h4 class="panel-title"><span aria-hidden="true">🛰️</span> {t.wire.title}</h4>
+        <h4 class="panel-title">{t.wire.title}</h4>
         <ol class="hops">
           {#each sim.wire as hop, i (`${hop.key}-${i}`)}
             <li
@@ -220,11 +218,10 @@
       <!-- The signer -->
       <div class="panel signer" class:asking={sim.phase === "awaiting"} data-testid="ch10-signer">
         <h4 class="panel-title">
-          <span aria-hidden="true">{mode === "paste" ? "🫥" : mode === "nip07" ? "🧩" : "📱"}</span>
           {t.signer.title[mode]}
         </h4>
         <div class="vault" class:open={mode === "paste"} data-testid="ch10-vault">
-          <span class="lock" aria-hidden="true">{mode === "paste" ? "🔓" : "🔐"}</span>
+          <LockGlyph open={mode === "paste"} testid="ch10-vault-lock" />
           <span>{mode === "paste" ? t.signer.vaultEmpty : t.signer.vault}</span>
         </div>
         {#if mode === "paste"}
@@ -275,8 +272,8 @@
     gap: var(--space-md);
     margin: var(--space-xl) 0;
     padding: var(--space-lg);
-    border: var(--border-width-thick) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-pop);
     min-height: var(--size-diagram-min-height);
@@ -317,25 +314,30 @@
     gap: var(--space-xs);
     align-items: flex-start;
     padding: var(--space-sm);
-    border: var(--border-width-medium) solid var(--color-border);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     cursor: pointer;
+    box-shadow: var(--shadow-pop-sm);
     transition:
-      transform var(--motion-duration-fast) var(--motion-easing-bounce),
-      border-color var(--motion-duration-fast) var(--motion-easing-standard),
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
       background-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .mode:hover {
-    transform: translateY(calc(-1 * var(--space-3xs)));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
   }
-  .mode.active {
-    border-color: var(--color-primary);
+  .mode:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
+  }
+  .mode.active,
+  .mode.active:hover {
+    box-shadow: var(--shadow-accent);
     background: var(--color-primary-subtle);
-    box-shadow: var(--shadow-pop-sm);
   }
   .mode[data-mode="paste"].active {
-    border-color: var(--color-danger);
     background: var(--color-danger-subtle);
   }
   .mode input {
@@ -348,9 +350,6 @@
   .mode:has(input:focus-visible) {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
     outline-offset: var(--space-3xs);
-  }
-  .mode-icon {
-    font-size: var(--font-size-xl);
   }
   .mode-text {
     display: flex;
@@ -407,6 +406,7 @@
   textarea,
   .secret {
     font: inherit;
+    font-size: var(--font-size-md);
     font-weight: var(--font-weight-regular);
     padding: var(--space-xs);
     border: var(--border-width-medium) solid var(--color-border-strong);
@@ -417,7 +417,7 @@
   }
   .secret {
     font-family: var(--font-family-mono);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
     border-color: var(--color-danger);
     background: var(--color-danger-subtle);
   }
@@ -511,11 +511,9 @@
   .vault.open {
     background: var(--color-danger-subtle);
   }
-  .lock {
-    font-size: var(--font-size-2xl);
-  }
   .signer.asking {
-    border-color: var(--color-primary);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-accent);
     animation: nudge var(--motion-duration-slower) var(--motion-easing-standard) infinite alternate;
   }
   @keyframes nudge {
@@ -538,7 +536,7 @@
   blockquote {
     margin: 0;
     padding: var(--space-xs);
-    border-left: var(--border-width-thick) solid var(--color-primary);
+    border-left: var(--border-width-thick) solid var(--color-text-primary);
     background: var(--color-primary-subtle);
     border-radius: var(--radius-sm);
     overflow-wrap: anywhere;
@@ -580,5 +578,11 @@
   .verdict {
     margin: 0;
     font-size: var(--font-size-md);
+  }
+  /* tokens.breakpoint.sm = 480px: a tighter frame so phones (320-414px) keep room for content. */
+  @media (max-width: 480px) {
+    .playground {
+      padding: var(--space-md);
+    }
   }
 </style>

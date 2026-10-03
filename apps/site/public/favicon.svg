@@ -1,23 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <title>Nostr School</title>
-  <!-- Static asset: colors mirror tokens (primary #7A2EF5, accent) because CSS vars can't reach favicons. -->
+  <!-- Static asset: colours mirror tokens (paper #F4EFE6, ink #1B1A17, primary #FF5C39,
+       teal #0E8C7F) because CSS vars can't reach favicons. Regenerate PNGs: bun run brand:images -->
+  <rect x="9" y="9" width="51" height="51" rx="3" fill="#0E8C7F" />
   <rect
     x="3"
     y="3"
-    width="58"
-    height="58"
-    rx="18"
-    fill="#7A2EF5"
-    stroke="#1B1033"
-    stroke-width="4"
+    width="51"
+    height="51"
+    rx="3"
+    fill="#FF5C39"
+    stroke="#1B1A17"
+    stroke-width="3"
   />
   <path
-    d="M21 45V19l22 26V19"
+    d="M17 42V16l23 26V16"
     fill="none"
-    stroke="#FFFFFF"
-    stroke-width="7"
-    stroke-linecap="round"
-    stroke-linejoin="round"
+    stroke="#1B1A17"
+    stroke-width="6"
+    stroke-linecap="square"
+    stroke-linejoin="miter"
   />
-  <circle cx="50" cy="14" r="7" fill="#FFB020" stroke="#1B1033" stroke-width="3" />
 </svg>

@@ -103,4 +103,10 @@
   .warn {
     color: var(--color-text-primary);
   }
+  /* Touch screens: a finger-sized hit area for the disclosure. */
+  @media (pointer: coarse) {
+    summary {
+      padding-block: calc((var(--size-touch-target) - 1lh) / 2);
+    }
+  }
 </style>

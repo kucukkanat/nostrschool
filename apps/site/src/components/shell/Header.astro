@@ -1,10 +1,11 @@
 ---
 /**
- * Site header: logo, primary nav, live-mode switch, theme switch, language switcher.
- * Always one row of `--size-header` (it is sticky, so every extra row costs reading space on
- * phones). Below tokens.breakpoint.lg the live/theme/locale controls move into a native popover
- * behind a settings button: no JavaScript needed, and the nav links stay visible. While live mode
- * is on, the button itself carries a LIVE tag so the mode stays unmissable with the menu closed.
+ * Site header, mobile first. Below tokens.breakpoint.lg it is one compact bar (logo + Menu
+ * button); the nav links, live switch, theme and language live in a menu sheet that drops down
+ * from the bar. The sheet is a native popover: no JavaScript, Escape and outside clicks close it.
+ * At lg and up the same element is laid out inline and the Menu button disappears, so every
+ * control exists once in the DOM. While live mode is on, the Menu button carries a LIVE tag so the
+ * mode stays unmissable with the sheet closed.
  */
 import { getDictionary, LOCALE_NAMES, LOCALES, type Locale } from "@nostrschool/i18n";
 import { href, switchLocale } from "~/lib/href";
@@ -27,50 +28,67 @@ const isActive = (id: string) => path.startsWith(href(locale, id));
 ---
 
 <header class="site-header" data-testid="site-header">
-  <div class="inner">
+  <div class="bar">
     <Logo locale={locale} />
-    <nav class="primary" aria-label={t.nav.primary} data-testid="nav-primary">
-      {sections.map((s) => (
-        <a
-          href={href(locale, s.id)}
-          data-testid={`nav-${s.id}`}
-          aria-current={isActive(s.id) ? "page" : undefined}
-        >
-          {s.label}
-        </a>
-      ))}
-    </nav>
     <button
       type="button"
-      class="settings-toggle"
-      popovertarget="header-settings"
-      data-testid="header-settings-toggle"
+      class="menu-toggle"
+      popovertarget="header-menu"
+      data-testid="header-menu-toggle"
     >
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path>
-        <circle cx="16" cy="7" r="2"></circle>
-        <circle cx="8" cy="17" r="2"></circle>
+        <path d="M4 7h16M4 12h16M4 17h10"></path>
       </svg>
-      <span class="visually-hidden">{t.nav.menu}</span>
-      <span class="settings-live" data-testid="header-settings-live">{t.live.on}</span>
+      <span class="menu-label">{t.nav.menu}</span>
+      <span class="menu-live" data-testid="header-menu-live">{t.live.on}</span>
     </button>
-    <div class="controls" id="header-settings" popover data-testid="header-settings">
-      <LiveToggle client:load locale={locale} />
-      <ThemeToggle client:load locale={locale} />
-      <nav class="locales" aria-label={t.nav.language} data-testid="locale-switcher">
-        {LOCALES.map((l) => (
+    <div class="menu" id="header-menu" popover data-testid="header-menu">
+      <nav class="primary" aria-label={t.nav.primary} data-testid="nav-primary">
+        {sections.map((s) => (
           <a
-            href={switchLocale(path, l)}
-            hreflang={l}
-            lang={l}
-            aria-current={l === locale ? "true" : undefined}
-            data-testid={`locale-${l}`}
+            href={href(locale, s.id)}
+            data-testid={`nav-${s.id}`}
+            aria-current={isActive(s.id) ? "page" : undefined}
           >
-            <span aria-hidden="true">{l.toUpperCase()}</span>
-            <span class="visually-hidden">{LOCALE_NAMES[l]}</span>
+            {s.label}
           </a>
         ))}
       </nav>
+      <div class="settings">
+        <div class="row">
+          <LiveToggle client:load locale={locale} />
+        </div>
+        <div class="row">
+          <span class="row-label" aria-hidden="true">{t.theme.label}</span>
+          <ThemeToggle client:load locale={locale} />
+        </div>
+        <div class="row">
+          <span class="row-label" aria-hidden="true">{t.nav.language}</span>
+          <nav class="locales" aria-label={t.nav.language} data-testid="locale-switcher">
+            {LOCALES.map((l) => (
+              <a
+                href={switchLocale(path, l)}
+                hreflang={l}
+                lang={l}
+                aria-current={l === locale ? "true" : undefined}
+                data-testid={`locale-${l}`}
+              >
+                <span aria-hidden="true">{l.toUpperCase()}</span>
+                <span class="visually-hidden">{LOCALE_NAMES[l]}</span>
+              </a>
+            ))}
+          </nav>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="close"
+        popovertarget="header-menu"
+        popovertargetaction="hide"
+        data-testid="header-menu-close"
+      >
+        {t.nav.close}
+      </button>
     </div>
   </div>
 </header>
@@ -80,13 +98,14 @@ const isActive = (id: string) => path.startsWith(href(locale, id));
     position: sticky;
     inset-block-start: 0;
     z-index: var(--z-sticky);
-    background: var(--color-surface);
-    border-block-end: var(--border-width-medium) solid var(--color-text);
+    background: var(--color-bg);
+    border-block-end: var(--border-width-medium) solid var(--color-border-strong);
     view-transition-name: site-header;
   }
-  .inner {
+  .bar {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--space-sm);
     /* --size-header includes the bottom border; the row gets the rest. */
     block-size: calc(var(--size-header) - var(--border-width-medium));
@@ -94,139 +113,246 @@ const isActive = (id: string) => path.startsWith(href(locale, id));
     margin-inline: auto;
     padding: 0 var(--space-md);
   }
-  .primary {
-    display: flex;
-    flex: 1;
-    gap: var(--space-3xs);
-    min-inline-size: 0;
-    /* Long translations scroll inside the nav instead of widening the page. */
-    overflow-x: auto;
-    scrollbar-width: none;
+  .bar > :global(.logo) {
+    flex: none;
   }
-  .primary a,
-  .locales a {
-    display: inline-flex;
-    align-items: center;
-    min-block-size: var(--size-control-sm);
-    padding: 0 var(--space-sm);
-    border-radius: var(--radius-pill);
-    color: var(--color-text);
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-semibold);
-    text-decoration: none;
-    white-space: nowrap;
-    transition:
-      background var(--motion-duration-fast) var(--motion-easing-standard),
-      transform var(--motion-duration-normal) var(--motion-easing-bounce);
-  }
-  .primary a:hover,
-  .locales a:hover {
-    background: var(--color-primary-subtle);
-    transform: translateY(calc(var(--space-3xs) * -1));
-  }
-  .primary a[aria-current="page"] {
-    background: var(--color-primary);
-    color: var(--color-on-primary);
-  }
-  .settings-toggle {
+
+  /* ── Menu button: an ink-outlined tab that lifts on hover and presses flat. */
+  .menu-toggle {
     display: inline-flex;
     flex: none;
     align-items: center;
-    gap: var(--space-2xs);
+    gap: var(--space-xs);
     min-block-size: var(--size-touch-target);
-    min-inline-size: var(--size-touch-target);
-    justify-content: center;
-    padding: 0 var(--space-xs);
-    border: var(--border-width-thin) solid var(--color-border);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface-sunken);
+    padding: 0 var(--space-sm);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
     color: var(--color-text);
+    font: inherit;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    box-shadow: var(--shadow-pop-sm);
     cursor: pointer;
+    transition:
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
-  .settings-toggle svg {
+  .menu-toggle:hover {
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .menu-toggle:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
+  }
+  .menu-toggle svg {
     inline-size: var(--size-icon-md);
     block-size: var(--size-icon-md);
     fill: none;
     stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
+    stroke-width: 2.5;
+    stroke-linecap: square;
   }
-  .settings-live {
+  .menu-live {
     display: none;
     padding: 0 var(--space-2xs);
-    border-radius: var(--radius-pill);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
     background: var(--color-live);
     color: var(--color-on-live);
-    font-family: var(--font-family-display);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-black);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-2xs);
+    font-weight: var(--font-weight-bold);
     letter-spacing: var(--font-letter-spacing-caps);
   }
-  :global(html[data-live="on"]) .settings-live {
+  :global(html[data-live="on"]) .menu-live {
     display: inline;
   }
-  /* Below lg the controls are a popover; the UA keeps it display:none until opened. */
-  .controls:popover-open {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-sm);
+
+  /* ── Menu sheet (below lg). The UA keeps the popover display:none until it is opened. */
+  .menu:popover-open {
+    display: grid;
+    align-content: start;
+    gap: var(--space-lg);
     position: fixed;
-    inset: var(--size-header) var(--space-md) auto auto;
-    margin: var(--space-xs) 0 0;
-    padding: var(--space-md);
-    border: var(--border-width-medium) solid var(--color-text);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
+    inset: var(--size-header) 0 auto;
+    /* Pinned to the viewport (100vw is the device width even when some page content overflows
+       and the mobile layout viewport grows), so a longer locale can never push controls offscreen. */
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 100vw;
+    max-block-size: calc(100dvh - var(--size-header));
+    margin: 0;
+    padding: var(--space-md) var(--space-md) var(--space-lg);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 0;
+    border-block-end: var(--border-width-medium) solid var(--color-border-strong);
+    background: var(--color-bg);
     color: var(--color-text);
-    box-shadow: var(--shadow-pop-sm);
+    box-shadow: var(--shadow-lg);
+    animation: sheet-in var(--motion-duration-normal) var(--motion-easing-decelerate);
+  }
+  /* A flat scrim (never blurred) under the sheet; clicking it closes the menu. */
+  .menu::backdrop {
+    background: var(--color-overlay);
+  }
+  @keyframes sheet-in {
+    from {
+      translate: 0 calc(var(--space-sm) * -1);
+      opacity: 0;
+    }
+  }
+  .primary {
+    display: grid;
+  }
+  .primary a {
+    display: flex;
+    align-items: center;
+    min-block-size: var(--size-control-lg);
+    padding-inline: var(--space-2xs);
+    border-block-end: var(--border-width-thin) solid var(--color-border);
+    color: var(--color-text);
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--font-letter-spacing-tight);
+    text-decoration: none;
+  }
+  /* Current section: a highlighter swipe, not a coloured pill. */
+  .primary a[aria-current="page"] {
+    background: var(--highlight-fill);
+    color: var(--color-on-highlight);
+  }
+  .primary a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: var(--border-width-medium);
+    text-underline-offset: 0.2em;
+  }
+  .settings {
+    display: grid;
+    gap: var(--space-sm);
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    min-inline-size: 0;
+  }
+  .row-label {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--font-letter-spacing-caps);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
   }
   .locales {
-    display: flex;
+    display: inline-flex;
+    gap: var(--space-3xs);
     padding: var(--space-3xs);
-    border-radius: var(--radius-pill);
-    border: var(--border-width-thin) solid var(--color-border);
-    background: var(--color-surface-sunken);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
   }
   .locales a {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: var(--size-control-sm);
+    min-block-size: var(--size-control-sm);
     padding: 0 var(--space-xs);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-family: var(--font-family-mono);
     font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
   }
+  .locales a:hover {
+    background: var(--color-surface-sunken);
+  }
+  /* Selected language: inverse ink chip (a non-colour cue, readable in both themes). */
   .locales a[aria-current="true"] {
-    background: var(--color-text);
-    color: var(--color-surface);
+    background: var(--color-surface-inverse);
+    color: var(--color-text-inverse);
   }
-  .inner > :global(.logo) {
-    flex: none;
+  .close {
+    justify-self: stretch;
+    min-block-size: var(--size-touch-target);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
   }
-  /* < tokens.breakpoint.md: the mark alone; the name stays as the link's accessible text. */
-  @media (max-width: 767px) {
-    .inner > :global(.logo) :global(.word) {
+
+  /* < tokens.breakpoint.sm: the mark alone; the name stays as the link's accessible text.
+     Setting rows stack (label above control) so longer locales never need a wider row. */
+  @media (max-width: 479px) {
+    .row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2xs);
+    }
+    .bar > :global(.logo) :global(.word) {
       position: absolute;
-      inline-size: 1px;
-      block-size: 1px;
+      inline-size: var(--border-width-thin);
+      block-size: var(--border-width-thin);
       overflow: hidden;
       clip-path: inset(50%);
       white-space: nowrap;
     }
   }
-  /* >= tokens.breakpoint.lg: controls sit inline; the popover is never opened (no toggle). */
+
+  /* >= tokens.breakpoint.lg: everything inline in the bar; the popover is never opened. */
   @media (min-width: 1024px) {
-    .settings-toggle {
+    .menu-toggle,
+    .close,
+    .row-label {
       display: none;
     }
-    .controls {
+    .menu {
       display: flex;
+      flex: 1;
       align-items: center;
-      gap: var(--space-xs);
+      gap: var(--space-md);
       position: static;
       inset: auto;
+      inline-size: auto;
       margin: 0;
       padding: 0;
       border: 0;
       background: none;
       color: inherit;
       overflow: visible;
+    }
+    .primary {
+      display: flex;
+      flex: 1;
+      gap: var(--space-2xs);
+      margin-inline-start: var(--space-lg);
+    }
+    .primary a {
+      min-block-size: var(--size-control-sm);
+      padding-inline: var(--space-xs);
+      border: 0;
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      letter-spacing: var(--font-letter-spacing-normal);
+    }
+    .settings {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .row {
+      flex-wrap: nowrap;
     }
   }
 </style>

@@ -1,5 +1,9 @@
 ---
-/** Logo mark + wordmark. The mark is decorative; the link's text is the site name. */
+/**
+ * Logo mark + wordmark. The mark is the favicon drawn with tokens: an orange tile with an ink
+ * outline and an ink "N", printed slightly off a teal plate (riso misregistration). On hover the
+ * plates drift a little further apart. The mark is decorative; the link's text is the site name.
+ */
 import { getDictionary, type Locale } from "@nostrschool/i18n";
 import { href } from "~/lib/href";
 
@@ -13,10 +17,12 @@ const [first = name, ...rest] = name.split(" ");
 ---
 
 <a class="logo" href={href(locale)} data-testid={testid}>
-  <svg class="mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-    <rect class="tile" x="2" y="2" width="36" height="36" rx="11"></rect>
-    <path class="letter" d="M13 28V12l14 16V12"></path>
-    <circle class="spark" cx="31" cy="9" r="4"></circle>
+  <svg class="mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+    <rect class="plate" x="9" y="9" width="51" height="51" rx="3"></rect>
+    <g class="print">
+      <rect class="tile" x="3" y="3" width="51" height="51" rx="3"></rect>
+      <path class="letter" d="M17 42V16l23 26V16"></path>
+    </g>
   </svg>
   <span class="word"
     ><span class="first">{first}</span>{rest.length > 0 && " "}<span class="rest"
@@ -30,6 +36,7 @@ const [first = name, ...rest] = name.split(" ");
     display: inline-flex;
     align-items: center;
     gap: var(--space-xs);
+    min-block-size: var(--size-touch-target);
     color: var(--color-text);
     text-decoration: none;
     font-family: var(--font-family-display);
@@ -39,29 +46,32 @@ const [first = name, ...rest] = name.split(" ");
     white-space: nowrap;
   }
   .mark {
+    flex: none;
     inline-size: var(--size-control-md);
     block-size: var(--size-control-md);
-    transition: transform var(--motion-duration-slow) var(--motion-easing-bounce);
+    overflow: visible;
   }
-  .logo:hover .mark {
-    transform: rotate(-10deg) scale(1.08);
+  .plate {
+    fill: var(--color-secondary);
+  }
+  .print {
+    transition: translate var(--motion-duration-normal) var(--motion-easing-bounce);
+  }
+  /* In SVG user units, so the print plate slips a few units further off the teal one. */
+  .logo:hover .print {
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
   }
   .tile {
     fill: var(--color-primary);
-    stroke: var(--color-text);
-    stroke-width: 2.5;
+    stroke: var(--color-border-strong);
+    stroke-width: 3;
   }
   .letter {
     fill: none;
     stroke: var(--color-on-primary);
-    stroke-width: 4.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .spark {
-    fill: var(--color-accent);
-    stroke: var(--color-text);
-    stroke-width: 2;
+    stroke-width: 6;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
   }
   .rest {
     color: var(--color-text-primary);

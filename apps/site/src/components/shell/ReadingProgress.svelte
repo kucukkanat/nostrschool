@@ -59,10 +59,12 @@
     background: transparent;
     pointer-events: none;
   }
+  /* A solid orange strip with an ink edge: the fill alone is too light against paper. */
   .bar {
     display: block;
     block-size: 100%;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    background: var(--color-primary);
+    border-block-end: var(--border-width-medium) solid var(--color-border-strong);
     transform-origin: left center;
     transform: scaleX(var(--progress));
   }

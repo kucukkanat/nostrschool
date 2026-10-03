@@ -128,7 +128,7 @@
     <div class="detail" data-testid="ch09-flow-detail" data-step={def.id}>
       {#key `${selected}-${def.id}`}
         <div class="detail-head" use:pop>
-          <span class="icon" aria-hidden="true">{def.icon}</span>
+          <span class="step-no" aria-hidden="true">{String(current + 1).padStart(2, "0")}</span>
           <div>
             <h3 class="detail-title" data-testid="ch09-flow-detail-title">
               {t.steps[def.id].title}
@@ -209,22 +209,29 @@
     min-height: var(--size-touch-target);
     padding: var(--space-2xs) var(--space-sm);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-md);
     background: var(--color-surface);
     color: var(--color-text);
     font-weight: var(--font-weight-semibold);
     cursor: pointer;
+    box-shadow: var(--shadow-pop-sm);
     transition:
-      transform var(--motion-duration-fast) var(--motion-easing-bounce),
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
       background-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .chip:hover {
-    transform: translateY(calc(-1 * var(--space-3xs)));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .chip:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
   .chip.active {
     background: var(--color-primary-subtle);
-    border-color: var(--color-primary);
-    box-shadow: var(--shadow-pop-sm);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-accent);
   }
   .chip:has(input:focus-visible) {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
@@ -252,7 +259,7 @@
     flex-direction: column;
     gap: var(--space-sm);
     padding: var(--space-md);
-    border: var(--border-width-medium) solid var(--color-primary);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-pop);
@@ -263,9 +270,20 @@
     gap: var(--space-sm);
     align-items: flex-start;
   }
-  .icon {
-    font-size: var(--font-size-3xl);
-    line-height: var(--font-line-height-tight);
+  /* Field-notebook step number instead of a decorative emoji. */
+  .step-no {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: var(--size-control-md);
+    block-size: var(--size-control-md);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-highlight);
+    color: var(--color-on-highlight);
+    font-family: var(--font-family-mono);
+    font-weight: var(--font-weight-bold);
+    box-shadow: var(--shadow-pop-sm);
   }
   .detail-title {
     margin: 0;
@@ -288,8 +306,8 @@
     transition: background-color var(--motion-duration-slow) var(--motion-easing-emphasized);
   }
   .counter.lit {
-    background: var(--color-accent-subtle);
-    color: var(--color-text);
+    background: var(--color-highlight);
+    color: var(--color-on-highlight);
   }
   .counter-value {
     display: inline-block;
@@ -304,6 +322,7 @@
     margin: 0;
     padding: var(--space-2xs) var(--space-sm);
     border-radius: var(--radius-pill);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     background: var(--color-secondary);
     color: var(--color-on-secondary);
     font-weight: var(--font-weight-bold);

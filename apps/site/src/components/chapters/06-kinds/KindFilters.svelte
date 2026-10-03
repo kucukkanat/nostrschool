@@ -102,12 +102,12 @@
     background: var(--color-surface);
     color: var(--color-text);
     font: inherit;
+    font-size: var(--font-size-md);
     transition: border-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
   input:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
     outline-offset: var(--space-3xs);
-    border-color: var(--color-primary);
   }
   .chips {
     display: flex;
@@ -121,7 +121,7 @@
     gap: var(--space-2xs);
     min-block-size: var(--size-touch-target);
     padding: var(--space-2xs) var(--space-sm);
-    border: var(--border-width-medium) solid var(--chip-color);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-pill);
     background: var(--color-surface);
     color: var(--color-text);
@@ -163,7 +163,7 @@
     block-size: var(--space-xs);
     border-radius: var(--radius-round);
     background: var(--chip-color);
-    box-shadow: 0 0 0 var(--border-width-thin) var(--color-surface);
+    border: var(--border-width-thin) solid var(--color-border-strong);
   }
   /* No opacity here: on a pressed (filled) chip a faded count drops below 4.5:1 contrast. */
   .n {

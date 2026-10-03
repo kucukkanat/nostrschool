@@ -1,4 +1,4 @@
-/** Pure geometry for the shell's illustrations: reading progress, course path, hero network. */
+/** Pure geometry for the shell's illustrations: reading progress and the hero network. */
 
 export interface Point {
   readonly x: number;
@@ -16,28 +16,6 @@ export const readingProgress = (m: {
   const scrollable = m.scrollHeight - m.clientHeight;
   return scrollable <= 0 ? 1 : clamp01(m.scrollTop / scrollable);
 };
-
-/**
- * Winding course path, Duolingo-style. x is a percentage of the width (so the path stretches
- * with the container), y is in "rows" (one stop per row, centred), so CSS can size rows with a
- * spacing token and the SVG uses a `0 0 100 count` viewBox.
- */
-export const courseStops = (count: number, amplitude = 26): readonly Point[] =>
-  Array.from({ length: Math.max(0, Math.floor(count)) }, (_, i) => ({
-    x: 50 + amplitude * Math.round(Math.sin((i * Math.PI) / 2)),
-    y: i + 0.5,
-  }));
-
-/** Smooth vertical S-curves through the stops (control points half a row above/below). */
-export const curvePath = (points: readonly Point[]): string =>
-  points
-    .map((p, i) => {
-      const prev = points[i - 1];
-      return prev === undefined
-        ? `M ${p.x} ${p.y}`
-        : `C ${prev.x} ${prev.y + 0.5} ${p.x} ${p.y - 0.5} ${p.x} ${p.y}`;
-    })
-    .join(" ");
 
 export const lerp = (a: Point, b: Point, t: number): Point => {
   const k = clamp01(t);

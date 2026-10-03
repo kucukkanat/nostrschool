@@ -4,12 +4,12 @@ import { expectNoA11yViolations } from "./helpers/a11y.ts";
 import { pagePath } from "./helpers/site.ts";
 import { expect, type Page, test } from "./helpers/test.ts";
 
-/** Below lg the header controls live in a popover; open it when its toggle is showing. */
-const openSettings = async (page: Page): Promise<void> => {
-  const toggle = page.getByTestId("header-settings-toggle");
+/** Below lg the nav and controls live in the header's menu sheet; open it when its toggle shows. */
+const openMenu = async (page: Page): Promise<void> => {
+  const toggle = page.getByTestId("header-menu-toggle");
   if (await toggle.isVisible()) {
     await toggle.click();
-    await expect(page.getByTestId("header-settings")).toBeVisible();
+    await expect(page.getByTestId("header-menu")).toBeVisible();
   }
 };
 
@@ -22,6 +22,7 @@ test.describe("navigation", () => {
 
   test("home → course → chapter → next chapter", async ({ page }) => {
     await page.goto(pagePath("en"));
+    await openMenu(page);
     await page.getByTestId("nav-learn").click();
     await expect(page).toHaveURL(/\/en\/learn\/$/);
     await expect(page.getByTestId("nav-learn")).toHaveAttribute("aria-current", "page");
@@ -49,6 +50,7 @@ test.describe("navigation", () => {
       "href",
       /\/en\/tools\/keys\/$/,
     );
+    await openMenu(page);
     await page.getByTestId("nav-tools").click();
     await expect(page.getByTestId("tools-title")).toBeVisible();
     await expect(page.getByTestId("tool-link-glossary")).toBeVisible();
@@ -76,14 +78,14 @@ test.describe("preferences", () => {
   test("theme toggle forces dark/light, persists, and returns to system", async ({ page }) => {
     await page.goto(pagePath("en"));
     const html = page.locator("html");
-    await openSettings(page);
+    await openMenu(page);
     await page.getByTestId("theme-dark").click();
     await expect(html).toHaveAttribute("data-theme", "dark");
     await page.reload();
     await expect(html).toHaveAttribute("data-theme", "dark");
     await expect(page.getByTestId("theme-dark-input")).toBeChecked();
 
-    await openSettings(page);
+    await openMenu(page);
     await page.getByTestId("theme-light").click();
     await expect(html).toHaveAttribute("data-theme", "light");
     await page.getByTestId("theme-system").click();
@@ -93,12 +95,12 @@ test.describe("preferences", () => {
 
   test("language switcher keeps the current page", async ({ page }) => {
     await page.goto(pagePath("en", "learn/keys"));
-    await openSettings(page);
+    await openMenu(page);
     await page.getByTestId("locale-es").click();
     await expect(page).toHaveURL(/\/es\/learn\/keys\/$/);
     await expect(page.locator("html")).toHaveAttribute("lang", "es-ES");
     await expect(page.getByTestId("locale-es")).toHaveAttribute("aria-current", "true");
-    await openSettings(page);
+    await openMenu(page);
     await page.getByTestId("locale-en").click();
     await expect(page).toHaveURL(/\/en\/learn\/keys\/$/);
   });
@@ -106,12 +108,12 @@ test.describe("preferences", () => {
   test("live toggle shows the LIVE badge and persists", async ({ page }) => {
     await page.goto(pagePath("en"));
     const toggle = page.getByTestId("live-toggle");
-    const menuTag = page.getByTestId("header-settings-live");
+    const menuTag = page.getByTestId("header-menu-live");
     await expect(toggle).toHaveAttribute("aria-pressed", "false");
     await expect(page.getByTestId("live-badge")).toHaveCount(0);
     await expect(menuTag).toBeHidden();
 
-    await openSettings(page);
+    await openMenu(page);
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("live-badge")).toBeVisible();
@@ -119,12 +121,12 @@ test.describe("preferences", () => {
     expect(await page.evaluate(() => localStorage.getItem("nostrschool:live"))).toBe("1");
 
     await page.goto(pagePath("en", "learn"));
-    // With the settings popover closed (phones), the toggle button itself says LIVE.
-    const menuToggle = page.getByTestId("header-settings-toggle");
+    // With the menu sheet closed (phones), the Menu button itself says LIVE.
+    const menuToggle = page.getByTestId("header-menu-toggle");
     await expect(
       (await menuToggle.isVisible()) ? menuTag : page.getByTestId("live-badge"),
     ).toBeVisible();
-    await openSettings(page);
+    await openMenu(page);
     await expect(page.getByTestId("live-toggle")).toContainText("Live");
     await page.getByTestId("live-toggle").click();
     await expect(page.getByTestId("live-badge")).toHaveCount(0);
@@ -156,9 +158,9 @@ test.describe("small screens", () => {
     const header = page.getByTestId("site-header");
     const height = (await header.boundingBox())?.height ?? Number.POSITIVE_INFINITY;
     expect(height).toBeLessThanOrEqual(64);
-    await expect(page.getByTestId("nav-glossary")).toBeVisible();
-    await expect(page.getByTestId("header-settings-toggle")).toBeVisible();
-    await expect(page.getByTestId("header-settings")).toBeHidden();
+    await expect(page.getByTestId("header-menu-toggle")).toBeVisible();
+    await expect(page.getByTestId("header-menu")).toBeHidden();
+    await expect(page.getByTestId("nav-glossary")).toBeHidden();
 
     // pagePath appends a trailing slash, so the hash goes after it.
     await page.goto(`${pagePath("en", "glossary")}#keypair`);
@@ -168,16 +170,49 @@ test.describe("small screens", () => {
     expect(top).toBeGreaterThanOrEqual(height);
   });
 
-  test("the settings popover shows labelled live, theme and language controls", async ({
+  test("the menu sheet holds the nav plus labelled live, theme and language controls", async ({
     page,
   }) => {
-    await page.goto(pagePath("en"));
-    await openSettings(page);
+    await page.goto(pagePath("en", "glossary"));
+    await openMenu(page);
+    await expect(page.getByTestId("nav-glossary")).toHaveAttribute("aria-current", "page");
     await expect(page.getByTestId("live-toggle")).toContainText("Live");
     await expect(page.getByTestId("theme-dark")).toBeVisible();
     await expect(page.getByTestId("locale-es")).toBeVisible();
     await page.keyboard.press("Escape");
-    await expect(page.getByTestId("header-settings")).toBeHidden();
+    await expect(page.getByTestId("header-menu")).toBeHidden();
+    await openMenu(page);
+    await page.getByTestId("header-menu-close").click();
+    await expect(page.getByTestId("header-menu")).toBeHidden();
+  });
+
+  test("the chapter list opens as a bottom sheet and closes with Escape", async ({ page }) => {
+    await page.goto(pagePath("en", "learn/keys"));
+    const sheet = page.getByTestId("chapter-rail-sheet");
+    await expect(sheet).toBeHidden();
+    await page.getByTestId("chapter-rail-toggle").click();
+    await expect(sheet).toBeVisible();
+    await expect(page.getByTestId("chapter-rail-02")).toHaveAttribute("aria-current", "page");
+    // The sheet slides up from below: measure where it lands, not a frame mid-slide.
+    await sheet.evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
+    const box = await sheet.boundingBox();
+    const viewport = page.viewportSize();
+    // Pinned to the bottom edge of the screen.
+    expect((box?.y ?? 0) + (box?.height ?? 0)).toBeCloseTo(viewport?.height ?? 0, 0);
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
+    await expect(page.getByTestId("chapter-rail-toggle")).toBeFocused();
+  });
+
+  test("no page scrolls sideways at 360px", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    for (const path of ["", "learn", "learn/keys", "tools", "glossary"]) {
+      await page.goto(pagePath("en", path));
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow, `/${path}`).toBeLessThanOrEqual(0);
+    }
   });
 
   test("the chapter intro keeps Nos and the bubble in one short row", async ({ page }) => {
@@ -203,7 +238,7 @@ test.describe("accessibility", () => {
       localStorage.setItem("nostrschool:theme", "dark");
     });
     await page.goto(pagePath("en"));
-    await openSettings(page);
+    await openMenu(page);
     await page.getByTestId("live-toggle").click();
     await expect(page.getByTestId("live-badge")).toBeVisible();
     await expectNoA11yViolations(page);

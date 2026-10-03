@@ -59,11 +59,15 @@ const pager = [
           <p class="summary" data-testid="chapter-summary">{meta.summary}</p>
           <ul class="meta">
             <li class="pill" data-testid="chapter-minutes">
-              <span aria-hidden="true">⏱ </span>{format(t.minutes, { n: meta.estimatedMinutes })}
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2.5 2.5M9 2h6"></path>
+              </svg>
+              {format(t.minutes, { n: meta.estimatedMinutes })}
             </li>
             {meta.nips.length > 0 && (
-              <li class="pill nips" data-testid="chapter-nips">
-                {t.nips}:
+              <li class="nips" data-testid="chapter-nips">
+                <span class="nips-label">{t.nips}</span>
                 {meta.nips.map((nip) => (
                   <a
                     href={nipUrl(nip)}
@@ -148,20 +152,17 @@ const pager = [
   .eyebrow {
     margin: 0;
     color: var(--color-text-primary);
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-bold);
-    text-transform: uppercase;
-    letter-spacing: var(--font-letter-spacing-caps);
   }
   h1 {
-    margin: var(--space-2xs) 0 var(--space-sm);
-    font-size: var(--font-size-4xl);
+    margin: var(--space-xs) 0 var(--space-sm);
+    font-size: var(--font-size-5xl);
     font-weight: var(--font-weight-black);
     view-transition-name: chapter-title;
   }
   .summary {
     margin: 0 0 var(--space-md);
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-snug);
     color: var(--color-text-muted);
   }
   .meta {
@@ -172,26 +173,80 @@ const pager = [
     padding: 0;
     list-style: none;
   }
+  /* Catalogue-label chips: mono, ink outline, square corners. */
   .pill {
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-2xs);
-    padding: var(--space-3xs) var(--space-sm);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface-sunken);
-    font-size: var(--font-size-sm);
+    padding: var(--space-3xs) var(--space-xs);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-raised);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
   }
+  .pill svg {
+    inline-size: var(--size-icon-sm);
+    block-size: var(--size-icon-sm);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: square;
+  }
+  /* NIP links get their own row of chips: side by side inside one pill they were ~18px targets. */
+  .nips {
+    display: flex;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+  }
+  .nips-label {
+    color: var(--color-text-muted);
+    letter-spacing: var(--font-letter-spacing-caps);
+    text-transform: uppercase;
+  }
   .nips a {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: var(--size-control-sm);
+    min-block-size: var(--size-control-sm);
+    padding-inline: var(--space-xs);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-raised);
     color: var(--color-text-primary);
+    box-shadow: var(--shadow-pop-sm);
+    text-decoration: none;
+    transition:
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
+  }
+  .nips a:hover {
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .nips a:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
+  }
+  @media (pointer: coarse) {
+    .nips a {
+      min-inline-size: var(--size-touch-target);
+      min-block-size: var(--size-touch-target);
+    }
   }
   .fallback {
     margin: var(--space-md) 0 0;
     padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-md);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
     background: var(--color-warning-subtle);
-    border: var(--border-width-thin) solid var(--color-warning);
   }
   .mascot {
     justify-self: end;
@@ -207,22 +262,32 @@ const pager = [
     display: grid;
     gap: var(--space-3xs);
     padding: var(--space-md);
-    border: var(--border-width-medium) solid var(--color-text);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
     color: var(--color-text);
     text-decoration: none;
     box-shadow: var(--shadow-pop-sm);
-    transition: transform var(--motion-duration-normal) var(--motion-easing-bounce);
+    transition:
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .page:hover {
-    transform: translateY(calc(var(--space-3xs) * -1));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .page:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
   .next {
     text-align: end;
   }
   .dir {
-    font-size: var(--font-size-sm);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: var(--font-letter-spacing-caps);
+    text-transform: uppercase;
     color: var(--color-text-muted);
   }
   .name {

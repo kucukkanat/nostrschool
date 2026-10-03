@@ -130,14 +130,16 @@
     cursor: pointer;
     transition:
       background-color var(--motion-duration-fast) var(--motion-easing-standard),
-      border-color var(--motion-duration-fast) var(--motion-easing-standard);
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .chip:hover {
-    border-color: var(--color-primary);
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-pop-sm);
   }
   .chip:has(:checked) {
     background: var(--color-primary);
-    border-color: var(--color-primary);
+    box-shadow: var(--shadow-accent);
     color: var(--color-on-primary);
   }
   .chip:has(:focus-visible),
@@ -149,6 +151,7 @@
     display: grid;
     gap: var(--space-xs);
     padding: var(--space-md);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-lg);
     background: var(--color-primary-subtle);
     box-shadow: var(--shadow-pop-sm);
@@ -165,13 +168,15 @@
   }
   .meter {
     height: var(--space-md);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-raised);
     overflow: hidden;
   }
   .fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    /* Flat riso ink, no gradient: the ink track outline carries it on paper. */
+    background: var(--color-primary);
     transform-origin: left center;
     /* Bounce easing gives the springy overshoot; tokens collapse it to 0ms under reduced motion. */
     transition: transform var(--motion-duration-slow) var(--motion-easing-bounce);

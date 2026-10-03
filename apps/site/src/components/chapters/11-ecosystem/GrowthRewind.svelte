@@ -87,7 +87,7 @@
   input[type="range"] {
     width: 100%;
     min-height: var(--size-touch-target);
-    accent-color: var(--color-primary);
+    accent-color: var(--color-text-primary);
   }
   input[type="range"]:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
@@ -127,8 +127,9 @@
       background-color var(--motion-duration-fast) var(--motion-easing-standard),
       transform var(--motion-duration-normal) var(--motion-easing-bounce);
   }
+  /* Blocks are too small to carry an ink outline, so they use the accent ink, not the orange fill. */
   .block.on {
-    background: var(--color-primary);
+    background: var(--color-text-primary);
     transform: scale(1);
   }
 </style>

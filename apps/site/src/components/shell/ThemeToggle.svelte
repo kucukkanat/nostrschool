@@ -93,9 +93,9 @@
     gap: var(--space-3xs);
     margin: 0;
     padding: var(--space-3xs);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface-sunken);
-    border: var(--border-width-thin) solid var(--color-border);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
   }
   .option {
     position: relative;
@@ -103,24 +103,24 @@
     place-items: center;
     inline-size: var(--size-control-sm);
     block-size: var(--size-control-sm);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-sm);
     color: var(--color-text-muted);
     cursor: pointer;
-    transition:
-      background var(--motion-duration-fast) var(--motion-easing-standard),
-      transform var(--motion-duration-normal) var(--motion-easing-bounce);
+    transition: background var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .option:hover {
+    background: var(--color-surface-sunken);
     color: var(--color-text);
-    transform: scale(1.1);
   }
+  /* Selected: orange fill plus an inset ink outline, so the state never rests on colour alone. */
   .option:has(:checked) {
     background: var(--color-primary);
     color: var(--color-on-primary);
+    box-shadow: inset 0 0 0 var(--border-width-medium) var(--color-border-strong);
   }
   .option:has(:focus-visible) {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
-    outline-offset: var(--space-3xs);
+    outline-offset: var(--size-focus-offset);
   }
   /* The input covers the label so it stays clickable and focusable, but is invisible. */
   .radio {

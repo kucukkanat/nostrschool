@@ -163,7 +163,7 @@
     gap: var(--space-md);
     padding: var(--space-md);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-pop);
   }
@@ -234,7 +234,7 @@
   .check input {
     width: var(--size-icon-sm);
     height: var(--size-icon-sm);
-    accent-color: var(--color-primary);
+    accent-color: var(--color-text-primary);
   }
   .check input:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
@@ -272,7 +272,7 @@
   .narration {
     margin: 0;
     padding: var(--space-sm) var(--space-md);
-    border-left: var(--border-width-heavy) solid var(--color-primary);
+    border-left: var(--border-width-heavy) solid var(--color-text-primary);
     border-radius: var(--radius-sm);
     background: var(--color-primary-subtle);
     font-weight: var(--font-weight-semibold);

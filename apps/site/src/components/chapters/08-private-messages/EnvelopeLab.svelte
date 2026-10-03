@@ -4,6 +4,7 @@
   import type { Hex } from "@nostrschool/protocol";
   import { Badge, Button, emit, JsonView, pop, shake } from "@nostrschool/ui";
   import { tick } from "svelte";
+  import LockGlyph from "../_shared/LockGlyph.svelte";
   import {
     buildScenario,
     detailParams,
@@ -212,7 +213,6 @@
     <div class="panels">
       <section class="panel" data-testid="ch08-relay-view" aria-labelledby="ch08-relay-title">
         <h4 id="ch08-relay-title" class="panel-title">
-          <span aria-hidden="true">📡</span>
           {t.relayTitle}
         </h4>
         <p class="muted small">{t.relaySubtitle}</p>
@@ -258,7 +258,6 @@
 
       <section class="panel" data-testid="ch08-open-view" aria-labelledby="ch08-open-title">
         <h4 id="ch08-open-title" class="panel-title">
-          <span aria-hidden="true">🔑</span>
           {t.openTitle}
         </h4>
         <fieldset class="choices">
@@ -293,7 +292,7 @@
                 use:pop={{ spring: "wobbly", from: 0.8 }}
               >
                 <div class="layer-head">
-                  <span class="lock" aria-hidden="true">{isOpen ? "🔓" : "🔒"}</span>
+                  <LockGlyph open={isOpen} testid="ch08-layer-{id}-lock" />
                   <span class="layer-name">{t.layers[id].name}</span>
                   <Badge testid="ch08-layer-{id}-kind" size="sm" tone="neutral"
                     >{t.layers[id].kind}</Badge
@@ -322,7 +321,7 @@
             <span class="bubble-label">{t.revealedMessage}</span>
             <p class="bubble-text" data-testid="ch08-revealed-text">{messageText}</p>
             {#if scheme === "nip17" && finished}
-              <p class="ok small" data-testid="ch08-author-check">✔ {t.authorCheck}</p>
+              <p class="ok small" data-testid="ch08-author-check">✓ {t.authorCheck}</p>
             {/if}
             {#if scheme === "nip04" && viewer !== "bob"}
               <p class="warn small" data-testid="ch08-garbage-warning">{t.garbageWarning}</p>
@@ -368,7 +367,7 @@
     min-height: var(--size-diagram-min-height);
     padding: var(--space-md);
     border: var(--border-width-medium) solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     background: var(--color-surface);
     box-shadow: var(--shadow-pop);
     color: var(--color-text);
@@ -405,6 +404,7 @@
     background: var(--color-surface-raised);
     color: var(--color-text);
     font: inherit;
+    font-size: var(--font-size-md);
     resize: vertical;
   }
   textarea:focus-visible,
@@ -443,34 +443,41 @@
     gap: var(--space-3xs);
     min-height: var(--size-touch-target);
     padding: var(--space-sm);
-    border: var(--border-width-medium) solid var(--color-border);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-lg);
     background: var(--color-surface-raised);
     color: var(--color-text);
     font: inherit;
     text-align: start;
     cursor: pointer;
+    box-shadow: var(--shadow-pop-sm);
     transition:
-      transform var(--motion-duration-fast) var(--motion-easing-bounce),
-      border-color var(--motion-duration-fast) var(--motion-easing-standard),
-      box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .scheme:hover,
   .viewer:hover {
-    transform: translateY(calc(-1 * var(--space-3xs)));
-    border-color: var(--color-primary);
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
+  }
+  .scheme:active,
+  .viewer:active {
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
   .scheme.active,
-  .viewer.active {
-    border-color: var(--color-primary);
+  .viewer.active,
+  .scheme.active:hover,
+  .viewer.active:hover {
+    box-shadow: var(--shadow-accent);
     background: var(--color-primary-subtle);
-    box-shadow: var(--shadow-pop-sm);
   }
   .step {
     display: inline-grid;
     place-items: center;
     width: var(--size-icon-lg);
     height: var(--size-icon-lg);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-round);
     background: var(--color-primary);
     color: var(--color-on-primary);
@@ -625,9 +632,9 @@
   }
   .bubble {
     padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl) var(--radius-sm);
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm);
     background: var(--color-primary-subtle);
-    border: var(--border-width-medium) solid var(--color-primary);
+    border: var(--border-width-medium) solid var(--color-text-primary);
   }
   .bubble-label {
     color: var(--color-text-primary);
@@ -660,5 +667,11 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-xs);
+  }
+  /* Touch screens: the small JSON disclosure still gets a finger-sized hit area. */
+  @media (pointer: coarse) {
+    .layer-json summary {
+      padding-block: calc((var(--size-touch-target) - 1lh) / 2);
+    }
   }
 </style>

@@ -73,9 +73,9 @@
     gap: var(--space-xs);
     min-block-size: var(--size-control-lg);
     padding: 0 var(--space-lg);
-    border: var(--border-width-medium) solid var(--color-text);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
     color: var(--color-text);
     font: inherit;
     font-family: var(--font-family-display);
@@ -84,30 +84,31 @@
     box-shadow: var(--shadow-pop);
     cursor: pointer;
     transition:
-      transform var(--motion-duration-normal) var(--motion-easing-bounce),
-      box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .button:hover {
-    transform: translate(calc(var(--space-3xs) * -1), calc(var(--space-3xs) * -1));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    box-shadow: var(--shadow-lift);
   }
   .button:active {
-    transform: translate(var(--space-3xs), var(--space-3xs));
-    box-shadow: var(--shadow-pop-sm);
+    translate: var(--size-press) var(--size-press);
+    box-shadow: var(--shadow-pressed);
   }
   .button.done {
     background: var(--color-success-solid);
     color: var(--color-on-success);
   }
+  /* A checkbox square that gets ticked, like a to-do in the margin. */
   .check {
     display: grid;
     place-items: center;
     inline-size: var(--size-icon-lg);
     block-size: var(--size-icon-lg);
-    border-radius: var(--radius-round);
+    border-radius: var(--radius-sm);
     border: var(--border-width-medium) solid currentColor;
-  }
-  .done .check {
-    animation: pop var(--motion-duration-slow) var(--motion-easing-bounce);
+    background: var(--color-surface-raised);
+    color: var(--color-text);
   }
   svg {
     inline-size: var(--size-icon-sm);
@@ -115,13 +116,19 @@
     fill: none;
     stroke: currentColor;
     stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    /* 24 ≈ the check path's length, so the tick draws itself in. */
+    stroke-dasharray: 24;
+  }
+  .done .check svg {
+    animation: tick var(--motion-duration-slow) var(--motion-easing-decelerate);
   }
   .button:not(.done) svg {
-    opacity: var(--opacity-subtle);
+    opacity: 0;
   }
   .undo {
+    min-block-size: var(--size-touch-target);
     border: 0;
     background: none;
     color: var(--color-text-muted);
@@ -130,9 +137,9 @@
     text-decoration: underline;
     cursor: pointer;
   }
-  @keyframes pop {
+  @keyframes tick {
     from {
-      transform: scale(0.4) rotate(-20deg);
+      stroke-dashoffset: 24;
     }
   }
 </style>

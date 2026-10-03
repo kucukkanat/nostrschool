@@ -35,18 +35,19 @@ const links = [
       </ul>
     </nav>
     <div class="notes">
-      <p data-testid="footer-safety"><span aria-hidden="true">🔐 </span>{t.safety.demoKeys}</p>
+      <p class="safety" data-testid="footer-safety">{t.safety.demoKeys}</p>
       <p data-testid="footer-read-only">{t.shell.readOnly}</p>
-      <p class="small">{t.footer.builtWith}</p>
+      <p class="small eyebrow">{t.footer.builtWith}</p>
     </div>
   </div>
 </footer>
 
 <style>
+  /* The notebook's back cover: a sunken sheet under a heavy ink rule. */
   .site-footer {
     margin-block-start: var(--space-4xl);
     background: var(--color-surface-sunken);
-    border-block-start: var(--border-width-medium) solid var(--color-text);
+    border-block-start: var(--border-width-thick) solid var(--color-border-strong);
   }
   .inner {
     display: grid;
@@ -55,23 +56,36 @@ const links = [
     margin-inline: auto;
     padding: var(--space-2xl) var(--space-md);
   }
-  .tagline,
-  .small {
+  .tagline {
+    margin: var(--space-xs) 0 0;
+    max-inline-size: var(--size-rail);
     color: var(--color-text-muted);
   }
   ul {
     display: grid;
-    gap: var(--space-xs);
+    gap: var(--space-3xs);
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  a:not(:global(.logo)) {
+  ul a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--size-touch-target);
     color: var(--color-text);
-    font-weight: var(--font-weight-semibold);
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
   }
   .notes p {
-    margin: 0 0 var(--space-xs);
+    margin: 0 0 var(--space-sm);
+  }
+  /* The safety rule is the one thing to remember: set it as a boxed field note. */
+  .safety {
+    padding: var(--space-sm) var(--space-md);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-warning-subtle);
+    font-weight: var(--font-weight-semibold);
   }
   /* >= tokens.breakpoint.md */
   @media (min-width: 768px) {
