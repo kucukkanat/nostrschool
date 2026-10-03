@@ -265,3 +265,21 @@ test.describe("accessibility", () => {
     await expect(hero).toHaveAttribute("data-animating", "false");
   });
 });
+
+test.describe("home hero layout", () => {
+  for (const width of [768, 1280, 1920]) {
+    test(`Nos and the bubble never overlap the network diagram at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(pagePath("en"));
+      const mascot = await page.getByTestId("hero-mascot-container").boundingBox();
+      const diagram = await page.getByTestId("hero-network").boundingBox();
+      if (mascot === null || diagram === null) throw new Error("hero parts are not rendered");
+      const overlaps =
+        mascot.x < diagram.x + diagram.width &&
+        mascot.x + mascot.width > diagram.x &&
+        mascot.y < diagram.y + diagram.height &&
+        mascot.y + mascot.height > diagram.y;
+      expect(overlaps).toBe(false);
+    });
+  }
+});

@@ -211,21 +211,41 @@ const noteLetter = (i: number) => String.fromCharCode("A".charCodeAt(0) + i);
     border: var(--border-width-medium) solid var(--color-border-strong);
     background: var(--color-surface-raised);
   }
+  /* Phones (< tokens.breakpoint.sm = 480px): Nos steps under the sheet, bubble above. */
   .hero-mascot {
-    position: absolute;
-    inset-block-end: calc(var(--space-lg) * -1);
-    inset-inline-start: 0;
-    z-index: var(--z-raised);
-    min-block-size: var(--size-mascot-lg);
+    justify-self: start;
+    margin-block-start: var(--space-md);
   }
-  /* Below sm (480px): on a phone the mascot and its bubble would cover the centre relay, so it
-     steps off the diagram and sits under the sheet instead. */
-  @media (max-width: 479.98px) {
+  /* >= tokens.breakpoint.sm: Nos used to hang over the sheet's corner, and with its bubble it
+     covered the diagram's lower half on every desktop width. It now sits in its own row under the
+     sheet (cleared past the plate's offset), at md size with the bubble beside it, so no width
+     can make the two overlap. The Mascot island keeps its column layout; these overrides only
+     reshape it here, like ChapterLayout's chapter intro (three classes beat its two). */
+  @media (min-width: 480px) {
+    .hero-art {
+      padding-block-end: 0;
+    }
     .hero-mascot {
-      position: static;
-      justify-self: start;
-      min-block-size: 0;
-      margin-block-start: var(--space-md);
+      --mascot-size-override: var(--size-mascot-md);
+      /* Reserve Nos's height (200×220 viewBox) before the island hydrates: no layout shift. */
+      min-block-size: calc(var(--size-mascot-md) * 1.1);
+      margin-block-start: var(--space-xl);
+    }
+    .hero-art .hero-mascot :global(.mascot-container) {
+      /* Reversed so Nos (second child) comes first, the bubble to its inline end. */
+      flex-direction: row-reverse;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .hero-art .hero-mascot :global(.bubble) {
+      text-align: start;
+    }
+    /* Tail points back at Nos instead of down. */
+    .hero-art .hero-mascot :global(.bubble::after) {
+      left: calc(var(--space-xs) * -1);
+      bottom: auto;
+      top: 50%;
+      transform: translateY(-50%) rotate(135deg);
     }
   }
 

@@ -227,3 +227,14 @@ test("HeroNetwork is a labelled image whose animation can be paused", async () =
   expect(pause.textContent?.trim()).toBe("Play animation");
   expect(getByTestId("hero-network").dataset["animating"]).toBe("false");
 });
+
+test("home hero: Nos and the bubble sit beside the diagram sheet, never on it (>= sm)", async () => {
+  // No layout engine here (Playwright owns pixels), so guard the hero CSS contract in the source:
+  // the mascot is never absolutely positioned over the sheet, and from sm up it is a md-sized row.
+  const page = await Bun.file(`${import.meta.dir}/../../pages/[locale]/index.astro`).text();
+  const css = page.slice(page.indexOf("<style>"));
+  expect(css).not.toMatch(/\.hero-mascot \{[^}]*position: absolute/);
+  const desktop = css.slice(css.indexOf("@media (min-width: 480px)"));
+  expect(desktop).toMatch(/\.hero-mascot \{[^}]*--mascot-size-override: var\(--size-mascot-md\)/);
+  expect(desktop).toMatch(/:global\(\.mascot-container\) \{[^}]*flex-direction: row-reverse/);
+});
