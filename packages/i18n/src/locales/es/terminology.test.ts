@@ -36,6 +36,20 @@ describe("Spanish terminology", () => {
       expect(hits).toEqual([]);
     });
 
+  // Em-dash asides read as translated English; Spanish prose uses commas, parentheses or colons.
+  // Code comments (// and JSDoc lines) are dev-facing, so they are skipped.
+  test("no em-dash asides in reader-facing text", () => {
+    const isComment = (line: string): boolean => /^\s*(\/\/|\/?\*)/.test(line);
+    const hits = sources.flatMap(([file, text]) =>
+      text
+        .split("\n")
+        .map((line, i) => [`${file}:${i + 1}`, line] as const)
+        .filter(([, line]) => line.includes("—") && !isComment(line))
+        .map(([where]) => where),
+    );
+    expect(hits).toEqual([]);
+  });
+
   test("glossary terms match the prose wording", () => {
     expect(glossaryEs.signer.term).toBe("Firmante");
     expect(glossaryEs["key-loss"].term).toBe("Pérdida de claves");
