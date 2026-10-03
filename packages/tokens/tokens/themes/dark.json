@@ -1,143 +1,158 @@
 {
   "color": {
+    "$type": "color",
     "bg": {
-      "$value": "{palette.ink.950}"
+      "$value": "{palette.night.900}"
     },
     "surface": {
-      "$value": "{palette.ink.900}"
+      "$value": "{palette.night.850}"
     },
     "surface-raised": {
-      "$value": "{palette.ink.850}"
+      "$value": "{palette.night.800}"
     },
     "surface-sunken": {
-      "$value": "{palette.ink.1000}"
+      "$value": "{palette.night.1000}"
     },
     "surface-inverse": {
-      "$value": "{palette.ink.50}"
+      "$value": "{palette.night.100}"
     },
     "text": {
-      "$value": "{palette.ink.50}"
+      "$value": "{palette.night.100}"
     },
     "text-muted": {
-      "$value": "{palette.ink.300}"
+      "$value": "{palette.night.300}"
     },
     "text-subtle": {
-      "$value": "{palette.ink.400}"
+      "$value": "{palette.night.400}"
     },
     "text-inverse": {
-      "$value": "{palette.ink.900}"
+      "$value": "{palette.night.900}"
     },
     "border": {
-      "$value": "{palette.ink.800}"
+      "$value": "{palette.night.700}"
     },
     "border-strong": {
-      "$value": "{palette.ink.500}"
+      "$value": "{palette.night.400}"
     },
     "focus-ring": {
-      "$value": "{palette.ink.0}",
-      "$description": "Neutral (not brand purple) so the ring stays ≥3:1 against primary fills/strokes as well as the page."
+      "$value": "{palette.yellow.marker}"
+    },
+    "focus-halo": {
+      "$value": "{palette.night.900}"
     },
     "selection": {
-      "$value": "{palette.purple.900}"
+      "$value": "{palette.yellow.dark-selection}"
+    },
+    "highlight": {
+      "$value": "{palette.yellow.dark-marker}"
+    },
+    "on-highlight": {
+      "$value": "{palette.ink.1000}"
+    },
+    "grain": {
+      "$value": "{palette.night.100}"
+    },
+    "halftone": {
+      "$value": "rgba(237, 231, 219, 0.22)"
     },
     "primary": {
-      "$value": "{palette.purple.400}"
+      "$value": "{palette.orange.dark-fill}"
     },
     "primary-hover": {
-      "$value": "{palette.purple.300}"
+      "$value": "{palette.orange.dark-hover}"
     },
     "primary-active": {
-      "$value": "{palette.purple.200}"
+      "$value": "{palette.orange.fill}"
     },
     "primary-subtle": {
-      "$value": "{palette.purple.950}"
+      "$value": "{palette.orange.dark-tint}"
     },
     "on-primary": {
       "$value": "{palette.ink.1000}"
     },
     "text-primary": {
-      "$value": "{palette.purple.300}"
+      "$value": "{palette.orange.dark-text}"
     },
     "secondary": {
-      "$value": "{palette.orange.400}"
+      "$value": "{palette.teal.dark-fill}"
     },
     "secondary-hover": {
-      "$value": "{palette.orange.300}"
+      "$value": "{palette.teal.dark-hover}"
     },
     "secondary-subtle": {
-      "$value": "{palette.orange.900}"
+      "$value": "{palette.teal.dark-tint}"
     },
     "on-secondary": {
       "$value": "{palette.ink.1000}"
     },
     "text-secondary": {
-      "$value": "{palette.orange.300}"
+      "$value": "{palette.teal.dark-text}"
     },
     "accent": {
-      "$value": "{palette.pink.400}"
+      "$value": "{palette.blue.dark-fill}"
     },
     "accent-hover": {
-      "$value": "{palette.pink.300}"
+      "$value": "{palette.blue.dark-hover}"
     },
     "accent-subtle": {
-      "$value": "{palette.pink.900}"
+      "$value": "{palette.blue.dark-tint}"
     },
     "on-accent": {
       "$value": "{palette.ink.1000}"
     },
     "text-accent": {
-      "$value": "{palette.pink.300}"
+      "$value": "{palette.blue.dark-text}"
     },
     "success": {
-      "$value": "{palette.green.300}"
+      "$value": "{palette.green.dark-text}"
     },
     "success-subtle": {
-      "$value": "{palette.green.900}"
+      "$value": "{palette.green.dark-tint}"
     },
     "success-solid": {
-      "$value": "{palette.green.400}"
+      "$value": "{palette.green.dark-fill}"
     },
     "on-success": {
       "$value": "{palette.ink.1000}"
     },
     "warning": {
-      "$value": "{palette.yellow.300}"
+      "$value": "{palette.yellow.dark-text}"
     },
     "warning-subtle": {
-      "$value": "{palette.yellow.900}"
+      "$value": "{palette.yellow.dark-tint}"
     },
     "warning-solid": {
-      "$value": "{palette.yellow.400}"
+      "$value": "{palette.yellow.dark-fill}"
     },
     "on-warning": {
       "$value": "{palette.ink.1000}"
     },
     "danger": {
-      "$value": "{palette.red.300}"
+      "$value": "{palette.red.dark-text}"
     },
     "danger-subtle": {
-      "$value": "{palette.red.900}"
+      "$value": "{palette.red.dark-tint}"
     },
     "danger-solid": {
-      "$value": "{palette.red.400}"
+      "$value": "{palette.red.dark-fill}"
     },
     "on-danger": {
       "$value": "{palette.ink.1000}"
     },
     "info": {
-      "$value": "{palette.blue.300}"
+      "$value": "{palette.blue.dark-text}"
     },
     "info-subtle": {
-      "$value": "{palette.blue.900}"
+      "$value": "{palette.blue.dark-tint}"
     },
     "info-solid": {
-      "$value": "{palette.blue.400}"
+      "$value": "{palette.blue.dark-fill}"
     },
     "on-info": {
       "$value": "{palette.ink.1000}"
     },
     "live": {
-      "$value": "{palette.red.400}"
+      "$value": "{palette.red.dark-fill}"
     },
     "on-live": {
       "$value": "{palette.ink.1000}"
@@ -146,204 +161,227 @@
       "$value": "rgba(0, 0, 0, 0.7)"
     },
     "shadow": {
-      "$value": "rgba(0, 0, 0, 0.5)"
+      "$value": "rgba(0, 0, 0, 0.45)"
     },
     "shadow-pop": {
-      "$value": "{palette.purple.400}"
+      "$value": "{palette.night.400}",
+      "$description": "Same light ink as border-strong: a dark offset would vanish on dark paper."
+    },
+    "shadow-accent": {
+      "$value": "{palette.orange.dark-fill}"
     },
     "code-bg": {
-      "$value": "{palette.ink.1000}"
+      "$value": "{palette.night.1000}"
     },
     "code-text": {
-      "$value": "{palette.ink.50}"
+      "$value": "{palette.night.100}"
     },
     "code-key": {
-      "$value": "{palette.purple.300}"
+      "$value": "{palette.orange.dark-text}"
     },
     "code-string": {
-      "$value": "{palette.green.300}"
+      "$value": "{palette.green.dark-text}"
     },
     "code-number": {
-      "$value": "{palette.blue.300}"
+      "$value": "{palette.blue.dark-text}"
     },
     "code-boolean": {
-      "$value": "{palette.orange.300}"
+      "$value": "{palette.teal.dark-text}"
     },
     "code-null": {
-      "$value": "{palette.pink.300}"
+      "$value": "{palette.pink.dark-text}"
     },
     "code-punctuation": {
-      "$value": "{palette.ink.300}"
+      "$value": "{palette.night.400}"
     },
     "code-highlight": {
-      "$value": "{palette.purple.950}"
+      "$value": "{palette.yellow.dark-tint}"
     },
     "packet-req": {
-      "$value": "{palette.blue.300}"
+      "$value": "{palette.blue.dark-fill}"
     },
     "packet-event": {
-      "$value": "{palette.purple.300}"
+      "$value": "{palette.orange.dark-fill}"
     },
     "packet-eose": {
-      "$value": "{palette.teal.300}"
+      "$value": "{palette.teal.dark-fill}"
     },
     "packet-ok": {
-      "$value": "{palette.green.300}"
+      "$value": "{palette.green.dark-fill}"
     },
     "packet-close": {
-      "$value": "{palette.ink.300}"
+      "$value": "{palette.gray.dark-fill}"
     },
     "packet-closed": {
-      "$value": "{palette.red.300}"
+      "$value": "{palette.red.dark-fill}"
     },
     "packet-notice": {
-      "$value": "{palette.orange.300}"
+      "$value": "{palette.yellow.dark-fill}"
     },
     "packet-auth": {
-      "$value": "{palette.yellow.300}"
+      "$value": "{palette.pink.dark-fill}"
     },
     "packet-count": {
-      "$value": "{palette.pink.300}"
+      "$value": "{palette.olive.dark-fill}"
     },
     "on-packet": {
       "$value": "{palette.ink.1000}"
     },
     "kind-regular": {
-      "$value": "{palette.blue.300}"
+      "$value": "{palette.blue.dark-fill}"
     },
     "kind-regular-subtle": {
-      "$value": "{palette.blue.900}"
+      "$value": "{palette.blue.dark-tint}"
     },
     "kind-replaceable": {
-      "$value": "{palette.purple.300}"
+      "$value": "{palette.orange.dark-fill}"
     },
     "kind-replaceable-subtle": {
-      "$value": "{palette.purple.950}"
+      "$value": "{palette.orange.dark-tint}"
     },
     "kind-ephemeral": {
-      "$value": "{palette.orange.300}"
+      "$value": "{palette.yellow.dark-fill}"
     },
     "kind-ephemeral-subtle": {
-      "$value": "{palette.orange.900}"
+      "$value": "{palette.yellow.dark-tint}"
     },
     "kind-addressable": {
-      "$value": "{palette.teal.300}"
+      "$value": "{palette.teal.dark-fill}"
     },
     "kind-addressable-subtle": {
-      "$value": "{palette.teal.900}"
+      "$value": "{palette.teal.dark-tint}"
     },
     "on-kind": {
       "$value": "{palette.ink.1000}"
     },
     "diagram-node": {
-      "$value": "{palette.ink.850}"
+      "$value": "{palette.night.800}"
     },
     "diagram-node-stroke": {
-      "$value": "{palette.ink.300}"
+      "$value": "{palette.night.300}"
     },
     "diagram-node-down": {
-      "$value": "{palette.red.900}"
+      "$value": "{palette.red.dark-tint}"
     },
     "diagram-node-down-stroke": {
-      "$value": "{palette.red.300}"
+      "$value": "{palette.red.dark-text}"
     },
     "diagram-edge": {
-      "$value": "{palette.ink.400}"
+      "$value": "{palette.night.400}"
     },
     "diagram-edge-active": {
-      "$value": "{palette.purple.300}"
+      "$value": "{palette.orange.dark-fill}"
     },
     "diagram-edge-dead": {
-      "$value": "{palette.red.400}"
+      "$value": "{palette.red.dark-text}"
     },
     "diagram-lane": {
-      "$value": "{palette.ink.900}"
+      "$value": "{palette.night.900}"
     },
     "diagram-lane-alt": {
-      "$value": "{palette.ink.850}"
+      "$value": "{palette.orange.dark-tint}"
     },
     "diagram-highlight": {
-      "$value": "{palette.yellow.300}"
+      "$value": "{palette.yellow.dark-selection}"
     },
     "diagram-label": {
-      "$value": "{palette.ink.50}"
+      "$value": "{palette.night.100}"
     },
     "envelope-wrap": {
-      "$value": "{palette.purple.900}"
+      "$value": "{palette.orange.dark-tint}"
     },
     "envelope-seal": {
-      "$value": "{palette.orange.900}"
+      "$value": "{palette.yellow.dark-tint}"
     },
     "envelope-rumor": {
-      "$value": "{palette.teal.900}"
+      "$value": "{palette.teal.dark-tint}"
     },
     "envelope-stroke": {
-      "$value": "{palette.ink.300}"
+      "$value": "{palette.night.300}"
     },
     "chart-1": {
-      "$value": "{palette.purple.300}"
+      "$value": "{palette.orange.dark-fill}"
     },
     "chart-2": {
-      "$value": "{palette.orange.300}"
+      "$value": "{palette.teal.dark-fill}"
     },
     "chart-3": {
-      "$value": "{palette.teal.300}"
+      "$value": "{palette.blue.dark-fill}"
     },
     "chart-4": {
-      "$value": "{palette.pink.300}"
+      "$value": "{palette.yellow.dark-fill}"
     },
     "chart-5": {
-      "$value": "{palette.blue.300}"
+      "$value": "{palette.pink.dark-fill}"
     },
     "chart-6": {
-      "$value": "{palette.yellow.300}"
+      "$value": "{palette.green.dark-fill}"
     },
     "chart-7": {
-      "$value": "{palette.green.300}"
+      "$value": "{palette.red.dark-text}"
     },
     "chart-8": {
-      "$value": "{palette.ink.300}"
+      "$value": "{palette.night.400}"
     },
     "chart-grid": {
-      "$value": "{palette.ink.800}"
+      "$value": "{palette.night.700}"
     },
     "chart-axis": {
-      "$value": "{palette.ink.300}"
+      "$value": "{palette.night.400}"
+    },
+    "mascot-line": {
+      "$value": "{palette.ink.1000}"
     },
     "mascot-body": {
-      "$value": "{palette.ink.700}"
+      "$value": "{palette.teal.dark-fill}"
     },
     "mascot-belly": {
-      "$value": "{palette.ink.100}"
+      "$value": "{palette.night.100}"
     },
     "mascot-beak": {
-      "$value": "{palette.orange.400}"
+      "$value": "{palette.orange.dark-fill}"
     },
     "mascot-legs": {
-      "$value": "{palette.orange.400}"
+      "$value": "{palette.orange.dark-fill}"
     },
     "mascot-accent": {
-      "$value": "{palette.purple.300}"
-    },
-    "$type": "color"
+      "$value": "{palette.yellow.dark-marker}"
+    }
   },
   "shadow": {
     "$type": "shadow",
+    "$description": "Hard offset shadows only (riso misregistration). No blur, no glow.",
     "sm": {
-      "$value": "0 1px 2px {color.shadow}"
+      "$value": "1px 1px 0 0 {color.shadow-pop}"
     },
     "md": {
-      "$value": "0 4px 12px {color.shadow}"
+      "$value": "3px 3px 0 0 {color.shadow-pop}"
     },
     "lg": {
-      "$value": "0 12px 32px {color.shadow}"
+      "$value": "5px 5px 0 0 {color.shadow-pop}"
     },
     "pop": {
-      "$value": "4px 4px 0 0 {color.shadow-pop}",
-      "$description": "Playful hard offset shadow for cards and buttons."
+      "$value": "3px 3px 0 0 {color.shadow-pop}",
+      "$description": "Default card/button shadow."
     },
     "pop-sm": {
       "$value": "2px 2px 0 0 {color.shadow-pop}"
+    },
+    "lift": {
+      "$value": "5px 5px 0 0 {color.shadow-pop}",
+      "$description": "Hover: element lifts (translate -2px) and the offset grows."
+    },
+    "pressed": {
+      "$value": "0 0 0 0 {color.shadow-pop}",
+      "$description": "Active: the shadow collapses (translate by the pop offset)."
+    },
+    "accent": {
+      "$value": "3px 3px 0 0 {color.shadow-accent}",
+      "$description": "Orange misregistration for featured cards/selected state."
+    },
+    "focus-halo": {
+      "$value": "0 0 0 2px {color.focus-halo}",
+      "$description": "Pair with the focus outline when the ring sits on a fill."
     }
   }
 }

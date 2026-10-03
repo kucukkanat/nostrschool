@@ -1,349 +1,404 @@
 {
   "color": {
+    "$type": "color",
     "bg": {
-      "$value": "{palette.ink.25}"
+      "$value": "{palette.paper.100}",
+      "$description": "Page paper."
     },
     "surface": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.paper.200}",
+      "$description": "Cards/panels: paper-2, one sheet darker than the page."
     },
     "surface-raised": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.paper.0}",
+      "$description": "Popovers, inputs, dialogs: the brightest sheet."
     },
     "surface-sunken": {
-      "$value": "{palette.ink.50}"
+      "$value": "{palette.paper.300}",
+      "$description": "Wells, code blocks, tracks."
     },
     "surface-inverse": {
-      "$value": "{palette.ink.900}"
+      "$value": "{palette.ink.1000}"
     },
     "text": {
-      "$value": "{palette.ink.900}"
+      "$value": "{palette.ink.1000}"
     },
     "text-muted": {
-      "$value": "{palette.ink.600}"
+      "$value": "{palette.ink.700}"
     },
     "text-subtle": {
-      "$value": "{palette.ink.500}"
+      "$value": "{palette.ink.600}"
     },
     "text-inverse": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.paper.100}"
     },
     "border": {
-      "$value": "{palette.ink.200}"
+      "$value": "{palette.paper.400}",
+      "$description": "Soft hairline/divider. Decorative only (no contrast requirement)."
     },
     "border-strong": {
-      "$value": "{palette.ink.500}"
+      "$value": "{palette.ink.1000}",
+      "$description": "The ink line: 1.5px outlines on cards, buttons, inputs and every fill."
     },
     "focus-ring": {
       "$value": "{palette.ink.1000}",
-      "$description": "Neutral (not brand purple) so the ring stays ≥3:1 against primary fills/strokes as well as the page."
+      "$description": "Ink in light, marker yellow in dark; ≥3:1 vs every surface. Pair with focus-halo when the ring touches a fill."
+    },
+    "focus-halo": {
+      "$value": "{palette.paper.0}",
+      "$description": "Gap colour between ring and element; ≥3:1 vs every accent fill and vs the ring."
     },
     "selection": {
-      "$value": "{palette.purple.100}"
+      "$value": "{palette.yellow.marker}"
+    },
+    "highlight": {
+      "$value": "{palette.yellow.marker}",
+      "$description": "Highlighter mark behind text (.highlight). Text on it is always on-highlight."
+    },
+    "on-highlight": {
+      "$value": "{palette.ink.1000}"
+    },
+    "grain": {
+      "$value": "{palette.ink.1000}",
+      "$description": "Paper grain speckle colour (masked by --pattern-grain)."
+    },
+    "halftone": {
+      "$value": "rgba(27, 26, 23, 0.28)",
+      "$description": "Halftone dot colour for illustration fills."
     },
     "primary": {
-      "$value": "{palette.purple.600}"
+      "$value": "{palette.orange.raw}",
+      "$description": "Interactive fill. Always outlined with border-strong; text on it is on-primary (ink)."
     },
     "primary-hover": {
-      "$value": "{palette.purple.700}"
+      "$value": "{palette.orange.hover}"
     },
     "primary-active": {
-      "$value": "{palette.purple.800}"
+      "$value": "{palette.orange.fill}"
     },
     "primary-subtle": {
-      "$value": "{palette.purple.50}"
+      "$value": "{palette.orange.tint}"
     },
     "on-primary": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.ink.1000}"
     },
     "text-primary": {
-      "$value": "{palette.purple.700}"
+      "$value": "{palette.orange.ink}",
+      "$description": "Accent ink: orange text, links, and orange strokes on paper."
     },
     "secondary": {
-      "$value": "{palette.orange.500}"
+      "$value": "{palette.teal.fill}"
     },
     "secondary-hover": {
-      "$value": "{palette.orange.400}"
+      "$value": "{palette.teal.hover}"
     },
     "secondary-subtle": {
-      "$value": "{palette.orange.50}"
+      "$value": "{palette.teal.tint}"
     },
     "on-secondary": {
       "$value": "{palette.ink.1000}"
     },
     "text-secondary": {
-      "$value": "{palette.orange.700}"
+      "$value": "{palette.teal.ink}"
     },
     "accent": {
-      "$value": "{palette.pink.600}"
+      "$value": "{palette.blue.fill}"
     },
     "accent-hover": {
-      "$value": "{palette.pink.700}"
+      "$value": "{palette.blue.hover}"
     },
     "accent-subtle": {
-      "$value": "{palette.pink.50}"
+      "$value": "{palette.blue.tint}"
     },
     "on-accent": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.ink.1000}"
     },
     "text-accent": {
-      "$value": "{palette.pink.700}"
+      "$value": "{palette.blue.ink}"
     },
     "success": {
-      "$value": "{palette.green.700}"
+      "$value": "{palette.green.ink}"
     },
     "success-subtle": {
-      "$value": "{palette.green.50}"
+      "$value": "{palette.green.tint}"
     },
     "success-solid": {
-      "$value": "{palette.green.700}"
+      "$value": "{palette.green.fill}"
     },
     "on-success": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.ink.1000}"
     },
     "warning": {
-      "$value": "{palette.yellow.800}"
+      "$value": "{palette.yellow.ink}"
     },
     "warning-subtle": {
-      "$value": "{palette.yellow.50}"
+      "$value": "{palette.yellow.tint}"
     },
     "warning-solid": {
-      "$value": "{palette.yellow.400}"
+      "$value": "{palette.yellow.marker}"
     },
     "on-warning": {
       "$value": "{palette.ink.1000}"
     },
     "danger": {
-      "$value": "{palette.red.700}"
+      "$value": "{palette.red.ink}"
     },
     "danger-subtle": {
-      "$value": "{palette.red.50}"
+      "$value": "{palette.red.tint}"
     },
     "danger-solid": {
-      "$value": "{palette.red.600}"
+      "$value": "{palette.red.fill}"
     },
     "on-danger": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.ink.1000}"
     },
     "info": {
-      "$value": "{palette.blue.700}"
+      "$value": "{palette.blue.ink}"
     },
     "info-subtle": {
-      "$value": "{palette.blue.50}"
+      "$value": "{palette.blue.tint}"
     },
     "info-solid": {
-      "$value": "{palette.blue.600}"
+      "$value": "{palette.blue.fill}"
     },
     "on-info": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.ink.1000}"
     },
     "live": {
-      "$value": "{palette.red.600}"
+      "$value": "{palette.red.fill}"
     },
     "on-live": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.ink.1000}"
     },
     "overlay": {
-      "$value": "rgba(18, 12, 28, 0.6)"
+      "$value": "rgba(27, 26, 23, 0.55)",
+      "$description": "Flat scrim behind modals/drawers. Never blurred."
     },
     "shadow": {
-      "$value": "rgba(54, 16, 122, 0.16)"
+      "$value": "rgba(27, 26, 23, 0.16)",
+      "$description": "Flat translucent cast shadow (e.g. under the mascot). Never blurred; box shadows use shadow-pop."
     },
     "shadow-pop": {
-      "$value": "{palette.ink.900}"
+      "$value": "{palette.ink.1000}",
+      "$description": "Hard offset shadow colour (the second print layer)."
+    },
+    "shadow-accent": {
+      "$value": "{palette.orange.raw}",
+      "$description": "Misregistration offset in the brand orange."
     },
     "code-bg": {
-      "$value": "{palette.ink.50}"
+      "$value": "{palette.paper.300}"
     },
     "code-text": {
-      "$value": "{palette.ink.900}"
+      "$value": "{palette.ink.1000}"
     },
     "code-key": {
-      "$value": "{palette.purple.700}"
+      "$value": "{palette.orange.ink}"
     },
     "code-string": {
-      "$value": "{palette.green.700}"
+      "$value": "{palette.green.ink}"
     },
     "code-number": {
-      "$value": "{palette.blue.700}"
+      "$value": "{palette.blue.ink}"
     },
     "code-boolean": {
-      "$value": "{palette.orange.700}"
+      "$value": "{palette.teal.ink}"
     },
     "code-null": {
-      "$value": "{palette.pink.700}"
+      "$value": "{palette.pink.ink}"
     },
     "code-punctuation": {
-      "$value": "{palette.ink.600}"
+      "$value": "{palette.ink.700}"
     },
     "code-highlight": {
-      "$value": "{palette.yellow.100}"
+      "$value": "{palette.yellow.marker-soft}"
     },
     "packet-req": {
-      "$value": "{palette.blue.600}"
+      "$value": "{palette.blue.fill}"
     },
     "packet-event": {
-      "$value": "{palette.purple.600}"
+      "$value": "{palette.orange.fill}"
     },
     "packet-eose": {
-      "$value": "{palette.teal.700}"
+      "$value": "{palette.teal.mark}"
     },
     "packet-ok": {
-      "$value": "{palette.green.700}"
+      "$value": "{palette.green.fill}"
     },
     "packet-close": {
-      "$value": "{palette.ink.600}"
+      "$value": "{palette.gray.fill}"
     },
     "packet-closed": {
-      "$value": "{palette.red.700}"
+      "$value": "{palette.red.fill}"
     },
     "packet-notice": {
-      "$value": "{palette.orange.700}"
+      "$value": "{palette.yellow.fill}"
     },
     "packet-auth": {
-      "$value": "{palette.yellow.800}"
+      "$value": "{palette.pink.fill}"
     },
     "packet-count": {
-      "$value": "{palette.pink.700}"
+      "$value": "{palette.olive.fill}"
     },
     "on-packet": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.ink.1000}"
     },
     "kind-regular": {
-      "$value": "{palette.blue.600}"
+      "$value": "{palette.blue.fill}"
     },
     "kind-regular-subtle": {
-      "$value": "{palette.blue.50}"
+      "$value": "{palette.blue.tint}"
     },
     "kind-replaceable": {
-      "$value": "{palette.purple.600}"
+      "$value": "{palette.orange.fill}"
     },
     "kind-replaceable-subtle": {
-      "$value": "{palette.purple.50}"
+      "$value": "{palette.orange.tint}"
     },
     "kind-ephemeral": {
-      "$value": "{palette.orange.700}"
+      "$value": "{palette.yellow.fill}"
     },
     "kind-ephemeral-subtle": {
-      "$value": "{palette.orange.50}"
+      "$value": "{palette.yellow.tint}"
     },
     "kind-addressable": {
-      "$value": "{palette.teal.700}"
+      "$value": "{palette.teal.mark}"
     },
     "kind-addressable-subtle": {
-      "$value": "{palette.teal.50}"
+      "$value": "{palette.teal.tint}"
     },
     "on-kind": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.ink.1000}"
     },
     "diagram-node": {
-      "$value": "{palette.ink.0}"
+      "$value": "{palette.paper.0}"
     },
     "diagram-node-stroke": {
-      "$value": "{palette.ink.700}"
+      "$value": "{palette.ink.1000}"
     },
     "diagram-node-down": {
-      "$value": "{palette.red.50}"
+      "$value": "{palette.red.tint}"
     },
     "diagram-node-down-stroke": {
-      "$value": "{palette.red.700}"
+      "$value": "{palette.red.ink}"
     },
     "diagram-edge": {
-      "$value": "{palette.ink.500}"
-    },
-    "diagram-edge-active": {
-      "$value": "{palette.purple.600}"
-    },
-    "diagram-edge-dead": {
-      "$value": "{palette.red.600}"
-    },
-    "diagram-lane": {
-      "$value": "{palette.ink.50}"
-    },
-    "diagram-lane-alt": {
-      "$value": "{palette.orange.50}"
-    },
-    "diagram-highlight": {
-      "$value": "{palette.yellow.300}"
-    },
-    "diagram-label": {
-      "$value": "{palette.ink.900}"
-    },
-    "envelope-wrap": {
-      "$value": "{palette.purple.100}"
-    },
-    "envelope-seal": {
-      "$value": "{palette.orange.100}"
-    },
-    "envelope-rumor": {
-      "$value": "{palette.teal.50}"
-    },
-    "envelope-stroke": {
-      "$value": "{palette.ink.700}"
-    },
-    "chart-1": {
-      "$value": "{palette.purple.600}"
-    },
-    "chart-2": {
-      "$value": "{palette.orange.600}"
-    },
-    "chart-3": {
-      "$value": "{palette.teal.600}"
-    },
-    "chart-4": {
-      "$value": "{palette.pink.600}"
-    },
-    "chart-5": {
-      "$value": "{palette.blue.600}"
-    },
-    "chart-6": {
-      "$value": "{palette.yellow.700}"
-    },
-    "chart-7": {
-      "$value": "{palette.green.700}"
-    },
-    "chart-8": {
-      "$value": "{palette.ink.500}"
-    },
-    "chart-grid": {
-      "$value": "{palette.ink.200}"
-    },
-    "chart-axis": {
       "$value": "{palette.ink.600}"
     },
+    "diagram-edge-active": {
+      "$value": "{palette.orange.ink}"
+    },
+    "diagram-edge-dead": {
+      "$value": "{palette.red.ink}"
+    },
+    "diagram-lane": {
+      "$value": "{palette.paper.100}"
+    },
+    "diagram-lane-alt": {
+      "$value": "{palette.orange.tint}"
+    },
+    "diagram-highlight": {
+      "$value": "{palette.yellow.marker}"
+    },
+    "diagram-label": {
+      "$value": "{palette.ink.1000}"
+    },
+    "envelope-wrap": {
+      "$value": "{palette.orange.tint}"
+    },
+    "envelope-seal": {
+      "$value": "{palette.yellow.tint}"
+    },
+    "envelope-rumor": {
+      "$value": "{palette.teal.tint}"
+    },
+    "envelope-stroke": {
+      "$value": "{palette.ink.1000}"
+    },
+    "chart-1": {
+      "$value": "{palette.orange.fill}"
+    },
+    "chart-2": {
+      "$value": "{palette.teal.raw}"
+    },
+    "chart-3": {
+      "$value": "{palette.blue.ink}"
+    },
+    "chart-4": {
+      "$value": "{palette.yellow.fill}"
+    },
+    "chart-5": {
+      "$value": "{palette.pink.ink}"
+    },
+    "chart-6": {
+      "$value": "{palette.green.ink}"
+    },
+    "chart-7": {
+      "$value": "{palette.red.ink}"
+    },
+    "chart-8": {
+      "$value": "{palette.ink.600}"
+    },
+    "chart-grid": {
+      "$value": "{palette.paper.400}"
+    },
+    "chart-axis": {
+      "$value": "{palette.ink.700}"
+    },
+    "mascot-line": {
+      "$value": "{palette.ink.1000}",
+      "$description": "Linework stays ink in both themes: the mascot is a printed sticker."
+    },
     "mascot-body": {
-      "$value": "{palette.ink.800}"
+      "$value": "{palette.teal.raw}"
     },
     "mascot-belly": {
-      "$value": "{palette.ink.50}"
+      "$value": "{palette.paper.0}"
     },
     "mascot-beak": {
-      "$value": "{palette.orange.500}"
+      "$value": "{palette.orange.raw}"
     },
     "mascot-legs": {
-      "$value": "{palette.orange.600}"
+      "$value": "{palette.orange.fill}"
     },
     "mascot-accent": {
-      "$value": "{palette.purple.500}"
-    },
-    "$type": "color"
+      "$value": "{palette.yellow.marker}"
+    }
   },
   "shadow": {
     "$type": "shadow",
+    "$description": "Hard offset shadows only (riso misregistration). No blur, no glow.",
     "sm": {
-      "$value": "0 1px 2px {color.shadow}"
+      "$value": "1px 1px 0 0 {color.shadow-pop}"
     },
     "md": {
-      "$value": "0 4px 12px {color.shadow}"
+      "$value": "3px 3px 0 0 {color.shadow-pop}"
     },
     "lg": {
-      "$value": "0 12px 32px {color.shadow}"
+      "$value": "5px 5px 0 0 {color.shadow-pop}"
     },
     "pop": {
-      "$value": "4px 4px 0 0 {color.shadow-pop}",
-      "$description": "Playful hard offset shadow for cards and buttons."
+      "$value": "3px 3px 0 0 {color.shadow-pop}",
+      "$description": "Default card/button shadow."
     },
     "pop-sm": {
       "$value": "2px 2px 0 0 {color.shadow-pop}"
+    },
+    "lift": {
+      "$value": "5px 5px 0 0 {color.shadow-pop}",
+      "$description": "Hover: element lifts (translate -2px) and the offset grows."
+    },
+    "pressed": {
+      "$value": "0 0 0 0 {color.shadow-pop}",
+      "$description": "Active: the shadow collapses (translate by the pop offset)."
+    },
+    "accent": {
+      "$value": "3px 3px 0 0 {color.shadow-accent}",
+      "$description": "Orange misregistration for featured cards/selected state."
+    },
+    "focus-halo": {
+      "$value": "0 0 0 2px {color.focus-halo}",
+      "$description": "Pair with the focus outline when the ring sits on a fill."
     }
   }
 }

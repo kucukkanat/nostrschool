@@ -21,7 +21,7 @@ every file. If the code and this document disagree, the code wins — report it 
 | d3 7.9 (+@types/d3), motion 14 (`import { animate } from "motion"`), nanostores 1.5, @nanostores/persistent 1.3 | | |
 | @rive-app/canvas 2.44, canvas-confetti 1.9, style-dictionary 5.5 | | |
 | Biome 2.5, Playwright 1.63 (+ Chromium installed), @axe-core/playwright 4.13, happy-dom 20, @testing-library/svelte 5.4 | | |
-| Fonts | @fontsource-variable/{fredoka,nunito,jetbrains-mono} | imported in `apps/site/src/styles/global.css` |
+| Fonts | @fontsource-variable/{bricolage-grotesque,jetbrains-mono} | self-hosted, imported in `apps/site/src/styles/global.css` (Bricolage via `opsz.css`: wght + optical size). No Google Fonts calls. |
 
 Who has which dependency (you may only import these from your package):
 
@@ -102,6 +102,42 @@ number (durations ms, breakpoints px). Svelte components use scoped `<style>` wi
 Breakpoints can't be CSS vars inside `@media`: write the px from `tokens.breakpoint` (sm 480,
 md 768, lg 1024, xl 1280) with a comment, or use `mediaUp("md")` in TS.
 
+### Brand: "riso field notebook" (design rules — read before styling anything)
+A printed zine / field notebook, not a SaaS landing page.
+- **Paper + ink.** Page is `--color-bg` (paper), cards `--color-surface` (paper-2, one sheet darker),
+  popovers/inputs `--color-surface-raised` (brightest sheet), wells/code `--color-surface-sunken`.
+  Text is ink (`--color-text`, `-muted`, `-subtle`).
+- **Ink lines.** Cards, buttons, inputs, chips and every coloured fill get a
+  `var(--border-width-medium) solid var(--color-border-strong)` outline (1.5px ink). `--color-border`
+  is only a soft hairline/divider.
+- **Hard offset shadows** (riso misregistration): `--shadow-pop` (3px ink), `--shadow-pop-sm`,
+  `--shadow-accent` (3px orange, featured/selected), `--shadow-lift` (hover), `--shadow-pressed` (active).
+  Microinteraction recipe: hover = `translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1)`
+  + `--shadow-lift`; active = translate by the pop offset + `--shadow-pressed` (the shadow collapses),
+  `var(--motion-duration-press) var(--motion-easing-press)`.
+- **One fluorescent orange.** `--color-primary` (#FF5C39) is a FILL for the main action/selected
+  state, always outlined and always with `--color-on-primary` (ink) text. It is only 2.7:1 on paper,
+  so it is **never** a text colour, line, icon stroke or sole state indicator — use
+  `--color-text-primary` (accent ink) for orange text/strokes and `--color-border-strong` +
+  `--shadow-accent` for "selected". Same for `secondary` (teal) and `accent` (riso blue): fills only;
+  `text-secondary` / `text-accent` for text and strokes.
+- **Ink text on bright fills**: every `--color-on-*` is ink in both themes.
+- **Textures**: paper grain is global (body::before). `.halftone` (or `--pattern-halftone` with
+  `background-size: var(--size-halftone-cell) var(--size-halftone-cell)`) for illustration fills;
+  `mark` / `.highlight` (`--pattern-highlight`) for highlighter emphasis; `.eyebrow` for mono caps labels.
+  These three hard-stop patterns are the ONLY allowed `*-gradient()` uses.
+- **Shape**: radii are small (`sm` 2px, `md` 4px, `lg` 6px, `xl` 10px). `--radius-pill` only for
+  tags/chips/toggles' track, never for buttons or cards.
+- **Type**: Bricolage Grotesque (display + body; headings `--font-weight-bold`/`black`,
+  `--font-letter-spacing-display` at 4xl+), JetBrains Mono for code, ids, labels, packets.
+  Sizes `lg`+ are fluid `clamp()`; don't add your own `vw` sizes.
+- **Don't**: purple/violet/indigo (a test rejects any emitted colour at hue 235°–320°), gradients
+  (except the three patterns above), `backdrop-filter`/blur, glows, neon, blurred `box-shadow`,
+  `text-shadow`, decorative emoji (✨🚀🎉…), and copy clichés ("unlock", "dive in", "embark",
+  "seamless", "revolutionize", "journey"). Functional symbols (✓ ✗ ⚡ for zaps) are fine.
+- **Mobile**: design at 360px first; no horizontal page scroll (long ids use
+  `overflow-wrap: anywhere`; tables/pre scroll inside themselves); hit areas ≥ `--size-touch-target`.
+
 ### Motion & reduced motion
 Use `@nostrschool/ui` motion helpers. Under reduced motion every animation becomes an instant
 state change; no information may be lost. CSS durations already collapse to `0ms` via tokens.
@@ -127,37 +163,65 @@ Read-only. Never publish. Live mode is opt-in via `$liveMode`.
 ## 3. Package APIs
 
 ### 3.1 `@nostrschool/tokens` (implemented) — `packages/tokens`
-Source JSON: `tokens/base/{palette,typography,layout,motion}.json`, `tokens/themes/{light,dark}.json`.
-Generated (committed, don't edit): `src/generated/tokens.{css,ts}`.
+Source JSON: `tokens/base/{palette,typography,layout,motion,pattern}.json`, `tokens/themes/{light,dark}.json`.
+Generated (committed, don't edit): `src/generated/tokens.{css,ts}`. The raw palette (riso inks) is
+private and never emitted. Brand rules: §2 "Brand".
 
 ```ts
 import "@nostrschool/tokens/tokens.css";               // CSS (site global.css does this)
-export const tokens;      // raw base values: tokens.space.md "16px", tokens.motion.duration.fast 120, tokens.motion.spring.bouncy {stiffness,damping,mass}, tokens.breakpoint.md 768
-export const themes;      // themes.light.color.primary "#7A2EF5", themes.dark.color.primary …
+export const tokens;      // raw base values: tokens.space.md "16px", tokens.motion.duration.fast 120, tokens.motion.spring.bouncy {stiffness,damping,mass}, tokens.breakpoint.md 768, tokens.pattern.grain "url(…)"
+export const themes;      // themes.light.color.primary "#FF5C39", themes.dark.color.primary "#FF6A48" …
 export const vars;        // vars.color.packetReq "var(--color-packet-req)", vars.space.md, vars.motion.spring.bouncy.stiffness …
 export const cssVarNames; // readonly tuple of every CSS var name (without --)
 export type ThemeName = "light" | "dark"; ColorToken; CssVarName; SpaceToken; RadiusToken; DurationToken; EasingToken; SpringToken; BreakpointToken;
 export const cssVar: (name: CssVarName, fallback?: string) => string;   // "var(--name)"
 export const mediaUp: (bp: BreakpointToken) => string;                  // "(min-width: 768px)"
-export const contrastRatio, relativeLuminance, parseHex, AA, CONTRAST_PAIRS;
+export const contrastRatio, relativeLuminance, parseHex, AA, CONTRAST_PAIRS; // CONTRAST_PAIRS: { text, nonText, focusFills, outlinedFills }
 ```
 CSS variable families (kebab-case; TS keys camelCase):
-- `--color-*`: `bg surface surface-raised surface-sunken surface-inverse text text-muted text-subtle text-inverse border border-strong focus-ring selection primary primary-hover primary-active primary-subtle on-primary text-primary secondary secondary-hover secondary-subtle on-secondary text-secondary accent accent-hover accent-subtle on-accent text-accent success success-subtle success-solid on-success warning … danger … info … live on-live overlay shadow shadow-pop`
+- paper levels: `bg` (paper #F4EFE6 / #161512) `surface` (paper-2, cards) `surface-raised` (brightest: popovers, inputs) `surface-sunken` (wells, code) `surface-inverse`
+- ink levels: `text text-muted text-subtle text-inverse`; lines: `border` (soft hairline, decorative) `border-strong` (the 1.5px ink line)
+- focus: `focus-ring` (ink / marker yellow in dark) + `focus-halo` (gap colour; `--shadow-focus-halo` when a ring sits on a fill); `selection`, `highlight` + `on-highlight` (marker), `grain`, `halftone`
+- accents (fills, ink text on them): `primary primary-hover primary-active primary-subtle on-primary` (riso orange) · `secondary secondary-hover secondary-subtle on-secondary` (teal) · `accent accent-hover accent-subtle on-accent` (riso blue)
+- accent inks (text/strokes on paper): `text-primary text-secondary text-accent`
+- status: `success warning danger info` (text) + `-subtle` (bg) + `-solid` (fill) + `on-*`; `live on-live`; `overlay` (flat scrim, never blurred); `shadow` (translucent flat cast shadow), `shadow-pop` (hard shadow colour), `shadow-accent` (orange misregistration)
 - code: `code-bg code-text code-key code-string code-number code-boolean code-null code-punctuation code-highlight`
-- packets: `packet-{req,event,eose,ok,close,closed,notice,auth,count}` + `on-packet`
-- kinds: `kind-{regular,replaceable,ephemeral,addressable}` (+`-subtle`) + `on-kind`
-- diagrams: `diagram-{node,node-stroke,node-down,node-down-stroke,edge,edge-active,edge-dead,lane,lane-alt,highlight,label}`, `envelope-{wrap,seal,rumor,stroke}` (`envelope-*` and `diagram-node-down*` are used by chapter components only, not by `@nostrschool/diagrams`)
-- charts: `chart-1 … chart-8`, `chart-grid`, `chart-axis`; mascot: `mascot-{body,belly,beak,legs,accent}`
-- `--font-family-{display,body,mono}`, `--font-size-{2xs,xs,sm,md,lg,xl,2xl,3xl,4xl,5xl,6xl}`, `--font-weight-{regular,medium,semibold,bold,black}`, `--font-line-height-{tight,snug,normal,relaxed}`, `--font-letter-spacing-{tight,normal,wide,caps}`
-- `--space-{0,3xs,2xs,xs,sm,md,lg,xl,2xl,3xl,4xl}` (2,4,8,12,16,24,32,48,64,96px)
-- `--size-{icon-sm,icon-md,icon-lg,icon-xl,control-sm,control-md,control-lg,touch-target,avatar-sm,avatar-md,avatar-lg,mascot-sm,mascot-md,mascot-lg,content,wide,rail,drawer,diagram-min-height}`
-- `--radius-{none,sm,md,lg,xl,pill,round}`, `--border-width-{thin,medium,thick,heavy}`, `--opacity-{disabled,muted,overlay,subtle,dimmed}`
-- `--shadow-{sm,md,lg,pop,pop-sm}` (pop = playful hard offset shadow)
-- `--motion-duration-{instant,fast,normal,slow,slower,packet,step}`, `--motion-easing-{standard,emphasized,decelerate,accelerate,bounce}`, `--motion-spring-{gentle,bouncy,snappy,wobbly}-{stiffness,damping,mass}`
+- packets: `packet-{req,event,eose,ok,close,closed,notice,auth,count}` + `on-packet` — mid-tone riso fills tuned so ink text is ≥4.5:1 AND the fill is ≥3:1 on page/surface, so one token works as a pill fill and as a line/dot.
+- kinds: `kind-{regular,replaceable,ephemeral,addressable}` (+`-subtle`) + `on-kind` (same dual-use guarantee)
+- diagrams: `diagram-{node,node-stroke,node-down,node-down-stroke,edge,edge-active,edge-dead,lane,lane-alt,highlight,label}`, `envelope-{wrap,seal,rumor,stroke}`
+- charts: `chart-1 … chart-8` (riso categorical, ≥3:1 on bg/surface/raised), `chart-grid`, `chart-axis`
+- mascot: `mascot-{line,body,belly,beak,legs,accent}` (ink linework in both themes; teal body, orange beak/legs, yellow accent; shading = `--pattern-halftone`)
+- `--font-family-{display,body,mono}` (Bricolage Grotesque Variable ×2, JetBrains Mono Variable), `--font-size-{2xs,xs,sm,md}` fixed + `{lg,xl,2xl,3xl,4xl,5xl,6xl}` fluid `clamp(rem, rem + vw, rem)`, `--font-weight-{regular,medium,semibold,bold,black}`, `--font-line-height-{tight,snug,normal,relaxed}`, `--font-letter-spacing-{tight,normal,wide,caps,display}`
+- `--space-{0,3xs,2xs,xs,sm,md,lg,xl,2xl,3xl,4xl}` (0,2,4,8,12,16,24,32,48,64,96px)
+- `--size-{icon-*,control-*,touch-target,avatar-*,mascot-*,content,wide,rail,drawer,diagram-min-height,halftone-cell,halftone-dot,grain-tile,focus-offset,lift}`
+- `--radius-{none 0,sm 2px,md 4px,lg 6px,xl 10px,pill,round}`, `--border-width-{thin 1px,medium 1.5px (brand line),thick 3px,heavy 4px}`, `--opacity-{disabled,muted,overlay,subtle,dimmed,grain,halftone}`
+- `--shadow-{sm,md,lg,pop,pop-sm,lift,pressed,accent,focus-halo}` — all hard offsets, zero blur (tested)
+- `--pattern-{grain,halftone,highlight}` (see §2 Brand)
+- `--motion-duration-{instant,press,fast,normal,slow,slower,packet,step}`, `--motion-easing-{standard,emphasized,decelerate,accelerate,bounce,press}` (bounce is a small crafted overshoot), `--motion-spring-{gentle,bouncy,snappy,wobbly}-{stiffness,damping,mass}`
 - `--z-{base,raised,dropdown,sticky,drawer,overlay,modal,popover,toast,mascot}`, `--breakpoint-{sm,md,lg,xl}`
+
+**Migration from the purple brand** (token names were already semantic, so nothing was renamed;
+meanings changed — restyle call sites accordingly):
+
+| Token | Before | Now / what to do |
+|---|---|---|
+| `primary` | purple #7A2EF5, white text, usable as border | riso orange fill, **ink** text; not a line/text colour → borders/strokes use `border-strong` or `text-primary` |
+| `secondary` | orange | teal fill (ink text); strokes use `text-secondary` |
+| `accent` | pink | riso blue fill (ink text); strokes use `text-accent` |
+| `on-*` (primary, accent, success, danger, info, live, packet, kind) | white | ink |
+| `surface` | white card | paper-2 (darker than page); use `surface-raised` for the brightest sheet |
+| `border-strong` | mid grey | ink (the 1.5px brand line) |
+| `border-width-medium` | 2px | 1.5px |
+| `radius-{sm,md,lg,xl}` | 6/12/20/28px | 2/4/6/10px |
+| `shadow-{sm,md,lg}` | soft blurred | hard offsets (1/3/5px); new `lift`, `pressed`, `accent`, `focus-halo` |
+| `color-shadow` | purple-tinted rgba | translucent ink (flat cast shadows only) |
+| `mascot-body` | dark ink | teal spot fill; new `mascot-line` for linework |
+| `font-family-display/body` | Fredoka / Nunito | Bricolage Grotesque |
+| new | — | `focus-halo highlight on-highlight grain halftone shadow-accent mascot-line`, `pattern-*`, `size-{halftone-*,grain-tile,focus-offset,lift}`, `opacity-{grain,halftone}`, `motion-duration-press`, `motion-easing-press`, `font-letter-spacing-display` |
 
 Themes: light by default; dark via `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) }`
 and forced with `<html data-theme="dark">` (persisted by the shell under localStorage `nostrschool:theme`).
+Regenerate the OG card and touch icon after brand changes: `bun run brand:images` (Playwright Chromium).
 
 ### 3.2 `@nostrschool/i18n` — `packages/i18n`
 ```ts

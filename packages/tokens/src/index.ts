@@ -27,136 +27,155 @@ export const cssVar = (name: CssVarName, fallback?: string): string =>
 /** Media query string for a breakpoint, e.g. `mediaUp("md")` → `"(min-width: 768px)"`. */
 export const mediaUp = (bp: BreakpointToken): string => `(min-width: ${tokens.breakpoint[bp]}px)`;
 
+type Pair = readonly [ColorToken, ColorToken];
+const SURFACES = ["bg", "surface", "surfaceRaised", "surfaceSunken"] as const;
+/** Surfaces diagrams, packets and chart marks are drawn on (sunken wells hold text only). */
+const CANVASES = ["bg", "surface", "surfaceRaised"] as const;
+const PACKETS = [
+  "packetReq",
+  "packetEvent",
+  "packetEose",
+  "packetOk",
+  "packetClose",
+  "packetClosed",
+  "packetNotice",
+  "packetAuth",
+  "packetCount",
+] as const;
+const KINDS = ["kindRegular", "kindReplaceable", "kindEphemeral", "kindAddressable"] as const;
+const CHARTS = [
+  "chart1",
+  "chart2",
+  "chart3",
+  "chart4",
+  "chart5",
+  "chart6",
+  "chart7",
+  "chart8",
+  "chartAxis",
+] as const;
+const CODE = [
+  "codeText",
+  "codeKey",
+  "codeString",
+  "codeNumber",
+  "codeBoolean",
+  "codeNull",
+  "codePunctuation",
+] as const;
+/** Solid fills that carry `on-*` (ink) text. In the zine look they are outlined with border-strong. */
+const FILLS = [
+  "primary",
+  "primaryHover",
+  "primaryActive",
+  "secondary",
+  "secondaryHover",
+  "accent",
+  "accentHover",
+  "successSolid",
+  "warningSolid",
+  "dangerSolid",
+  "infoSolid",
+  "live",
+  "highlight",
+  ...PACKETS,
+  ...KINDS,
+] as const;
+const cross = <A extends ColorToken, B extends ColorToken>(
+  fgs: readonly A[],
+  bgs: readonly B[],
+): readonly Pair[] => fgs.flatMap((fg) => bgs.map((bg) => [fg, bg] as const));
+
 /**
- * Color pairs (foreground, background) that must meet WCAG AA in BOTH themes.
- * `text` pairs need 4.5:1, `nonText` pairs (borders, focus rings, chart marks) need 3:1.
+ * Color pairs that must meet WCAG AA in BOTH themes (enforced by tokens.test.ts).
+ * - `text`: 4.5:1. `nonText`: 3:1 (borders, focus rings, chart marks, edges).
+ * - `focusFills`: when the focus ring hugs one of these fills, the ring OR the halo (the gap
+ *   colour between ring and element, `focus-halo`) must reach 3:1 against it.
+ * - `outlinedFills`: each fill must separate from the page/surfaces at 3:1 either by itself or
+ *   through its border-strong outline (light theme: orange on paper is 2.7:1, the ink line is 15:1).
  */
 export const CONTRAST_PAIRS: {
-  readonly text: readonly (readonly [ColorToken, ColorToken])[];
-  readonly nonText: readonly (readonly [ColorToken, ColorToken])[];
+  readonly text: readonly Pair[];
+  readonly nonText: readonly Pair[];
+  readonly focusFills: readonly ColorToken[];
+  readonly outlinedFills: readonly ColorToken[];
 } = {
   text: [
-    ...(
-      ["text", "textMuted", "textSubtle", "textPrimary", "textSecondary", "textAccent"] as const
-    ).flatMap((fg) =>
-      (["bg", "surface", "surfaceRaised", "surfaceSunken"] as const).map((bg) => [fg, bg] as const),
+    ...cross(
+      [
+        "text",
+        "textMuted",
+        "textSubtle",
+        "textPrimary",
+        "textSecondary",
+        "textAccent",
+        "success",
+        "warning",
+        "danger",
+        "info",
+      ],
+      SURFACES,
     ),
-    ["text", "primarySubtle"],
+    ...cross(
+      ["text", "textMuted"],
+      [
+        "primarySubtle",
+        "secondarySubtle",
+        "accentSubtle",
+        "successSubtle",
+        "warningSubtle",
+        "dangerSubtle",
+        "infoSubtle",
+      ],
+    ),
     ["textPrimary", "primarySubtle"],
-    ["text", "secondarySubtle"],
-    ["text", "accentSubtle"],
-    ["textInverse", "surfaceInverse"],
-    ["onPrimary", "primary"],
-    ["onPrimary", "primaryHover"],
-    ["onPrimary", "primaryActive"],
-    ["onSecondary", "secondary"],
-    ["onSecondary", "secondaryHover"],
-    ["onAccent", "accent"],
-    ["onAccent", "accentHover"],
+    ["textSecondary", "secondarySubtle"],
+    ["textAccent", "accentSubtle"],
     ["success", "successSubtle"],
-    ["success", "surface"],
     ["warning", "warningSubtle"],
-    ["warning", "surface"],
     ["danger", "dangerSubtle"],
-    ["danger", "surface"],
     ["info", "infoSubtle"],
-    ["info", "surface"],
+    ["textInverse", "surfaceInverse"],
+    ...cross(["onPrimary"], ["primary", "primaryHover", "primaryActive"]),
+    ...cross(["onSecondary"], ["secondary", "secondaryHover"]),
+    ...cross(["onAccent"], ["accent", "accentHover"]),
     ["onSuccess", "successSolid"],
     ["onWarning", "warningSolid"],
     ["onDanger", "dangerSolid"],
     ["onInfo", "infoSolid"],
     ["onLive", "live"],
-    ...(
-      [
-        "codeText",
-        "codeKey",
-        "codeString",
-        "codeNumber",
-        "codeBoolean",
-        "codeNull",
-        "codePunctuation",
-      ] as const
-    ).flatMap((fg) => [[fg, "codeBg"] as const, [fg, "codeHighlight"] as const]),
-    ...(
-      [
-        "packetReq",
-        "packetEvent",
-        "packetEose",
-        "packetOk",
-        "packetClose",
-        "packetClosed",
-        "packetNotice",
-        "packetAuth",
-        "packetCount",
-      ] as const
-    ).map((bg) => ["onPacket", bg] as const),
-    ...(["kindRegular", "kindReplaceable", "kindEphemeral", "kindAddressable"] as const).map(
-      (bg) => ["onKind", bg] as const,
-    ),
-    ["text", "kindRegularSubtle"],
-    ["text", "kindReplaceableSubtle"],
-    ["text", "kindEphemeralSubtle"],
-    ["text", "kindAddressableSubtle"],
-    ["diagramLabel", "diagramNode"],
-    ["diagramLabel", "diagramLane"],
-    ["diagramLabel", "diagramLaneAlt"],
-    ["diagramLabel", "diagramNodeDown"],
-    ["text", "envelopeWrap"],
-    ["text", "envelopeSeal"],
-    ["text", "envelopeRumor"],
+    ["onHighlight", "highlight"],
     ["text", "selection"],
+    ...cross(CODE, ["codeBg", "codeHighlight"]),
+    ...cross(["onPacket"], PACKETS),
+    ...cross(["onKind"], KINDS),
+    ...cross(
+      ["text"],
+      [
+        "kindRegularSubtle",
+        "kindReplaceableSubtle",
+        "kindEphemeralSubtle",
+        "kindAddressableSubtle",
+      ],
+    ),
+    ...cross(["diagramLabel"], ["diagramNode", "diagramLane", "diagramLaneAlt", "diagramNodeDown"]),
+    ...cross(["text"], ["envelopeWrap", "envelopeSeal", "envelopeRumor", "diagramHighlight"]),
   ],
   nonText: [
-    ["borderStrong", "surface"],
-    ["borderStrong", "bg"],
-    ["focusRing", "bg"],
-    ["focusRing", "surface"],
-    ["focusRing", "surfaceRaised"],
-    ["focusRing", "surfaceSunken"],
-    // The ring often hugs a primary-filled button/tab, so it must also separate from primary.
-    ["focusRing", "primary"],
-    ...(
-      [
-        "chart1",
-        "chart2",
-        "chart3",
-        "chart4",
-        "chart5",
-        "chart6",
-        "chart7",
-        "chart8",
-        "chartAxis",
-      ] as const
-    ).map((fg) => [fg, "surface"] as const),
-    ["diagramEdge", "surface"],
-    ["diagramEdgeActive", "surface"],
-    ["diagramEdgeDead", "surface"],
+    ...cross(["borderStrong", "focusRing"], SURFACES),
+    ["focusRing", "focusHalo"],
+    ...cross([...CHARTS, ...PACKETS, ...KINDS, "live"], CANVASES),
+    ...cross(["diagramEdge", "diagramEdgeActive", "diagramEdgeDead"], [...CANVASES, "diagramNode"]),
+    ...cross(["textPrimary", "textSecondary", "textAccent"], CANVASES),
     ["diagramNodeStroke", "diagramNode"],
+    ["diagramNodeStroke", "surface"],
     ["diagramNodeDownStroke", "diagramNodeDown"],
     ["envelopeStroke", "surface"],
-    ...(
-      [
-        "packetReq",
-        "packetEvent",
-        "packetEose",
-        "packetOk",
-        "packetClose",
-        "packetClosed",
-        "packetNotice",
-        "packetAuth",
-        "packetCount",
-      ] as const
-    ).map((fg) => [fg, "surface"] as const),
-    ...(
-      [
-        "kindRegular",
-        "kindReplaceable",
-        "kindEphemeral",
-        "kindAddressable",
-        "live",
-        "primary",
-        "accent",
-      ] as const
-    ).map((fg) => [fg, "surface"] as const),
+    ...cross(["envelopeStroke"], ["envelopeWrap", "envelopeSeal", "envelopeRumor"]),
+    ["mascotLine", "mascotBody"],
+    ["mascotLine", "mascotBelly"],
+    ["mascotLine", "mascotBeak"],
   ],
+  focusFills: FILLS,
+  outlinedFills: FILLS,
 };

@@ -1,0 +1,17 @@
+{
+  "pattern": {
+    "$description": "Print textures. Grain is a MASK (colour from color.grain); halftone is a hard-stop dot pattern (not a gradient look). Both are disabled in print and under prefers-reduced-data.",
+    "grain": {
+      "$value": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.7 0 0 0 -.62'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+      "$description": "Use as mask-image over a background of var(--color-grain) at var(--opacity-grain)."
+    },
+    "halftone": {
+      "$value": "radial-gradient(circle, var(--color-halftone) var(--size-halftone-dot), transparent calc(var(--size-halftone-dot) + 0.5px))",
+      "$description": "background-image with background-size: var(--size-halftone-cell) var(--size-halftone-cell)."
+    },
+    "highlight": {
+      "$value": "linear-gradient(176deg, transparent 0 34%, var(--color-highlight) 34% 88%, transparent 88%)",
+      "$description": "Hard-stop highlighter band, slightly tilted; used by .highlight. Text stays var(--color-text)/on-highlight."
+    }
+  }
+}

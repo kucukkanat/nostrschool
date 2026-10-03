@@ -2,84 +2,240 @@
   "space": {
     "$type": "dimension",
     "$description": "Spacing scale (4px base). Use for padding, margin and gap.",
-    "0": { "$value": "0px" },
-    "3xs": { "$value": "2px" },
-    "2xs": { "$value": "4px" },
-    "xs": { "$value": "8px" },
-    "sm": { "$value": "12px" },
-    "md": { "$value": "16px" },
-    "lg": { "$value": "24px" },
-    "xl": { "$value": "32px" },
-    "2xl": { "$value": "48px" },
-    "3xl": { "$value": "64px" },
-    "4xl": { "$value": "96px" }
+    "0": {
+      "$value": "0px"
+    },
+    "3xs": {
+      "$value": "2px"
+    },
+    "2xs": {
+      "$value": "4px"
+    },
+    "xs": {
+      "$value": "8px"
+    },
+    "sm": {
+      "$value": "12px"
+    },
+    "md": {
+      "$value": "16px"
+    },
+    "lg": {
+      "$value": "24px"
+    },
+    "xl": {
+      "$value": "32px"
+    },
+    "2xl": {
+      "$value": "48px"
+    },
+    "3xl": {
+      "$value": "64px"
+    },
+    "4xl": {
+      "$value": "96px"
+    }
   },
   "size": {
     "$type": "dimension",
-    "icon-sm": { "$value": "16px" },
-    "icon-md": { "$value": "20px" },
-    "icon-lg": { "$value": "24px" },
-    "icon-xl": { "$value": "32px" },
-    "control-sm": { "$value": "32px" },
-    "control-md": { "$value": "40px" },
-    "control-lg": { "$value": "48px" },
-    "touch-target": { "$value": "44px", "$description": "Minimum hit area for pointer targets (WCAG 2.5.5)." },
-    "avatar-sm": { "$value": "24px" },
-    "avatar-md": { "$value": "40px" },
-    "avatar-lg": { "$value": "64px" },
-    "mascot-sm": { "$value": "64px" },
-    "mascot-md": { "$value": "120px" },
-    "mascot-lg": { "$value": "200px" },
-    "content": { "$value": "720px", "$description": "Max width of prose." },
-    "wide": { "$value": "1120px", "$description": "Max width of interactives and page chrome." },
-    "rail": { "$value": "280px", "$description": "Chapter rail width." },
-    "drawer": { "$value": "420px" },
-    "diagram-min-height": { "$value": "320px", "$description": "Reserved island height to avoid layout shift." }
+    "icon-sm": {
+      "$value": "16px"
+    },
+    "icon-md": {
+      "$value": "20px"
+    },
+    "icon-lg": {
+      "$value": "24px"
+    },
+    "icon-xl": {
+      "$value": "32px"
+    },
+    "control-sm": {
+      "$value": "32px"
+    },
+    "control-md": {
+      "$value": "40px"
+    },
+    "control-lg": {
+      "$value": "48px"
+    },
+    "touch-target": {
+      "$value": "44px",
+      "$description": "Minimum hit area for pointer targets (WCAG 2.5.5)."
+    },
+    "avatar-sm": {
+      "$value": "24px"
+    },
+    "avatar-md": {
+      "$value": "40px"
+    },
+    "avatar-lg": {
+      "$value": "64px"
+    },
+    "mascot-sm": {
+      "$value": "64px"
+    },
+    "mascot-md": {
+      "$value": "120px"
+    },
+    "mascot-lg": {
+      "$value": "200px"
+    },
+    "content": {
+      "$value": "720px",
+      "$description": "Max width of prose."
+    },
+    "wide": {
+      "$value": "1120px",
+      "$description": "Max width of interactives and page chrome."
+    },
+    "rail": {
+      "$value": "280px",
+      "$description": "Chapter rail width."
+    },
+    "drawer": {
+      "$value": "420px"
+    },
+    "diagram-min-height": {
+      "$value": "320px",
+      "$description": "Reserved island height to avoid layout shift."
+    },
+    "halftone-cell": {
+      "$value": "6px",
+      "$description": "Halftone dot pitch."
+    },
+    "halftone-dot": {
+      "$value": "1.4px",
+      "$description": "Halftone dot radius."
+    },
+    "grain-tile": {
+      "$value": "180px"
+    },
+    "focus-offset": {
+      "$value": "2px"
+    },
+    "lift": {
+      "$value": "2px",
+      "$description": "Hover lift distance (translate) paired with shadow-lift."
+    }
   },
   "radius": {
     "$type": "dimension",
-    "none": { "$value": "0px" },
-    "sm": { "$value": "6px" },
-    "md": { "$value": "12px" },
-    "lg": { "$value": "20px" },
-    "xl": { "$value": "28px" },
-    "pill": { "$value": "999px" },
-    "round": { "$value": "50%" }
+    "$description": "Mostly squarish: printed paper corners, not pills.",
+    "none": {
+      "$value": "0px"
+    },
+    "sm": {
+      "$value": "2px"
+    },
+    "md": {
+      "$value": "4px"
+    },
+    "lg": {
+      "$value": "6px"
+    },
+    "xl": {
+      "$value": "10px"
+    },
+    "pill": {
+      "$value": "999px",
+      "$description": "Tags/chips only."
+    },
+    "round": {
+      "$value": "50%"
+    }
   },
   "border-width": {
     "$type": "dimension",
-    "thin": { "$value": "1px" },
-    "medium": { "$value": "2px" },
-    "thick": { "$value": "3px" },
-    "heavy": { "$value": "4px" }
+    "thin": {
+      "$value": "1px"
+    },
+    "medium": {
+      "$value": "1.5px",
+      "$description": "The brand ink line: outlines on cards, buttons, inputs, fills."
+    },
+    "thick": {
+      "$value": "3px",
+      "$description": "Focus outline, emphasis rules."
+    },
+    "heavy": {
+      "$value": "4px"
+    }
   },
   "opacity": {
     "$type": "number",
-    "disabled": { "$value": 0.45 },
-    "muted": { "$value": 0.7 },
-    "overlay": { "$value": 0.6 },
-    "subtle": { "$value": 0.12 },
-    "dimmed": { "$value": 0.35, "$description": "Unreachable/offline diagram nodes." }
+    "disabled": {
+      "$value": 0.45
+    },
+    "muted": {
+      "$value": 0.7
+    },
+    "overlay": {
+      "$value": 0.6
+    },
+    "subtle": {
+      "$value": 0.12
+    },
+    "dimmed": {
+      "$value": 0.35,
+      "$description": "Unreachable/offline diagram nodes."
+    },
+    "grain": {
+      "$value": 0.07,
+      "$description": "Paper grain overlay strength."
+    },
+    "halftone": {
+      "$value": 1,
+      "$description": "Halftone overlays use color-halftone alpha; scale here if needed."
+    }
   },
   "z": {
     "$type": "number",
-    "base": { "$value": 0 },
-    "raised": { "$value": 10 },
-    "dropdown": { "$value": 100 },
-    "sticky": { "$value": 200 },
-    "drawer": { "$value": 300 },
-    "overlay": { "$value": 400 },
-    "modal": { "$value": 500 },
-    "popover": { "$value": 600 },
-    "toast": { "$value": 700 },
-    "mascot": { "$value": 800 }
+    "base": {
+      "$value": 0
+    },
+    "raised": {
+      "$value": 10
+    },
+    "dropdown": {
+      "$value": 100
+    },
+    "sticky": {
+      "$value": 200
+    },
+    "drawer": {
+      "$value": 300
+    },
+    "overlay": {
+      "$value": 400
+    },
+    "modal": {
+      "$value": 500
+    },
+    "popover": {
+      "$value": 600
+    },
+    "toast": {
+      "$value": 700
+    },
+    "mascot": {
+      "$value": 800
+    }
   },
   "breakpoint": {
     "$type": "dimension",
     "$description": "CSS vars can't be used inside @media; use these from TS (matchMedia) or mirror the px values.",
-    "sm": { "$value": "480px" },
-    "md": { "$value": "768px" },
-    "lg": { "$value": "1024px" },
-    "xl": { "$value": "1280px" }
+    "sm": {
+      "$value": "480px"
+    },
+    "md": {
+      "$value": "768px"
+    },
+    "lg": {
+      "$value": "1024px"
+    },
+    "xl": {
+      "$value": "1280px"
+    }
   }
 }
