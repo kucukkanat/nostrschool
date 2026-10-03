@@ -4,7 +4,7 @@
   import { duration, emit, prefersReducedMotion } from "@nostrschool/ui";
   import { tick } from "svelte";
   import { flip } from "svelte/animate";
-  import { backOut } from "svelte/easing";
+  import { cubicOut } from "svelte/easing";
   import { fade, scale } from "svelte/transition";
   import KindDetail from "./KindDetail.svelte";
   import KindFilters from "./KindFilters.svelte";
@@ -152,7 +152,7 @@
               {@const index = flat.indexOf(entry)}
               <li
                 animate:flip={{ duration: duration("normal") }}
-                in:scale={{ duration: duration("normal"), start: 0.6, easing: backOut }}
+                in:scale={{ duration: duration("normal"), start: 0.9, easing: cubicOut }}
                 out:scale={{ duration: duration("fast"), start: 0.6 }}
               >
                 <button
@@ -238,8 +238,8 @@
     border-radius: var(--radius-round);
     border: var(--border-width-medium) solid var(--dot-color);
     transition:
-      background-color var(--motion-duration-normal) var(--motion-easing-bounce),
-      transform var(--motion-duration-normal) var(--motion-easing-bounce);
+      background-color var(--motion-duration-normal) var(--motion-easing-standard),
+      transform var(--motion-duration-normal) var(--motion-easing-standard);
   }
   .dot.on {
     background: var(--dot-color);
@@ -369,17 +369,21 @@
     cursor: pointer;
     /* No overflow clipping: aspect-ratio then acts as a minimum, so a multi-line name grows the
        tile (and its grid row) instead of being cut off. */
+    /* Riso press (CONTRACTS "Brand"): hover lifts the tile slightly off-register onto a small hard
+       shadow; pressing slides it back down onto its shadow, which collapses. No overshoot. */
     transition:
-      transform var(--motion-duration-fast) var(--motion-easing-bounce),
-      box-shadow var(--motion-duration-fast) var(--motion-easing-standard),
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
       background-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .tile:hover {
-    transform: translateY(calc(-1 * var(--space-3xs))) rotate(-1deg);
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
     box-shadow: var(--shadow-pop-sm);
   }
-  .tile:active {
-    transform: scale(0.94);
+  .tile:active,
+  .tile.selected:active {
+    translate: 0 0;
+    box-shadow: var(--shadow-pressed);
   }
   .tile:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
@@ -390,7 +394,7 @@
     background: var(--kind-color);
     color: var(--color-on-kind);
     box-shadow: var(--shadow-accent);
-    transform: translateY(calc(-1 * var(--space-3xs)));
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
   }
   .num {
     font-family: var(--font-family-mono);

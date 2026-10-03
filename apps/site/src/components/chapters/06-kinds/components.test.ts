@@ -129,6 +129,34 @@ describe("KindsTable on small screens", () => {
   });
 });
 
+describe("KindsTable riso interaction", () => {
+  // happy-dom has no layout or transitions, so the press/hover contract is checked in the source.
+  const css = async (): Promise<string> => {
+    const src = await Bun.file(new URL("./KindsTable.svelte", import.meta.url)).text();
+    return src.slice(src.indexOf("<style>"));
+  };
+  const rule = (styles: string, selector: string): string =>
+    new RegExp(`\\n  ${selector.replaceAll(".", "\\.")} \\{([^}]*)\\}`).exec(styles)?.[1] ?? "";
+
+  test("tiles use no overshoot easing anywhere", async () => {
+    const src = await Bun.file(new URL("./KindsTable.svelte", import.meta.url)).text();
+    expect(src).not.toMatch(/easing-bounce|backOut|elastic|spring/);
+  });
+
+  test("hover lifts a tile off-register; press collapses its shadow", async () => {
+    const styles = await css();
+    expect(rule(styles, ".tile")).toContain(
+      "translate var(--motion-duration-press) var(--motion-easing-press)",
+    );
+    expect(rule(styles, ".tile:hover")).toContain(
+      "translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1)",
+    );
+    expect(rule(styles, ".tile:hover")).not.toMatch(/rotate|scale/);
+    expect(styles).toMatch(/\.tile:active,\n {2}\.tile\.selected:active \{[^}]*--shadow-pressed/);
+    expect(styles).not.toMatch(/\.tile[^{]*\{[^}]*transform:/);
+  });
+});
+
 describe("KindDetail", () => {
   const entries = localizeKinds(getDictionary("en").kinds.names);
   test("shows rumor and signed sources", () => {

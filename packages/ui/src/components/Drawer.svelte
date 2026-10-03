@@ -83,17 +83,25 @@
     outline: var(--border-width-thick) solid var(--color-focus-ring);
     outline-offset: var(--size-focus-offset);
   }
+  /* Riso interaction language, no overshoot: the chevron turns on the standard curve; the gear
+     slips off-register on hover and snaps back into register while the summary is pressed. */
   .chevron,
   .gear {
     display: inline-block;
-    transition: rotate var(--motion-duration-normal) var(--motion-easing-bounce);
+  }
+  .chevron {
+    transition: rotate var(--motion-duration-normal) var(--motion-easing-standard);
   }
   .gear {
     color: var(--color-text-primary);
+    transition:
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      rotate var(--motion-duration-press) var(--motion-easing-press);
   }
   @media (hover: hover) {
-    summary:hover .gear {
-      rotate: 0.25turn;
+    summary:hover:not(:active) .gear {
+      translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+      rotate: 0.125turn;
     }
     summary:hover .title {
       text-decoration: underline var(--border-width-medium) var(--color-text-primary);

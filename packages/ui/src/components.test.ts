@@ -185,6 +185,18 @@ describe("Drawer", () => {
     expect((second.getByTestId("d2") as HTMLDetailsElement).open).toBe(true);
     expect((second.getByTestId("d2-always") as HTMLInputElement).checked).toBe(true);
   });
+  test("the gear slips off-register on the press curve, never the bounce", async () => {
+    // happy-dom has no layout, so the riso interaction contract is checked in the source.
+    const src = await Bun.file(new URL("./components/Drawer.svelte", import.meta.url)).text();
+    const css = src.slice(src.indexOf("<style>"));
+    expect(css).not.toMatch(/easing-bounce|spring/);
+    expect(css).toMatch(
+      /\.gear \{[^}]*translate var\(--motion-duration-press\) var\(--motion-easing-press\)/,
+    );
+    expect(css).toMatch(
+      /summary:hover:not\(:active\) \.gear \{[^}]*translate: calc\(var\(--size-lift\) \* -1\)/,
+    );
+  });
 });
 
 describe("Term", () => {
