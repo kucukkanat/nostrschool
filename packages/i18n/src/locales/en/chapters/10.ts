@@ -26,7 +26,7 @@ export const ch10 = {
     app: {
       title: "The app (some website)",
       noteLabel: "Your note",
-      defaultNote: "gm! Signed without sharing my key 🔐",
+      defaultNote: "gm! Signed without sharing my key.",
       sign: "Sign & post",
       reset: "Start over",
       memoryTitle: "Everything the app received",
@@ -86,7 +86,7 @@ export const ch10 = {
     verdict: {
       idle: "Write a note and press “Sign & post”.",
       awaiting: "The signer is asking for your approval. Look at the signer box.",
-      safe: "Signed and posted, and the app never saw your secret key. 🎉",
+      safe: "Signed and posted, and the app never saw your secret key.",
       leaked:
         "Posted… but the app now holds your secret key. Any bug, sneaky script or bad employee could be you, forever.",
       rejected: "You said no, so nothing was signed. That's the signer protecting you.",

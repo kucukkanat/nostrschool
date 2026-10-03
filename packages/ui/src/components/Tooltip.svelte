@@ -46,26 +46,27 @@
   }
   .tooltip:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
-    outline-offset: var(--space-3xs);
+    outline-offset: var(--size-focus-offset);
   }
   .bubble {
     position: absolute;
     z-index: var(--z-popover);
     inline-size: max-content;
-    max-inline-size: var(--size-rail);
+    max-inline-size: min(var(--size-rail), calc(100vw - var(--space-xl)));
     padding: var(--space-2xs) var(--space-xs);
     border-radius: var(--radius-sm);
     background: var(--color-surface-inverse);
     color: var(--color-text-inverse);
+    font-family: var(--font-family-mono);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
     line-height: var(--font-line-height-snug);
     pointer-events: none;
     opacity: 0;
-    scale: 0.85;
+    scale: 0.96;
     transition:
       opacity var(--motion-duration-fast) var(--motion-easing-standard),
-      scale var(--motion-duration-normal) var(--motion-easing-bounce);
+      scale var(--motion-duration-fast) var(--motion-easing-decelerate);
   }
   .top .bubble {
     inset-block-end: calc(100% + var(--space-2xs));

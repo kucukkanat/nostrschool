@@ -65,7 +65,7 @@ const PALETTE = [
 /** Stable color per group, in first-seen order (ungrouped nodes share the first color). */
 export const groupColors = (nodes: readonly GraphNode[]): ReadonlyMap<string, string> => {
   const groups = [...new Set(nodes.map((n) => n.group ?? ""))];
-  return new Map(groups.map((g, i) => [g, PALETTE[i % PALETTE.length] ?? vars.color.primary]));
+  return new Map(groups.map((g, i) => [g, PALETTE[i % PALETTE.length] ?? vars.color.chart1]));
 };
 
 export interface Point {

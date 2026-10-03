@@ -105,7 +105,7 @@
   }
   .slice {
     transform-origin: 0 0;
-    animation: spin-in var(--motion-duration-slower) var(--motion-easing-bounce) backwards;
+    animation: spin-in var(--motion-duration-slower) var(--motion-easing-decelerate) backwards;
     animation-delay: calc(var(--i) * var(--motion-duration-fast) / 2);
   }
   .center {
@@ -118,12 +118,15 @@
   }
   .small {
     fill: var(--color-text-muted);
-    font-size: var(--font-size-sm);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    letter-spacing: var(--font-letter-spacing-caps);
+    text-transform: uppercase;
   }
   @keyframes spin-in {
     from {
       opacity: 0;
-      transform: rotate(-30deg) scale(0.7);
+      transform: rotate(-12deg);
     }
   }
 </style>

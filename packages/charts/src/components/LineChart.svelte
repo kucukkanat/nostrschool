@@ -123,18 +123,17 @@
     fill: none;
     stroke: var(--c);
     stroke-width: var(--border-width-thick);
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
     stroke-dasharray: 1;
     animation: draw var(--motion-duration-step) var(--motion-easing-emphasized) backwards;
   }
+  /* Points are riso dots: series colour fill, ink outline (stroke comes from the frame's mark rule). */
   .point {
-    fill: var(--color-surface);
-    stroke: var(--c);
-    stroke-width: var(--border-width-medium);
+    fill: var(--c);
     transform-box: fill-box;
     transform-origin: center;
-    animation: pop var(--motion-duration-slow) var(--motion-easing-bounce) backwards;
+    animation: pop var(--motion-duration-slow) var(--motion-easing-decelerate) backwards;
     animation-delay: calc(
       var(--motion-duration-slower) +
       var(--i) *

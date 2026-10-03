@@ -40,38 +40,46 @@
 </div>
 
 <style>
+  /* An index card: paper-2, ink line, hard shadow; the figure is set big in accent ink. */
   .tile {
     display: grid;
     gap: var(--space-2xs);
     align-content: start;
+    min-width: 0;
     padding: var(--space-md);
     background: var(--color-surface);
     color: var(--color-text);
-    border: var(--border-width-medium) solid var(--color-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-pop-sm);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-pop);
     font-family: var(--font-family-body);
-    animation: rise var(--motion-duration-slower) var(--motion-easing-bounce) backwards;
+    animation: rise var(--motion-duration-slow) var(--motion-easing-decelerate) backwards;
   }
   .label {
     color: var(--color-text-muted);
-    font-size: var(--font-size-sm);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
-    letter-spacing: var(--font-letter-spacing-wide);
+    letter-spacing: var(--font-letter-spacing-caps);
+    text-transform: uppercase;
   }
   .value {
     font-family: var(--font-family-display);
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-black);
+    letter-spacing: var(--font-letter-spacing-display);
     line-height: var(--font-line-height-tight);
     color: var(--color-text-primary);
     font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
   }
   .delta {
     justify-self: start;
     padding: var(--space-3xs) var(--space-xs);
-    border-radius: var(--radius-pill);
-    font-size: var(--font-size-sm);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
     font-weight: var(--font-weight-bold);
   }
   .up {
@@ -93,7 +101,7 @@
   @keyframes rise {
     from {
       opacity: 0;
-      transform: translateY(var(--space-sm)) scale(0.96);
+      translate: 0 var(--space-xs);
     }
   }
 </style>

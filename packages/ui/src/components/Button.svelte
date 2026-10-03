@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { squish } from "../actions.ts";
   import type { ButtonProps } from "../types.ts";
 
   const {
@@ -39,7 +38,6 @@
     aria-disabled={inert ? "true" : undefined}
     aria-label={ariaLabel}
     {onclick}
-    use:squish={{ disabled: inert }}
   >
     {@render body()}
   </a>
@@ -53,27 +51,29 @@
     aria-pressed={pressed}
     aria-label={ariaLabel}
     {onclick}
-    use:squish={{ disabled: inert }}
   >
     {@render body()}
   </button>
 {/if}
 
 <style>
+  /* Riso press recipe: the button sits on a hard ink shadow; hover lifts it off the page, press
+     pushes it down onto its own shadow (the shadow collapses). Pure CSS, so it is free of JS and
+     collapses to an instant state change under reduced motion via the duration tokens. */
   .btn {
     --btn-bg: var(--color-primary);
     --btn-bg-hover: var(--color-primary-hover);
     --btn-fg: var(--color-on-primary);
-    --btn-border: var(--color-primary-active);
+    --btn-shadow: var(--shadow-pop-sm);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-xs);
-    min-height: var(--size-control-md);
+    min-height: var(--size-touch-target);
     min-width: var(--size-touch-target);
     padding: 0 var(--space-md);
-    border: var(--border-width-medium) solid var(--btn-border);
-    border-radius: var(--radius-pill);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
     background: var(--btn-bg);
     color: var(--btn-fg);
     font-family: var(--font-family-display);
@@ -82,60 +82,73 @@
     line-height: var(--font-line-height-tight);
     text-decoration: none;
     cursor: pointer;
-    box-shadow: var(--shadow-pop-sm);
+    box-shadow: var(--btn-shadow);
     transition:
       background-color var(--motion-duration-fast) var(--motion-easing-standard),
-      box-shadow var(--motion-duration-fast) var(--motion-easing-standard),
-      translate var(--motion-duration-normal) var(--motion-easing-bounce);
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
+      translate var(--motion-duration-press) var(--motion-easing-press);
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-  .btn:hover:not(:disabled, [aria-disabled="true"]) {
+  /* Hover only where a real pointer hovers: on touch screens it would stick after a tap. */
+  @media (hover: hover) {
+    .btn:hover:not(:disabled, [aria-disabled="true"]) {
+      --btn-shadow: var(--shadow-lift);
+      background: var(--btn-bg-hover);
+      translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    }
+  }
+  .btn:active:not(:disabled, [aria-disabled="true"]),
+  .btn[aria-pressed="true"] {
+    --btn-shadow: var(--shadow-pressed);
     background: var(--btn-bg-hover);
-    translate: 0 calc(-1 * var(--space-3xs));
-    box-shadow: var(--shadow-pop);
-  }
-  .btn:active:not(:disabled, [aria-disabled="true"]) {
-    translate: 0 0;
-    box-shadow: none;
+    translate: var(--size-lift) var(--size-lift);
   }
   .btn:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
-    outline-offset: var(--space-3xs);
+    outline-offset: var(--size-focus-offset);
+    /* The halo fills the outline gap so the ring reads on any fill and any page colour. */
+    box-shadow: var(--shadow-focus-halo), var(--btn-shadow);
   }
   .btn:disabled,
   .btn[aria-disabled="true"] {
+    --btn-shadow: var(--shadow-pressed);
     opacity: var(--opacity-disabled);
     cursor: not-allowed;
-    box-shadow: none;
   }
   .btn[aria-busy="true"] {
     cursor: progress;
-  }
-  .btn[aria-pressed="true"] {
-    background: var(--btn-bg-hover);
-    box-shadow: inset var(--shadow-pop-sm);
   }
   .secondary {
     --btn-bg: var(--color-secondary);
     --btn-bg-hover: var(--color-secondary-hover);
     --btn-fg: var(--color-on-secondary);
-    --btn-border: var(--color-secondary-hover);
   }
   .ghost {
     --btn-bg: transparent;
     --btn-bg-hover: var(--color-primary-subtle);
-    --btn-fg: var(--color-text-primary);
-    --btn-border: transparent;
-    box-shadow: none;
+    --btn-fg: var(--color-text);
+    --btn-shadow: var(--shadow-pressed);
+    border-color: transparent;
+    text-decoration: underline var(--border-width-medium) transparent;
+    text-underline-offset: var(--space-2xs);
   }
-  .ghost:hover:not(:disabled, [aria-disabled="true"]) {
-    box-shadow: none;
+  @media (hover: hover) {
+    .ghost:hover:not(:disabled, [aria-disabled="true"]) {
+      --btn-shadow: var(--shadow-pressed);
+      translate: none;
+      text-decoration-color: var(--color-text-primary);
+    }
+  }
+  .ghost:active:not(:disabled, [aria-disabled="true"]),
+  .ghost[aria-pressed="true"] {
+    translate: none;
+    border-color: var(--color-border-strong);
   }
   .danger {
     --btn-bg: var(--color-danger-solid);
-    --btn-bg-hover: var(--color-danger);
+    --btn-bg-hover: var(--color-danger-solid);
     --btn-fg: var(--color-on-danger);
-    --btn-border: var(--color-danger);
   }
   .sm {
     min-height: var(--size-control-sm);
@@ -146,6 +159,12 @@
     min-height: var(--size-control-lg);
     padding: 0 var(--space-lg);
     font-size: var(--font-size-lg);
+  }
+  /* Small buttons are fine for a mouse; a fingertip still needs the full touch target. */
+  @media (pointer: coarse) {
+    .sm {
+      min-height: var(--size-touch-target);
+    }
   }
   .icon {
     display: inline-flex;

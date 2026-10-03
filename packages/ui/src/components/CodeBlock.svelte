@@ -38,27 +38,32 @@
 </figure>
 
 <style>
-  .code {
-    margin: var(--space-lg) 0;
-    border-radius: var(--radius-md);
-    background: var(--color-code-bg);
-    color: var(--color-code-text);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-  }
+  /* A clipped printout: sunken paper, ink outline, mono type. The header strip carries the caption,
+     a mono language tag and the copy button; the code scrolls inside itself, never the page. */
   .code {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
       "caption tools"
       "code code";
+    min-inline-size: 0;
+    margin: var(--space-lg) 0;
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-code-bg);
+    color: var(--color-code-text);
+    overflow: hidden;
+    box-shadow: var(--shadow-pop-sm);
   }
   figcaption {
     grid-area: caption;
     align-self: center;
+    min-inline-size: 0;
     padding: var(--space-2xs) var(--space-md);
     font-family: var(--font-family-body);
     font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    overflow-wrap: anywhere;
   }
   .tools {
     grid-area: tools;
@@ -71,15 +76,19 @@
     color: var(--color-code-punctuation);
     font-family: var(--font-family-mono);
     font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: var(--font-letter-spacing-caps);
   }
   pre {
     grid-area: code;
     margin: 0;
-    border-top: var(--border-width-thin) solid var(--color-code-punctuation);
-    padding: var(--space-md) 0;
+    border-top: var(--border-width-thin) dashed var(--color-border-strong);
+    border-radius: 0;
+    padding: var(--space-sm) 0;
     overflow-x: auto;
+    overscroll-behavior-x: contain;
+    background: transparent;
     font-family: var(--font-family-mono);
     font-size: var(--font-size-sm);
     line-height: var(--font-line-height-relaxed);
@@ -95,9 +104,10 @@
     padding: 0 var(--space-md);
     border-left: var(--border-width-heavy) solid transparent;
   }
+  /* Highlighter on the line, with an accent-ink tick in the margin (orange itself is a fill only). */
   .hl {
     background: var(--color-code-highlight);
-    border-left-color: var(--color-primary);
+    border-left-color: var(--color-text-primary);
   }
   .t-key {
     color: var(--color-code-key);

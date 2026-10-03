@@ -40,13 +40,18 @@
     align-items: center;
     gap: var(--space-2xs);
   }
+  /* Ink-outlined riso chip, the same treatment as the marks it keys. */
   .swatch {
+    flex: none;
     width: var(--size-icon-sm);
     height: var(--size-icon-sm);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-sm);
   }
   .detail {
     color: var(--color-text-muted);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
     font-variant-numeric: tabular-nums;
   }
 </style>

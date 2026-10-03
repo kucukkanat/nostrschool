@@ -2,6 +2,7 @@
   import { format, getDictionary } from "@nostrschool/i18n";
   import { tokens } from "@nostrschool/tokens";
   import { PlaybackControls, $reducedMotion as reducedMotion } from "@nostrschool/ui";
+  import { BOX_RADIUS, HALFTONE_CELL, HALFTONE_DOT, SHADOW } from "../logic/ink.ts";
   import { swimlaneLayout } from "../logic/layout.ts";
   import { popIn } from "../logic/motion.ts";
   import { play, stepDelay, tick } from "../logic/playback.ts";
@@ -107,6 +108,20 @@
           >
             <path d="M0,0 L10,5 L0,10 z" />
           </marker>
+          <!-- Riso halftone screen: alternate lanes read as a second ink pass, not a tint. -->
+          <pattern
+            id="{uid}-halftone"
+            width={HALFTONE_CELL}
+            height={HALFTONE_CELL}
+            patternUnits="userSpaceOnUse"
+          >
+            <circle
+              class="halftone-dot"
+              cx={HALFTONE_CELL / 2}
+              cy={HALFTONE_CELL / 2}
+              r={HALFTONE_DOT}
+            />
+          </pattern>
         </defs>
         {#each L.lanes as { lane, x }, i (lane.id)}
           <g data-testid="{testid}-lane-{lane.id}" class="lane">
@@ -117,6 +132,16 @@
               width="160"
               height={L.height}
             />
+            {#if i % 2 === 1}
+              <rect
+                class="lane-screen"
+                x={x - 80}
+                y="0"
+                width="160"
+                height={L.height}
+                fill="url(#{uid}-halftone)"
+              />
+            {/if}
             <text class="lane-label" {x} y="28" text-anchor="middle" dominant-baseline="central">
               {lane.label}
             </text>
@@ -144,12 +169,20 @@
               {/if}
             {/if}
             <rect
+              class="box-shadow"
+              x={s.x - BOX_W / 2 + SHADOW}
+              y={s.y - BOX_H / 2 + SHADOW}
+              width={BOX_W}
+              height={BOX_H}
+              rx={BOX_RADIUS}
+            />
+            <rect
               class="box"
               x={s.x - BOX_W / 2}
               y={s.y - BOX_H / 2}
               width={BOX_W}
               height={BOX_H}
-              rx="12"
+              rx={BOX_RADIUS}
             />
             <text
               class="box-label"
@@ -199,11 +232,20 @@
   .lane-bg.alt {
     fill: var(--color-diagram-lane-alt);
   }
+  .halftone-dot {
+    fill: var(--color-halftone);
+    opacity: var(--opacity-halftone);
+  }
+  .lane-screen {
+    pointer-events: none;
+  }
   .lane-label {
     fill: var(--color-diagram-label);
-    font-family: var(--font-family-display);
+    font-family: var(--font-family-mono);
     font-weight: var(--font-weight-bold);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
+    letter-spacing: var(--font-letter-spacing-caps);
+    text-transform: uppercase;
   }
   .wire {
     stroke: var(--color-diagram-edge);
@@ -211,6 +253,9 @@
   }
   .arrow path {
     fill: var(--color-diagram-edge);
+  }
+  .box-shadow {
+    fill: var(--color-shadow-pop);
   }
   .box {
     fill: var(--color-diagram-node);
@@ -231,14 +276,18 @@
   .step.pending .box {
     stroke-dasharray: 6 6;
   }
+  .step.pending .box-shadow,
   .step.pending .box-label,
   .step.pending .wire,
   .step.pending :global(.wire-packet) {
     opacity: 0;
   }
+  /* Current step: thicker ink line + orange misregistration (the brand's "selected"). */
   .step.current .box {
-    stroke: var(--color-diagram-edge-active);
-    stroke-width: var(--border-width-heavy);
+    stroke-width: var(--border-width-thick);
+  }
+  .step.current .box-shadow {
+    fill: var(--color-shadow-accent);
   }
   .step.current .wire {
     stroke: var(--color-diagram-edge-active);

@@ -1,7 +1,10 @@
 import { vars } from "@nostrschool/tokens";
 import type { PacketType } from "./types.ts";
 
-/** Fill color (CSS var reference) per packet type; text uses `vars.color.onPacket`. */
+/**
+ * Riso spot fill (CSS var reference) per packet type. Always drawn as an ink-outlined chip with
+ * `vars.color.onPacket` (ink) text; `custom` (non-relay traffic: HTTP, NIP-46…) is the marker yellow.
+ */
 export const PACKET_COLORS: Readonly<Record<PacketType, string>> = {
   EVENT: vars.color.packetEvent,
   REQ: vars.color.packetReq,
@@ -12,5 +15,5 @@ export const PACKET_COLORS: Readonly<Record<PacketType, string>> = {
   EOSE: vars.color.packetEose,
   CLOSED: vars.color.packetClosed,
   NOTICE: vars.color.packetNotice,
-  custom: vars.color.diagramEdgeActive,
+  custom: vars.color.highlight,
 };

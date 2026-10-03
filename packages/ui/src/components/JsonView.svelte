@@ -127,9 +127,14 @@
 
 <style>
   .json {
+    /* Own stacking context so the highlighter swipe (z-index -1) paints above this background. */
+    isolation: isolate;
+    min-inline-size: 0;
     margin: 0;
-    padding: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
     overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-md);
     background: var(--color-code-bg);
     color: var(--color-code-text);
@@ -145,21 +150,37 @@
   }
   .row {
     display: block;
+    position: relative;
     border-radius: var(--radius-sm);
-    transition: background-color var(--motion-duration-normal) var(--motion-easing-standard);
   }
   .children {
     display: block;
-    padding-left: var(--space-lg);
+    padding-left: var(--space-md);
   }
+  /* Mirrors tokens.breakpoint.sm (480px): deeper indents once a phone's width isn't the limit. */
+  @media (min-width: 480px) {
+    .children {
+      padding-left: var(--space-lg);
+    }
+  }
+  /* Highlighter pen: the marker swipes left to right once, then stays; an accent-ink tick marks the
+     margin so the highlight doesn't rely on the fill colour alone. */
   .hl {
-    background: var(--color-code-highlight);
-    box-shadow: inset var(--border-width-heavy) 0 0 var(--color-primary);
-    animation: glow var(--motion-duration-slower) var(--motion-easing-bounce);
+    box-shadow: inset var(--border-width-heavy) 0 0 var(--color-text-primary);
   }
-  @keyframes glow {
+  .hl::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--color-code-highlight);
+    transform-origin: left center;
+    animation: swipe var(--motion-duration-slower) var(--motion-easing-decelerate);
+  }
+  @keyframes swipe {
     from {
-      background: transparent;
+      scale: 0 1;
     }
   }
   .key {
@@ -167,7 +188,7 @@
   }
   .string {
     color: var(--color-code-string);
-    word-break: break-all;
+    overflow-wrap: anywhere;
   }
   .number {
     color: var(--color-code-number);
@@ -188,17 +209,22 @@
     font: inherit;
     text-align: start;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   .selectable {
     border-radius: var(--radius-sm);
-    text-decoration: underline dotted transparent;
+    text-decoration: underline dotted var(--border-width-medium) currentColor;
+    text-underline-offset: var(--space-3xs);
     transition: background-color var(--motion-duration-fast) var(--motion-easing-standard);
   }
-  .selectable:hover {
-    background: var(--color-code-highlight);
-    text-decoration-color: currentColor;
+  @media (hover: hover) {
+    .selectable:hover {
+      background: var(--color-code-highlight);
+      text-decoration-style: solid;
+    }
   }
   .twisty {
+    position: relative;
     display: inline-block;
     inline-size: var(--size-icon-sm);
     margin-left: calc(-1 * var(--size-icon-sm));
@@ -206,14 +232,32 @@
   }
   .twisty span {
     display: inline-block;
-    transition: rotate var(--motion-duration-normal) var(--motion-easing-bounce);
+    transition: rotate var(--motion-duration-normal) var(--motion-easing-standard);
   }
   [data-open="true"] > .twisty span {
     rotate: 0.25turn;
   }
+  /* Rows stay compact for reading; on touch the tiny controls get an invisible fingertip-sized
+     hit area instead of 44px-tall rows. */
+  @media (pointer: coarse) {
+    .twisty::after,
+    .selectable::after,
+    .summary::after {
+      content: "";
+      position: absolute;
+      inset-block: calc(-1 * var(--space-sm));
+      inset-inline: calc(-1 * var(--space-xs));
+    }
+    .selectable,
+    .summary {
+      position: relative;
+    }
+  }
   .summary {
     color: var(--color-code-null);
     font-style: italic;
+    text-decoration: underline dotted var(--border-width-medium) currentColor;
+    text-underline-offset: var(--space-3xs);
   }
   button:focus-visible {
     outline: var(--border-width-medium) solid var(--color-focus-ring);

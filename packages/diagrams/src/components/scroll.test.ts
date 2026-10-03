@@ -36,8 +36,8 @@ describe("lane diagrams follow playback on narrow screens", () => {
     { id: "s3", lane: "a", label: "Three" },
   ];
 
-  test("Swimlane scrolls the current step into view and fades hidden edges", async () => {
-    const { getByTestId } = render(Swimlane, {
+  test("Swimlane scrolls the current step into view and flags hidden edges with ink cues", async () => {
+    const { getByTestId, queryByTestId } = render(Swimlane, {
       props: { testid: "sw", locale: "en", title: "Flow", lanes, steps },
     });
     const strip = getByTestId("sw-scroll");
@@ -47,6 +47,8 @@ describe("lane diagrams follow playback on narrow screens", () => {
     await fireEvent.scroll(strip);
     expect(strip.getAttribute("data-overflow-end")).toBe("true");
     expect(strip.getAttribute("data-overflow-start")).toBe("false");
+    expect(getByTestId("sw-scroll-cue-end").getAttribute("aria-hidden")).toBe("true");
+    expect(queryByTestId("sw-scroll-cue-start")).toBeNull();
 
     // Step 2 lives in lane "d" (x 480..640): the strip must scroll right to show it.
     layout(getByTestId("sw-step-s2"), { left: 500, width: 132 });
@@ -55,6 +57,7 @@ describe("lane diagrams follow playback on narrow screens", () => {
     expect(strip.scrollLeft).toBeGreaterThan(300);
     await fireEvent.scroll(strip);
     expect(strip.getAttribute("data-overflow-start")).toBe("true");
+    expect(getByTestId("sw-scroll-cue-start").textContent).toBe("←");
 
     // Back to lane "a": scrolls home again.
     const left = strip.scrollLeft;

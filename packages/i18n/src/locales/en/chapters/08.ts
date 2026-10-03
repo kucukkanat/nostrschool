@@ -8,7 +8,7 @@ export const ch08 = {
     description:
       "Alice sends Bob the same message three ways. Compare what a relay can read, then try to open each envelope with different keys.",
     messageLabel: "Alice's message to Bob",
-    defaultMessage: "Meet me at the bakery at 9. Bring the secret croissant 🥐",
+    defaultMessage: "Meet me at the bakery at 9. Bring the secret croissant.",
     charCount: "{count} / {max} characters",
     schemeLabel: "How should Alice send it?",
     schemes: {

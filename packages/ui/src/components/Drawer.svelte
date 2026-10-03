@@ -37,60 +37,89 @@
 </details>
 
 <style>
+  /* "Under the hood" is a folded-over flap: dashed edge while closed (an invitation to open),
+     a solid ink page on a hard shadow once open. */
   .drawer {
     margin: var(--space-lg) 0;
     border: var(--border-width-medium) dashed var(--color-border-strong);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     background: var(--color-surface-sunken);
-    transition: border-color var(--motion-duration-fast) var(--motion-easing-standard);
+    transition:
+      background-color var(--motion-duration-fast) var(--motion-easing-standard),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .drawer[open] {
     border-style: solid;
-    border-color: var(--color-primary);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-pop-sm);
   }
+  /* Grid, not wrapping flex: markers and hint keep fixed columns so a long title wraps
+     beside them on phones instead of dropping below an orphaned marker row. */
   summary {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--space-xs);
     min-height: var(--size-touch-target);
     padding: var(--space-xs) var(--space-md);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     font-family: var(--font-family-display);
     font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
+    color: var(--color-text);
     cursor: pointer;
     list-style: none;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .drawer[open] summary {
+    border-bottom: var(--border-width-thin) dashed var(--color-border-strong);
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
   }
   summary::-webkit-details-marker {
     display: none;
   }
   summary:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
-    outline-offset: var(--space-3xs);
+    outline-offset: var(--size-focus-offset);
   }
   .chevron,
   .gear {
     display: inline-block;
     transition: rotate var(--motion-duration-normal) var(--motion-easing-bounce);
   }
-  summary:hover .gear {
-    rotate: 0.25turn;
+  .gear {
+    color: var(--color-text-primary);
+  }
+  @media (hover: hover) {
+    summary:hover .gear {
+      rotate: 0.25turn;
+    }
+    summary:hover .title {
+      text-decoration: underline var(--border-width-medium) var(--color-text-primary);
+      text-underline-offset: var(--space-2xs);
+    }
   }
   .drawer[open] .chevron {
     rotate: 0.25turn;
   }
+  .title {
+    min-inline-size: 0;
+    overflow-wrap: break-word;
+  }
   .hint {
-    margin-left: auto;
+    align-self: center;
     color: var(--color-text-muted);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-sm);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
     font-weight: var(--font-weight-regular);
+    letter-spacing: var(--font-letter-spacing-caps);
+    text-transform: uppercase;
   }
   .content {
-    padding: 0 var(--space-md) var(--space-md);
-    animation: unfold var(--motion-duration-normal) var(--motion-easing-bounce);
-    transform-origin: top;
+    min-inline-size: 0;
+    padding: var(--space-md);
+    animation: unfold var(--motion-duration-normal) var(--motion-easing-decelerate);
   }
   @keyframes unfold {
     from {
@@ -102,20 +131,24 @@
     display: flex;
     align-items: center;
     gap: var(--space-xs);
+    min-height: var(--size-touch-target);
     margin-top: var(--space-md);
-    padding-top: var(--space-sm);
-    border-top: var(--border-width-thin) solid var(--color-border);
+    padding-top: var(--space-xs);
+    border-top: var(--border-width-thin) dashed var(--color-border);
     color: var(--color-text-muted);
     font-size: var(--font-size-sm);
     cursor: pointer;
   }
   .always input {
-    inline-size: var(--size-icon-sm);
-    block-size: var(--size-icon-sm);
-    accent-color: var(--color-primary);
+    flex: none;
+    inline-size: var(--size-icon-md);
+    block-size: var(--size-icon-md);
+    margin: 0;
+    /* Ink, not orange: a checked box must read on paper (orange is only 2.7:1). */
+    accent-color: var(--color-text);
   }
   .always input:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
-    outline-offset: var(--space-3xs);
+    outline-offset: var(--size-focus-offset);
   }
 </style>

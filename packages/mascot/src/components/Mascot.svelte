@@ -139,8 +139,10 @@
 </div>
 
 <style>
+  /* Consumers may resize from outside with `--mascot-size-override` (e.g. a smaller hero mascot on
+     phones); a plain `--mascot-size` on a wrapper would lose to the declarations below. */
   .mascot-container {
-    --mascot-size: var(--size-mascot-md);
+    --mascot-size: var(--mascot-size-override, var(--size-mascot-md));
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -148,10 +150,16 @@
     position: relative;
   }
   .sm {
-    --mascot-size: var(--size-mascot-sm);
+    --mascot-size: var(--mascot-size-override, var(--size-mascot-sm));
+    --mascot-line-width: var(--border-width-thin);
   }
-  .lg {
-    --mascot-size: var(--size-mascot-lg);
+  /* Mobile first: a 200px ostrich swallows a 320px screen (and whatever it sits beside), so "lg"
+     renders at the md size until there is room for it. */
+  /* >= tokens.breakpoint.sm */
+  @media (min-width: 480px) {
+    .lg {
+      --mascot-size: var(--mascot-size-override, var(--size-mascot-lg));
+    }
   }
 
   .mascot {
@@ -183,7 +191,9 @@
   .bubble {
     position: relative;
     margin: 0;
-    max-width: calc(var(--mascot-size) * 2);
+    /* Never wider than the phone it is on, minus the page gutters. */
+    max-inline-size: min(calc(var(--mascot-size) * 2), calc(100vw - var(--space-md) * 2));
+    overflow-wrap: anywhere;
     padding: var(--space-xs) var(--space-sm);
     background: var(--color-surface-raised);
     color: var(--color-text);

@@ -13,7 +13,17 @@ import {
   staticLayout,
   validateGraph,
 } from "./graph.ts";
-import { arrowDirection, laneCenter, sequenceLayout, swimlaneLayout } from "./layout.ts";
+import {
+  arrowDirection,
+  DEFAULT_METRICS,
+  fitLaneWidth,
+  laneCenter,
+  MONO_CHAR,
+  minLaneWidth,
+  sequenceLayout,
+  swimlaneLayout,
+  visibleHeight,
+} from "./layout.ts";
 import { stageState, truncate } from "./pipeline.ts";
 import { play, stepDelay, tick } from "./playback.ts";
 import { followScrollLeft, hiddenEdges } from "./scroll.ts";
@@ -89,6 +99,27 @@ describe("lane layout", () => {
       [150, 50, 110, "left"],
       [150, 150, 150, "self"],
     ]);
+  });
+  test("fitLaneWidth narrows lanes on phones but never below the longest label", () => {
+    const labels = ["Your client", "Relay Alpha", "Relay Beta"];
+    expect(fitLaneWidth(0, labels)).toBe(DEFAULT_METRICS.laneWidth);
+    expect(fitLaneWidth(300, [])).toBe(DEFAULT_METRICS.laneWidth);
+    expect(fitLaneWidth(1200, labels)).toBe(DEFAULT_METRICS.laneWidth);
+    const min = minLaneWidth(labels);
+    expect(min).toBeGreaterThanOrEqual("Relay Alpha".length * MONO_CHAR);
+    expect(fitLaneWidth(330, labels)).toBe(Math.max(min, 110));
+    expect(fitLaneWidth(120, labels)).toBe(min);
+    expect(minLaneWidth(["a", "b"])).toBe(96);
+    // A label wider than the default lane never widens past the default.
+    expect(fitLaneWidth(100, ["x".repeat(40)])).toBe(DEFAULT_METRICS.laneWidth);
+  });
+  test("visibleHeight only reaches the rows revealed so far", () => {
+    const m = { laneWidth: 100, headerHeight: 50, rowHeight: 40 };
+    expect(visibleHeight(-1, 5, m)).toBe(50 + 1.5 * 40);
+    expect(visibleHeight(0, 5, m)).toBe(50 + 1.5 * 40);
+    expect(visibleHeight(2, 5, m)).toBe(50 + 3.5 * 40);
+    expect(visibleHeight(9, 5, m)).toBe(50 + 5.5 * 40);
+    expect(visibleHeight(-1, 0, m)).toBe(50 + 1.5 * 40);
   });
   test("sequenceLayout rejects bad data", () => {
     const dupLane = sequenceLayout([...lanes, { id: "a", label: "again" }], []);
@@ -281,5 +312,17 @@ describe("scroll", () => {
       start: false,
       end: false,
     });
+  });
+});
+
+describe("ink geometry", () => {
+  test("reads small radii and hard shadow offsets from tokens", async () => {
+    const ink = await import("./ink.ts");
+    expect(ink.INK_RADIUS).toBe(2);
+    expect(ink.BOX_RADIUS).toBe(4);
+    expect(ink.SHADOW_SM).toBe(2);
+    expect(ink.SHADOW).toBe(3);
+    expect(ink.HALFTONE_DOT).toBeLessThan(ink.HALFTONE_CELL / 2);
+    expect(() => ink.parsePx("auto")).toThrow("expected a px token");
   });
 });

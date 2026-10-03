@@ -115,6 +115,27 @@ describe("BarChart", () => {
     expect(container.querySelector("svg")?.getAttribute("data-orientation")).toBe("horizontal");
   });
 
+  test("catch-all buckets are pinned last behind a dashed rule; pinned=[] opts out", () => {
+    const rows = [{ id: "other", label: "everything else", value: 999 }, ...data];
+    const { getByTestId, container } = render(BarChart, {
+      props: { ...base, testid: "p", data: rows, sorted: true, orientation: "horizontal" },
+    });
+    const ids = [...container.querySelectorAll("[data-mark]")].map((e) =>
+      e.getAttribute("data-testid"),
+    );
+    expect(ids.at(-1)).toBe("p-bar-other");
+    expect(getByTestId("p-separator").tagName.toLowerCase()).toBe("line");
+    expect(getByTestId("p-label-other").textContent?.trim()).toBe("everything else");
+    cleanup();
+    const off = render(BarChart, {
+      props: { ...base, testid: "q", data: rows, sorted: true, pinned: [] },
+    });
+    expect(off.queryByTestId("q-separator")).toBeNull();
+    expect(off.container.querySelector("[data-mark]")?.getAttribute("data-testid")).toBe(
+      "q-bar-other",
+    );
+  });
+
   test("empty data shows the no-data state; invalid data also warns", () => {
     const warn = spyOn(console, "warn");
     const empty = render(BarChart, { props: { ...base, testid: "e", data: [] } });
@@ -241,6 +262,13 @@ describe("Treemap", () => {
     expect(getByTestId("tm-row-reactions").textContent).toContain("25%");
     // Big cells get an inline label.
     expect(notes.parentElement?.querySelector("text")?.textContent).toContain("Notes");
+    // ...on an ink-outlined paper plate that stays inside its cell (ink text reads on any fill).
+    const plate = getByTestId("tm-cell-notes-plate");
+    expect(plate.getAttribute("aria-hidden")).toBe("true");
+    const n = (el: Element, a: string) => Number(el.getAttribute(a));
+    expect(n(plate, "x")).toBeGreaterThan(n(notes, "x"));
+    expect(n(plate, "x") + n(plate, "width")).toBeLessThan(n(notes, "x") + n(notes, "width"));
+    expect(n(plate, "y") + n(plate, "height")).toBeLessThan(n(notes, "y") + n(notes, "height"));
   });
 
   test("invalid trees show the empty state and warn", () => {

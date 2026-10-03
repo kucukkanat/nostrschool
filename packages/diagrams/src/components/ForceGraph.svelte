@@ -13,6 +13,7 @@
     staticLayout,
     validateGraph,
   } from "../logic/graph.ts";
+  import { SHADOW } from "../logic/ink.ts";
   import { popIn } from "../logic/motion.ts";
   import type { ForceGraphProps, GraphNode } from "../types.ts";
   import Frame from "./internal/Frame.svelte";
@@ -283,6 +284,8 @@
                focus ring keeps 3:1 contrast in both themes and doesn't shrink with faded nodes. -->
           <circle class="focus-halo" r={R + 6} data-testid="{testid}-node-{node.id}-focus" />
           <g class="shape">
+            <!-- Hard offset "misregistration" disc: ink by default, orange when selected. -->
+            <circle class="cast" cx={SHADOW} cy={SHADOW} r={R} />
             <circle class="disc" r={R} />
             <circle class="group" r={R - 3} style:stroke={colors.get(node.group ?? "")} />
             {#if node.avatar !== undefined}
@@ -393,9 +396,16 @@
     stroke: var(--color-diagram-node-stroke);
     stroke-width: var(--border-width-medium);
   }
+  .cast {
+    fill: var(--color-shadow-pop);
+    transition: fill var(--motion-duration-fast) var(--motion-easing-standard);
+  }
+  /* Selected = the brand's "selected": thick ink ring + orange misregistration (never a bright stroke). */
   .node.selected .ring {
-    stroke: var(--color-diagram-highlight);
-    stroke-width: var(--border-width-heavy);
+    stroke-width: var(--border-width-thick);
+  }
+  .node.selected .cast {
+    fill: var(--color-shadow-accent);
   }
   .focus-halo {
     fill: none;
@@ -423,8 +433,8 @@
   }
   .label {
     fill: var(--color-diagram-label);
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-bold);
+    font-family: var(--font-family-mono);
+    font-weight: var(--font-weight-semibold);
     /* SVG text shrinks with the viewBox; counter-scale so names never drop below xs on screen. */
     font-size: max(var(--font-size-sm), calc(var(--font-size-xs) * var(--units-per-px, 1)));
     paint-order: stroke;

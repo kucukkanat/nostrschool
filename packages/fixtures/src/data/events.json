@@ -148,7 +148,7 @@
         ],
         [
           "e",
-          "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356"
+          "6f762f141286ff49dc17f167204069df048758cf0a4cd83dae2455f277241253"
         ],
         [
           "bolt11",
@@ -156,7 +156,7 @@
         ],
         [
           "description",
-          "{\"kind\":9734,\"created_at\":1735684800,\"tags\":[[\"relays\",\"wss://relay.alpha.example\",\"wss://relay.gamma.example\"],[\"amount\",\"2100000\"],[\"p\",\"c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb\"],[\"e\",\"def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356\"]],\"content\":\"Love the ostrich! ⚡\",\"pubkey\":\"e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc\",\"id\":\"24539a56da112a91ea3fe9d50a2035de5adae837ad34b400c356fd9698070156\",\"sig\":\"ede28dd77e905b31235635119d54498b553b49b37b27aad91e8543dd58d88082dd1580fa739d810ca95b07bc2f593b08417a7615b2dfa9994d148ade55c9d314\"}"
+          "{\"kind\":9734,\"created_at\":1735684800,\"tags\":[[\"relays\",\"wss://relay.alpha.example\",\"wss://relay.gamma.example\"],[\"amount\",\"2100000\"],[\"p\",\"c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb\"],[\"e\",\"6f762f141286ff49dc17f167204069df048758cf0a4cd83dae2455f277241253\"]],\"content\":\"Love the ostrich! ⚡\",\"pubkey\":\"e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc\",\"id\":\"f9863d290f96c1ca9285db349e885f518b6573873477e87cdcfe5869b5c98e51\",\"sig\":\"28d8dc4893fddfcb57532741fde37ec1befa751288d6cfb5e981122444e18ad4b17592ac84a07cb2d484c20bd4006dfc129a059222aa2eeaef595074b671574f\"}"
         ],
         [
           "preimage",
@@ -165,8 +165,8 @@
       ],
       "content": "",
       "pubkey": "044b2cc412cc89149bc4f38a5067db6034dbaafe20321721a5414bb7237176f4",
-      "id": "3e7b4396d8f84f25d96cc02f2f299e3fe0616983f5d08d4cba94e64d60e4b0d9",
-      "sig": "8c09408f2e0d741d12c81f592e3b4c51ce6c6e7da4fbc5d353232395fc597d575cc445871fc9afd533b23a6d74239202f10dbac191dd7840ea397d3f7de766e6"
+      "id": "7682a16d40733fd532c600fc001391fdb208a9a6037f88d1f1cad2f1694ac347",
+      "sig": "2e584640f02b15def129e281551368b07bfcd0531c652a0f15a294fa1823bf6925eda9dc2e5c23c14ceab38865e14deb2e9ba682ab62722856a706f79cb35434"
     },
     {
       "kind": 9734,
@@ -187,13 +187,13 @@
         ],
         [
           "e",
-          "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356"
+          "6f762f141286ff49dc17f167204069df048758cf0a4cd83dae2455f277241253"
         ]
       ],
       "content": "Love the ostrich! ⚡",
       "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
-      "id": "24539a56da112a91ea3fe9d50a2035de5adae837ad34b400c356fd9698070156",
-      "sig": "ede28dd77e905b31235635119d54498b553b49b37b27aad91e8543dd58d88082dd1580fa739d810ca95b07bc2f593b08417a7615b2dfa9994d148ade55c9d314"
+      "id": "f9863d290f96c1ca9285db349e885f518b6573873477e87cdcfe5869b5c98e51",
+      "sig": "28d8dc4893fddfcb57532741fde37ec1befa751288d6cfb5e981122444e18ad4b17592ac84a07cb2d484c20bd4006dfc129a059222aa2eeaef595074b671574f"
     },
     {
       "kind": 7,
@@ -201,7 +201,7 @@
       "tags": [
         [
           "e",
-          "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356",
+          "6f762f141286ff49dc17f167204069df048758cf0a4cd83dae2455f277241253",
           "wss://relay.alpha.example"
         ],
         [
@@ -215,8 +215,8 @@
       ],
       "content": "⚡",
       "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
-      "id": "e6286a91ee732b9f937fb14c8e63b7644b405f7739e6e0a642607523dd278406",
-      "sig": "79bc8ba3d42d0373c649cff535aa4e6a74ff8c9ca00bebf00bc507556cbf280c9836cb15236c841ca21776296efbf8a63fa0720b45285a9a39e87d93a501af3e"
+      "id": "e657d50367cdba43e263424506974a224e480dbc18a49a6001b58b1bdf3ec10f",
+      "sig": "991d02382a63bcc70a2fbce6ed956028f790a66787c9e301b0b0a386bde1c38a395d2d4e9431e06fc344ac3a5ec9dc093f6726db6761ea41a67a06b03ac8c990"
     },
     {
       "kind": 1,
@@ -231,10 +231,10 @@
           "zaps"
         ]
       ],
-      "content": "Today's weird animal: a purple ostrich riding a lightning bolt ⚡ #art #zaps",
+      "content": "Today's weird animal: an orange ostrich riding a lightning bolt ⚡ #art #zaps",
       "pubkey": "c71750007e42443e5ca8c1ea00babed4e8c78a9cb45dd6db3733d918e0b55deb",
-      "id": "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356",
-      "sig": "3b6ce43dabd4b7fae9986de02cc36067ced7343f29e1b1a81a1199d6ef18c2d5e87f8076ddf20cf24e0061596d9081e1561db5675b073c5cb2c1a6dedbe5f7d8"
+      "id": "6f762f141286ff49dc17f167204069df048758cf0a4cd83dae2455f277241253",
+      "sig": "aa1bddad4e1d2e886833adc4493dcfcfb5e36ecaed4c710bb0cab49792442d746460cc5b02f8100d55455bd1c244d610c15d56adee0071bb408b8556f24ca40c"
     },
     {
       "kind": 9735,
@@ -250,7 +250,7 @@
         ],
         [
           "e",
-          "31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301"
+          "43d328cf57341ece3c76b3f8353ddbca2401f51f55da739de950e50357d891d0"
         ],
         [
           "bolt11",
@@ -258,7 +258,7 @@
         ],
         [
           "description",
-          "{\"kind\":9734,\"created_at\":1735682400,\"tags\":[[\"relays\",\"wss://relay.alpha.example\",\"wss://relay.beta.example\"],[\"amount\",\"21000\"],[\"p\",\"e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc\"],[\"e\",\"31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301\"]],\"content\":\"Thanks for the warm welcome!\",\"pubkey\":\"5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812\",\"id\":\"0c0c283bedd6d38164ba053c22c3c8315cc9f1ce66f2fd776711df2cc524bff9\",\"sig\":\"34669de664f949106a052d8c335c622c27c8baa79ef9e6fb62c88fc48304da14f13f33823052f719d3560f576ae905f222bb441052bb21b99819487e102c77b3\"}"
+          "{\"kind\":9734,\"created_at\":1735682400,\"tags\":[[\"relays\",\"wss://relay.alpha.example\",\"wss://relay.beta.example\"],[\"amount\",\"21000\"],[\"p\",\"e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc\"],[\"e\",\"43d328cf57341ece3c76b3f8353ddbca2401f51f55da739de950e50357d891d0\"]],\"content\":\"Thanks for the warm welcome!\",\"pubkey\":\"5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812\",\"id\":\"a50e55b76ee1a7ef44ea73168466c0a7ed1750e968326f5c2ed19bc8119636e5\",\"sig\":\"c1d5f40b7c9053cf0b90233144e1b0ba70585d9fdbd79091a9a02a019d871d0fcf37b53f65bb174854c4e86a27d59863796f79f86f9de5fdbbb109b6b00ad316\"}"
         ],
         [
           "preimage",
@@ -267,35 +267,8 @@
       ],
       "content": "",
       "pubkey": "044b2cc412cc89149bc4f38a5067db6034dbaafe20321721a5414bb7237176f4",
-      "id": "015063ba58b63cca9aea80bb637891288f7353bae16778e9faa161d053902f17",
-      "sig": "71cd7256565f0f270408f7839be359dbc15d14bceb79268f8fe01790aaa6a108e12513bb7e598805ea63c196d9a023647911f609a890667e24620a2629782bd0"
-    },
-    {
-      "kind": 9734,
-      "created_at": 1735682400,
-      "tags": [
-        [
-          "relays",
-          "wss://relay.alpha.example",
-          "wss://relay.beta.example"
-        ],
-        [
-          "amount",
-          "21000"
-        ],
-        [
-          "p",
-          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
-        ],
-        [
-          "e",
-          "31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301"
-        ]
-      ],
-      "content": "Thanks for the warm welcome!",
-      "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
-      "id": "0c0c283bedd6d38164ba053c22c3c8315cc9f1ce66f2fd776711df2cc524bff9",
-      "sig": "34669de664f949106a052d8c335c622c27c8baa79ef9e6fb62c88fc48304da14f13f33823052f719d3560f576ae905f222bb441052bb21b99819487e102c77b3"
+      "id": "46c5bd3fad01c201a000dae64148e689eeea5111cd20abc0fe9e03e911199a5d",
+      "sig": "0eeb63dc45e12c9db5e2c6feaa57133baa473c09089a495d8ecc43709e14e5f7ea896fc9b8c70c6bdeb01ad3dc6ef64919e0ab280a472c552e2d668f01bceb7a"
     },
     {
       "kind": 3,
@@ -326,12 +299,39 @@
       "sig": "e14788049a608742ab6d5be77efe0589c0bbe1a5129fd8f6a01b62a3be5d3a9abf69a21d344fb091bb113df8a5fdb0fd4e68674bcbf33fb3a81ccbecb6f43274"
     },
     {
+      "kind": 9734,
+      "created_at": 1735682400,
+      "tags": [
+        [
+          "relays",
+          "wss://relay.alpha.example",
+          "wss://relay.beta.example"
+        ],
+        [
+          "amount",
+          "21000"
+        ],
+        [
+          "p",
+          "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc"
+        ],
+        [
+          "e",
+          "43d328cf57341ece3c76b3f8353ddbca2401f51f55da739de950e50357d891d0"
+        ]
+      ],
+      "content": "Thanks for the warm welcome!",
+      "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
+      "id": "a50e55b76ee1a7ef44ea73168466c0a7ed1750e968326f5c2ed19bc8119636e5",
+      "sig": "c1d5f40b7c9053cf0b90233144e1b0ba70585d9fdbd79091a9a02a019d871d0fcf37b53f65bb174854c4e86a27d59863796f79f86f9de5fdbbb109b6b00ad316"
+    },
+    {
       "kind": 7,
       "created_at": 1735682100,
       "tags": [
         [
           "e",
-          "31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301",
+          "43d328cf57341ece3c76b3f8353ddbca2401f51f55da739de950e50357d891d0",
           "wss://relay.alpha.example"
         ],
         [
@@ -345,8 +345,8 @@
       ],
       "content": "❤️",
       "pubkey": "5f69e52aeb38975e54cb99428da837124166abb4198c1128c54491be73d23812",
-      "id": "7fd96a62d8b2854f127dc294ed283039382670c68e4db5d4e4bad17acfeb8287",
-      "sig": "83294e49dda32a22310437ba8cf6a8359d216278381380856590d961696c4c0632a1aa2db24abe421adccd5fd6f9396ce767ce13a398f9618208febd27ffb9ac"
+      "id": "114a1a571f0694874ca2450726dedd46207e4f4d6fbd50d48f50e63699b81f59",
+      "sig": "f75c985466f34ee474e9601bdf06a6cabe8fd27e3a201300e69ed67a01b763b556c580704dd16d1ace177a2b01415394eae1d35fac0c5b6a3230846cc9059acb"
     },
     {
       "kind": 6,
@@ -395,10 +395,10 @@
           "wss://relay.beta.example"
         ]
       ],
-      "content": "Welcome Grace! 💜 Try following nostr:npub1cut4qqr7gfzruh9gc84qpw476n5v0z5uk3wadkehx0v33c94th4sp5w043 for art and nostr:npub15uug8yf2frp428q4fr752jrk64m3y6npca44fpkgq7l7ckrfuxpsj5l3x6 for good questions.",
+      "content": "Welcome Grace! Try following nostr:npub1cut4qqr7gfzruh9gc84qpw476n5v0z5uk3wadkehx0v33c94th4sp5w043 for art and nostr:npub15uug8yf2frp428q4fr752jrk64m3y6npca44fpkgq7l7ckrfuxpsj5l3x6 for good questions.",
       "pubkey": "e550c6e92808f358382b7b8c14345344f5ef9a299529834d1c26d57b6ace44cc",
-      "id": "31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301",
-      "sig": "c73eda5aa524d3db194c50725897e15b5aed57dfcb6995c4b59c9e6af702aef259b340682323770ee724f2ef9f9163fadb06912572d6d93ec5d247860c35c174"
+      "id": "43d328cf57341ece3c76b3f8353ddbca2401f51f55da739de950e50357d891d0",
+      "sig": "7b455528f6ffd4ec4ec12fe23f7f19a9eab16fde61e174865cc3feef0f4302560032ca1e21be08b8659e667571b97163eb7d783245af4df63868c8f467b0544d"
     },
     {
       "kind": 1,
@@ -1318,30 +1318,30 @@
     "814d487f9a9591bde04009eff371facb26e82f3a41cec1bcdcdab310075053be": [
       "wss://relay.beta.example"
     ],
-    "3e7b4396d8f84f25d96cc02f2f299e3fe0616983f5d08d4cba94e64d60e4b0d9": [
+    "7682a16d40733fd532c600fc001391fdb208a9a6037f88d1f1cad2f1694ac347": [
       "wss://relay.alpha.example",
       "wss://relay.gamma.example"
     ],
-    "24539a56da112a91ea3fe9d50a2035de5adae837ad34b400c356fd9698070156": [],
-    "e6286a91ee732b9f937fb14c8e63b7644b405f7739e6e0a642607523dd278406": [
+    "f9863d290f96c1ca9285db349e885f518b6573873477e87cdcfe5869b5c98e51": [],
+    "e657d50367cdba43e263424506974a224e480dbc18a49a6001b58b1bdf3ec10f": [
       "wss://relay.alpha.example",
       "wss://relay.beta.example",
       "wss://relay.gamma.example"
     ],
-    "def4b79eea11b4d6c0caa6da27dedc1ff5fc274a3378c64193f21aa05125d356": [
+    "6f762f141286ff49dc17f167204069df048758cf0a4cd83dae2455f277241253": [
       "wss://relay.alpha.example",
       "wss://relay.gamma.example"
     ],
-    "015063ba58b63cca9aea80bb637891288f7353bae16778e9faa161d053902f17": [
+    "46c5bd3fad01c201a000dae64148e689eeea5111cd20abc0fe9e03e911199a5d": [
       "wss://relay.alpha.example",
       "wss://relay.beta.example"
     ],
-    "0c0c283bedd6d38164ba053c22c3c8315cc9f1ce66f2fd776711df2cc524bff9": [],
     "4e78ff8c30e1df537fc58830c141cbe5f16e8cccda3f7d41d333b045c1754503": [
       "wss://relay.alpha.example",
       "wss://relay.gamma.example"
     ],
-    "7fd96a62d8b2854f127dc294ed283039382670c68e4db5d4e4bad17acfeb8287": [
+    "a50e55b76ee1a7ef44ea73168466c0a7ed1750e968326f5c2ed19bc8119636e5": [],
+    "114a1a571f0694874ca2450726dedd46207e4f4d6fbd50d48f50e63699b81f59": [
       "wss://relay.alpha.example",
       "wss://relay.beta.example",
       "wss://relay.gamma.example"
@@ -1351,7 +1351,7 @@
       "wss://relay.beta.example",
       "wss://relay.gamma.example"
     ],
-    "31efcb5fdd0807ee4689e5e361ececfd841996c6e79a63c05733baec9fb39301": [
+    "43d328cf57341ece3c76b3f8353ddbca2401f51f55da739de950e50357d891d0": [
       "wss://relay.alpha.example",
       "wss://relay.beta.example",
       "wss://relay.gamma.example"

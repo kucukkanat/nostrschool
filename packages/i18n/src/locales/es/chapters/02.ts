@@ -77,7 +77,7 @@ export const ch02: typeof en = {
     description:
       "Una firma Schnorr prueba que la clave secreta de prueba aprobó exactamente este mensaje. Cambia una letra después de firmar y mira cómo falla la verificación.",
     messageLabel: "Mensaje",
-    defaultMessage: "¡gm nostr! 🌅",
+    defaultMessage: "¡gm nostr!",
     sign: "Firmar con la clave de prueba",
     signatureLabel: "Firma (64 bytes, hex)",
     valid: "Válida: esta clave pública firmó exactamente este mensaje.",

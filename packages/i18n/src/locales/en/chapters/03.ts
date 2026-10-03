@@ -3,7 +3,7 @@
 export const ch03 = {
   title: "Anatomy of an event",
   summary: "Every post, like and profile is a signed JSON event. Take one apart.",
-  sampleContent: "Hello Nostr! 👋 This is my very first signed note.",
+  sampleContent: "Hello Nostr! This is my first signed note.",
   fields: {
     heading: "The seven fields",
     select: "Explain the {field} field",

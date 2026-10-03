@@ -87,6 +87,7 @@ export const common: typeof en = {
   home: {
     eyebrow: "Un curso de Nostr divertido y práctico",
     title: "Aprende Nostr experimentando con lo de verdad",
+    titleMark: "the real thing", // TODO(es)
     lead: "Genera claves, firma eventos y mira cómo vuelan los paquetes entre relays. Criptografía real, funcionando aquí mismo en tu navegador.",
     ctaTools: "Explorar las herramientas",
     ctaContinue: "Continuar: {title}",

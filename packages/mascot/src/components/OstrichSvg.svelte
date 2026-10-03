@@ -9,12 +9,30 @@
   }
 
   const { pose, still = false, testid = "mascot-svg" }: Props = $props();
+
+  // Pattern and clip ids must be unique per instance: several Nos can share one page.
+  const uid = $props.id();
+  const dots = `${uid}-dots`;
+  const dotsWarm = `${uid}-dots-warm`;
+  const bodyClip = `${uid}-body`;
+  const bellyClip = `${uid}-belly`;
+
+  // Drawn twice: once as the misregistered orange print pass, once as the teal body.
+  const BODY =
+    "M52 128 C52 100 74 90 100 90 C126 90 148 100 148 128 C148 150 138 164 128 166 Q122 174 114 168 Q107 176 100 168 Q93 176 86 168 Q78 174 72 166 C62 164 52 150 52 128 Z";
+  const WING_L =
+    "M60 112 C44 116 36 134 40 150 C46 144 50 148 54 142 C58 146 62 140 64 134 C66 126 64 116 60 112 Z";
+  const WING_R =
+    "M140 112 C156 116 164 134 160 150 C154 144 150 148 146 142 C142 146 138 140 136 134 C134 126 136 116 140 112 Z";
 </script>
 
 <!--
-  "Nos" the ostrich, front-facing chibi. Decorative: the accessible name lives on the parent
-  (role="img"), so this SVG is aria-hidden. Every pose is pure CSS on named groups, which keeps
-  poses swappable without re-rendering and lets reduced motion drop only the loops.
+  "Nos" the ostrich, front-facing chibi, printed like a two-colour riso sticker: ink linework,
+  teal and orange spot fills, marker-yellow feathers and halftone dots for shading. The orange
+  body pass sits slightly off the teal one on purpose (misregistration).
+  Decorative: the accessible name lives on the parent (role="img"), so this SVG is aria-hidden.
+  Every pose is pure CSS on named groups, which keeps poses swappable without re-rendering and
+  lets reduced motion drop only the loops.
   Geometry is in viewBox user units (200 × 220); colors are mascot/theme tokens only.
 -->
 <svg
@@ -26,10 +44,26 @@
   aria-hidden="true"
   focusable="false"
 >
-  <ellipse class="shadow" cx="100" cy="208" rx="46" ry="6" />
+  <defs>
+    <!-- Halftone screens. userSpaceOnUse keeps dots the same size on every shape. -->
+    <pattern id={dots} width="4.5" height="4.5" patternUnits="userSpaceOnUse">
+      <circle class="dot-ink" cx="2.25" cy="2.25" r="1.05" />
+    </pattern>
+    <pattern id={dotsWarm} width="3.6" height="3.6" patternUnits="userSpaceOnUse">
+      <circle class="dot-warm" cx="1.8" cy="1.8" r="1" />
+    </pattern>
+    <clipPath id={bodyClip}><path d={BODY} /></clipPath>
+    <clipPath id={bellyClip}><ellipse cx="100" cy="136" rx="28" ry="24" /></clipPath>
+  </defs>
+
+  <ellipse class="shadow" cx="103" cy="209" rx="46" ry="6" data-testid="{testid}-shadow" />
 
   <g class="figure">
     <g class="legs">
+      <path class="leg-ink" d="M88 160 Q86 182 84 204" />
+      <path class="leg-ink" d="M112 160 Q114 182 116 204" />
+      <path class="foot-ink" d="M72 207 Q84 200 96 207" />
+      <path class="foot-ink" d="M104 207 Q116 200 128 207" />
       <path class="leg" d="M88 160 Q86 182 84 204" />
       <circle class="knee" cx="86" cy="182" r="4.5" />
       <path class="foot" d="M72 207 Q84 200 96 207" />
@@ -41,30 +75,35 @@
     <g class="tail">
       <ellipse class="plume" cx="58" cy="104" rx="9" ry="22" transform="rotate(-38 58 104)" />
       <ellipse class="plume" cx="142" cy="104" rx="9" ry="22" transform="rotate(38 142 104)" />
-      <ellipse
-        class="plume plume-tip"
-        cx="52"
-        cy="92"
-        rx="4"
-        ry="8"
-        transform="rotate(-38 52 92)"
-      />
-      <ellipse
-        class="plume plume-tip"
-        cx="148"
-        cy="92"
-        rx="4"
-        ry="8"
-        transform="rotate(38 148 92)"
-      />
+      <ellipse class="plume-tip" cx="52" cy="92" rx="4" ry="8" transform="rotate(-38 52 92)" />
+      <ellipse class="plume-tip" cx="148" cy="92" rx="4" ry="8" transform="rotate(38 148 92)" />
     </g>
 
     <g class="torso">
-      <path
-        class="body"
-        d="M52 128 C52 100 74 90 100 90 C126 90 148 100 148 128 C148 150 138 164 128 166 Q122 174 114 168 Q107 176 100 168 Q93 176 86 168 Q78 174 72 166 C62 164 52 150 52 128 Z"
+      <path class="misreg" d={BODY} transform="translate(2.5 2.5)" />
+      <path class="body" d={BODY} />
+      <!-- Shade the lower flank, clipped to the body so dots never spill onto the page. -->
+      <rect
+        class="shade"
+        clip-path="url(#{bodyClip})"
+        x="40"
+        y="146"
+        width="120"
+        height="40"
+        fill="url(#{dots})"
+        data-testid="{testid}-halftone"
       />
       <ellipse class="belly" cx="100" cy="136" rx="28" ry="24" />
+      <ellipse
+        class="shade"
+        clip-path="url(#{bellyClip})"
+        cx="104"
+        cy="164"
+        rx="34"
+        ry="14"
+        fill="url(#{dots})"
+      />
+      <ellipse class="belly-line" cx="100" cy="136" rx="28" ry="24" />
       <path
         class="belly-fluff"
         d="M80 124 Q86 118 90 124 Q95 117 100 124 Q105 117 110 124 Q114 118 120 124"
@@ -73,7 +112,11 @@
 
     <g class="neck">
       <path class="neck-shape" d="M93 100 C91 84 95 70 94 58 L108 58 C107 70 111 84 109 100 Z" />
-      <path class="neck-stripe" d="M98 98 C97 84 100 72 99 60 L103 60 C102 72 104 84 104 98 Z" />
+      <path
+        class="neck-stripe"
+        d="M98 98 C97 84 100 72 99 60 L103 60 C102 72 104 84 104 98 Z"
+        fill="url(#{dots})"
+      />
 
       <g class="head">
         <g class="crest">
@@ -96,8 +139,8 @@
           />
         </g>
         <circle class="skull" cx="101" cy="40" r="20" />
-        <ellipse class="cheek" cx="85" cy="49" rx="4.5" ry="3" />
-        <ellipse class="cheek" cx="117" cy="49" rx="4.5" ry="3" />
+        <ellipse class="cheek" cx="85" cy="49" rx="4.5" ry="3" fill="url(#{dotsWarm})" />
+        <ellipse class="cheek" cx="117" cy="49" rx="4.5" ry="3" fill="url(#{dotsWarm})" />
 
         {#each [93, 109] as cx (cx)}
           <g class="eye" style:transform-origin="{cx}px 38px">
@@ -132,20 +175,19 @@
     />
 
     <g class="wing wing-l">
-      <path
-        d="M60 112 C44 116 36 134 40 150 C46 144 50 148 54 142 C58 146 62 140 64 134 C66 126 64 116 60 112 Z"
-      />
+      <path class="wing-shape" d={WING_L} />
+      <path class="wing-shade" d={WING_L} fill="url(#{dots})" />
       <path class="wing-line" d="M56 120 Q48 132 46 144 M60 124 Q56 134 54 140" />
     </g>
     <g class="wing wing-r">
-      <path
-        d="M140 112 C156 116 164 134 160 150 C154 144 150 148 146 142 C142 146 138 140 136 134 C134 126 136 116 140 112 Z"
-      />
+      <path class="wing-shape" d={WING_R} />
+      <path class="wing-shade" d={WING_R} fill="url(#{dots})" />
       <path class="wing-line" d="M144 120 Q152 132 154 144 M140 124 Q144 134 146 140" />
     </g>
   </g>
 
-  <!-- Pose props: hidden unless the pose shows them. -->
+  <!-- Pose props: hidden unless the pose shows them. They sit on the page, so they use the
+       theme ink (border-strong / text), not the always-dark mascot line. -->
   <g class="prop think-bubble">
     <circle cx="136" cy="34" r="3" />
     <circle cx="146" cy="24" r="5" />
@@ -166,14 +208,24 @@
     <text class="z z3" x="150" y="6">Z</text>
   </g>
 
+  <!-- Cheer marks: comic "emanata" ticks plus a printed dot, not glittery sparkles. -->
   <g class="prop sparkles">
-    <path class="sparkle s1" d="M34 40 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z" />
-    <path
-      class="sparkle s2"
-      d="M166 64 l2.4 5.6 5.6 2.4 -5.6 2.4 -2.4 5.6 -2.4 -5.6 -5.6 -2.4 5.6 -2.4 Z"
-    />
-    <path class="sparkle s3" d="M24 96 l2 4.6 4.6 2 -4.6 2 -2 4.6 -2 -4.6 -4.6 -2 4.6 -2 Z" />
-    <path class="sparkle s4" d="M176 108 l2.6 6 6 2.6 -6 2.6 -2.6 6 -2.6 -6 -6 -2.6 6 -2.6 Z" />
+    <g class="sparkle s1">
+      <path class="tick" d="M30 44 l-6 -6 M36 40 l0 -9 M40 45 l7 -5" />
+      <circle class="spot" cx="34" cy="50" r="2.6" />
+    </g>
+    <g class="sparkle s2">
+      <path class="tick" d="M164 62 l5 -7 M170 66 l8 -2 M168 72 l7 4" />
+      <circle class="spot" cx="161" cy="70" r="2.2" />
+    </g>
+    <g class="sparkle s3">
+      <path class="tick" d="M26 96 l-7 -3 M24 103 l-8 2" />
+      <circle class="spot" cx="30" cy="110" r="2" />
+    </g>
+    <g class="sparkle s4">
+      <path class="tick" d="M176 104 l7 -4 M178 112 l8 1" />
+      <circle class="spot" cx="172" cy="120" r="2.4" />
+    </g>
   </g>
 
   <g class="prop confetti">
@@ -199,6 +251,8 @@
     --loop-fast: calc(var(--motion-duration-slower) * 1);
     --pose-ease: var(--motion-easing-bounce);
     --pose-dur: var(--motion-duration-slow);
+    /* The parent may thin the line for tiny sizes, where 1.5px ink would swamp the fills. */
+    --line: var(--mascot-line-width, var(--border-width-medium));
   }
 
   /* Pivots are in viewBox units; view-box makes px resolve against the 200×220 user space. */
@@ -222,42 +276,55 @@
   }
 
   /* ---------- paint ---------- */
+  /* Every spot fill gets the ink line; non-scaling keeps it the 1.5px brand line at any size. */
+  .misreg,
+  .body,
+  .belly-line,
+  .neck-shape,
+  .skull,
+  .lid,
+  .plume,
+  .plume-tip,
+  .crest-feather,
+  .ruff,
+  .wing-shape,
+  .eye-white,
+  .knee,
+  .beak,
+  .jaw,
+  .cheek {
+    stroke: var(--color-mascot-line);
+    stroke-width: var(--line);
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
   .shadow {
     fill: var(--color-shadow);
-    opacity: var(--opacity-subtle);
   }
+  /* Legs are strokes, so the outline is a wider ink stroke underneath the orange one. */
+  .leg-ink,
+  .foot-ink,
   .leg,
   .foot {
     fill: none;
+    stroke-linecap: round;
+  }
+  .leg-ink,
+  .foot-ink {
+    stroke: var(--color-mascot-line);
+    stroke-width: 9;
+  }
+  .leg,
+  .foot {
     stroke: var(--color-mascot-legs);
     stroke-width: 6;
-    stroke-linecap: round;
   }
   .knee {
     fill: var(--color-mascot-legs);
   }
-  .plume,
-  .crest-feather,
-  .ruff,
-  .wing path:first-child {
-    fill: var(--color-mascot-accent);
-  }
-  .plume-tip,
-  .wing-line,
-  .belly-fluff {
-    fill: none;
-    stroke: var(--color-mascot-belly);
-    stroke-width: 2;
-    stroke-linecap: round;
-    opacity: var(--opacity-muted);
-  }
-  .plume-tip {
-    fill: var(--color-mascot-belly);
+  .misreg {
+    fill: var(--color-mascot-beak);
     stroke: none;
-  }
-  .belly-fluff {
-    stroke: var(--color-mascot-body);
-    opacity: var(--opacity-subtle);
   }
   .body,
   .neck-shape,
@@ -265,35 +332,61 @@
   .lid {
     fill: var(--color-mascot-body);
   }
+  .plume,
+  .crest-feather,
+  .ruff,
+  .wing-shape {
+    fill: var(--color-mascot-accent);
+  }
+  .plume-tip {
+    fill: var(--color-mascot-beak);
+  }
   .belly,
-  .neck-stripe,
   .eye-white,
   .glint {
     fill: var(--color-mascot-belly);
   }
+  .belly-line {
+    fill: none;
+  }
+  .dot-ink {
+    fill: var(--color-halftone);
+  }
+  /* A dotted stripe down the neck: the same screen, printed lighter. */
   .neck-stripe {
     opacity: var(--opacity-muted);
   }
-  .pupil-dot,
-  .mouth {
-    fill: var(--color-mascot-body);
+  .dot-warm {
+    fill: var(--color-mascot-beak);
   }
-  .cheek {
-    fill: var(--color-mascot-accent);
-    opacity: var(--opacity-subtle);
+  .shade,
+  .wing-shade {
+    pointer-events: none;
+  }
+  .wing-shade {
+    opacity: var(--opacity-muted);
+  }
+  .wing-line,
+  .belly-fluff,
+  .lash {
+    fill: none;
+    stroke: var(--color-mascot-line);
+    stroke-width: var(--line);
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .pupil-dot,
+  .mouth,
+  .nostril {
+    fill: var(--color-mascot-line);
   }
   .beak {
     fill: var(--color-mascot-beak);
   }
-  .jaw,
-  .nostril {
+  .jaw {
     fill: var(--color-mascot-legs);
   }
   .lash {
-    fill: none;
-    stroke: var(--color-mascot-belly);
-    stroke-width: 1.6;
-    stroke-linecap: round;
     opacity: 0;
   }
 
@@ -333,31 +426,40 @@
   }
   .think-bubble {
     transform-origin: 140px 34px;
-    fill: var(--color-surface);
+    fill: var(--color-surface-raised);
     stroke: var(--color-border-strong);
-    stroke-width: 1.5;
+    stroke-width: var(--border-width-medium);
+    vector-effect: non-scaling-stroke;
   }
   .think-bubble .dot {
-    fill: var(--color-text-muted);
+    fill: var(--color-text);
     stroke: none;
   }
   .alarm {
     transform-origin: 126px 26px;
   }
-  .sweat {
-    fill: var(--color-info);
+  .sweat,
+  .spot,
+  .bit {
+    stroke: var(--color-border-strong);
+    stroke-width: var(--border-width-medium);
+    vector-effect: non-scaling-stroke;
   }
-  .shock {
+  .sweat {
+    fill: var(--color-accent);
+  }
+  .shock,
+  .tick {
     fill: none;
-    stroke: var(--color-danger);
-    stroke-width: 3;
+    stroke: var(--color-text);
+    stroke-width: 2.5;
     stroke-linecap: round;
   }
   .zzz {
     transform-origin: 124px 30px;
   }
   .z {
-    fill: var(--color-text-muted);
+    fill: var(--color-text);
     font-family: var(--font-family-display);
     font-weight: var(--font-weight-bold);
     font-size: 14px;
@@ -371,21 +473,22 @@
   .sparkles {
     transform-origin: 100px 80px;
   }
-  .s1,
-  .s4 {
-    fill: var(--color-warning);
+  .s1 .spot,
+  .s4 .spot {
+    fill: var(--color-mascot-accent);
   }
-  .s2 {
+  .s2 .spot {
     fill: var(--color-primary);
   }
-  .s3 {
-    fill: var(--color-accent);
+  .s3 .spot {
+    fill: var(--color-secondary);
   }
   .confetti {
     transform-origin: 100px 0;
   }
-  /* Each confetti bit spins around its own center, not the viewBox origin. */
-  .bit {
+  /* Each confetti bit (and cheer mark) spins around its own center, not the viewBox origin. */
+  .bit,
+  .sparkle {
     transform-box: fill-box;
     transform-origin: center;
   }

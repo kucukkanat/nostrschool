@@ -2,7 +2,8 @@
   import { format, getDictionary } from "@nostrschool/i18n";
   import { tokens } from "@nostrschool/tokens";
   import { PlaybackControls, $reducedMotion as reducedMotion } from "@nostrschool/ui";
-  import { sequenceLayout } from "../logic/layout.ts";
+  import { BOX_RADIUS, SHADOW } from "../logic/ink.ts";
+  import { DEFAULT_METRICS, fitLaneWidth, sequenceLayout, visibleHeight } from "../logic/layout.ts";
   import { popIn, travel } from "../logic/motion.ts";
   import { play, stepDelay, tick } from "../logic/playback.ts";
   import { clamp } from "../logic/validate.ts";
@@ -27,7 +28,18 @@
 
   const uid = $props.id();
   const t = $derived(getDictionary(locale).diagrams.sequence);
-  const layout = $derived(sequenceLayout(lanes, messages));
+  // Measured width of the plate; 0 until hydrated (SSR keeps the default lane width).
+  let available = $state(0);
+  const metrics = $derived({
+    ...DEFAULT_METRICS,
+    laneWidth: fitLaneWidth(
+      available,
+      lanes.map((l) => l.label),
+    ),
+  });
+  const layout = $derived(sequenceLayout(lanes, messages, metrics));
+  // Header width tracks the lane, leaving a gutter so neighbouring headers never touch.
+  const head = $derived(metrics.laneWidth - 20);
   const last = $derived(messages.length - 1);
   const current = $derived(clamp(step, -1, last));
   const message = $derived(messages[current]);
@@ -89,84 +101,104 @@
 >
   {#if layout.ok}
     {@const L = layout.value}
-    <ScrollStrip {testid} label={title} follow={current}>
-      <svg
-        bind:this={svg}
-        class="svg"
-        viewBox="0 0 {L.width} {L.height}"
-        role="img"
-        aria-label={title}
-        style:--lanes={lanes.length}
-      >
-        <defs>
-          {#each ["idle", "active"] as variant (variant)}
-            <marker
-              id="{uid}-arrow-{variant}"
-              class="arrow-{variant}"
-              viewBox="0 0 10 10"
-              refX="9"
-              refY="5"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto-start-reverse"
-            >
-              <path d="M0,0 L10,5 L0,10 z" />
-            </marker>
+    {@const H = visibleHeight(current, messages.length, metrics)}
+    <div class="fit" bind:clientWidth={available}>
+      <ScrollStrip {testid} label={title} follow={current}>
+        <svg
+          bind:this={svg}
+          class="svg"
+          viewBox="0 0 {L.width} {H}"
+          role="img"
+          aria-label={title}
+          style:min-width="{L.width}px"
+          data-testid="{testid}-svg"
+        >
+          <defs>
+            {#each ["idle", "active"] as variant (variant)}
+              <marker
+                id="{uid}-arrow-{variant}"
+                class="arrow-{variant}"
+                viewBox="0 0 10 10"
+                refX="9"
+                refY="5"
+                markerWidth="7"
+                markerHeight="7"
+                orient="auto-start-reverse"
+              >
+                <path d="M0,0 L10,5 L0,10 z" />
+              </marker>
+            {/each}
+          </defs>
+          {#each L.lanes as { lane, x } (lane.id)}
+            <g data-testid="{testid}-lane-{lane.id}" data-kind={lane.kind ?? "client"} class="lane">
+              <line class="lifeline" x1={x} x2={x} y1="40" y2={H} />
+              <rect
+                class="lane-head-shadow"
+                x={x - head / 2 + SHADOW}
+                y={4 + SHADOW}
+                width={head}
+                height="36"
+                rx={BOX_RADIUS}
+              />
+              <rect
+                class="lane-head"
+                x={x - head / 2}
+                y="4"
+                width={head}
+                height="36"
+                rx={BOX_RADIUS}
+              />
+              <text class="lane-label" {x} y="22" text-anchor="middle" dominant-baseline="central">
+                {lane.label}
+              </text>
+            </g>
           {/each}
-        </defs>
-        {#each L.lanes as { lane, x } (lane.id)}
-          <g data-testid="{testid}-lane-{lane.id}" data-kind={lane.kind ?? "client"} class="lane">
-            <line class="lifeline" x1={x} x2={x} y1="40" y2={L.height} />
-            <rect class="lane-head" x={x - 70} y="4" width="140" height="36" rx="12" />
-            <text class="lane-label" {x} y="22" text-anchor="middle" dominant-baseline="central">
-              {lane.label}
-            </text>
-          </g>
-        {/each}
-        {#each L.messages as m (m.message.id)}
-          {@const state = m.index < current ? "sent" : m.index === current ? "current" : "pending"}
-          {@const variant = state === "current" ? "active" : "idle"}
-          <g
-            data-testid="{testid}-message-{m.message.id}"
-            data-state={state}
-            class="message {state}"
-            aria-hidden={state === "pending"}
-          >
-            {#if m.direction === "self"}
-              <path
-                class="wire"
-                d="M{m.x1},{m.y - 12} h40 v24 h-36"
-                marker-end="url(#{uid}-arrow-{variant})"
-              />
-              <WirePacket
-                x={m.x1 + 40}
-                y={m.y - 22}
-                type={m.message.packet ?? "custom"}
-                label={m.message.label}
-              />
-            {:else}
-              <line
-                class="wire"
-                x1={m.x1 + (m.direction === "right" ? 4 : -4)}
-                x2={m.x2 + (m.direction === "right" ? -4 : 4)}
-                y1={m.y}
-                y2={m.y}
-                marker-end="url(#{uid}-arrow-{variant})"
-              />
-              <WirePacket
-                x={(m.x1 + m.x2) / 2}
-                y={m.y - 14}
-                type={m.message.packet ?? "custom"}
-                label={m.message.label}
-              />
-              {#if state === "current"}
-                <circle class="dot" cx={m.x2} cy={m.y} r="6" />
+          {#each L.messages as m (m.message.id)}
+            {@const state =
+              m.index < current ? "sent" : m.index === current ? "current" : "pending"}
+            {@const variant = state === "current" ? "active" : "idle"}
+            <g
+              data-testid="{testid}-message-{m.message.id}"
+              data-state={state}
+              class="message {state}"
+              aria-hidden={state === "pending"}
+            >
+              {#if m.direction === "self"}
+                <path
+                  class="wire"
+                  d="M{m.x1},{m.y - 12} h40 v24 h-36"
+                  marker-end="url(#{uid}-arrow-{variant})"
+                />
+                <WirePacket
+                  x={m.x1 + 40}
+                  y={m.y - 22}
+                  type={m.message.packet ?? "custom"}
+                  label={m.message.label}
+                />
+              {:else}
+                <line
+                  class="wire"
+                  x1={m.x1 + (m.direction === "right" ? 4 : -4)}
+                  x2={m.x2 + (m.direction === "right" ? -4 : 4)}
+                  y1={m.y}
+                  y2={m.y}
+                  marker-end="url(#{uid}-arrow-{variant})"
+                />
+                <WirePacket
+                  x={(m.x1 + m.x2) / 2}
+                  y={m.y - 14}
+                  type={m.message.packet ?? "custom"}
+                  label={m.message.label}
+                />
+                {#if state === "current"}
+                  <circle class="dot" cx={m.x2} cy={m.y} r="6" />
+                {/if}
               {/if}
-            {/if}
-          </g>
-        {/each}
-      </svg>
-    </ScrollStrip>
+            </g>
+          {/each}
+        </svg>
+      </ScrollStrip>
+    </div>
     {#if message !== undefined && (detail !== undefined || message.payload !== undefined)}
       <div class="detail" data-testid="{testid}-detail">
         {#if detail !== undefined}
@@ -219,19 +251,25 @@
   .scroll {
     overflow-x: auto;
   }
+  .fit {
+    min-width: 0;
+  }
   .svg {
-    /* Keeps labels legible on phones: below this the strip scrolls instead of shrinking. */
-    --lane-min: calc(var(--size-touch-target) * 2.5);
+    /* min-width (inline, = layout width in px) keeps the viewBox scale >= 1, so labels never
+       render below their token size; when lanes can't fit, the strip scrolls instead. */
     display: block;
     width: 100%;
-    min-width: calc(var(--lanes) * var(--lane-min));
     height: auto;
     font-family: var(--font-family-body);
   }
   .lifeline {
-    stroke: var(--color-diagram-lane);
+    stroke: var(--color-diagram-edge);
     stroke-width: var(--border-width-medium);
-    stroke-dasharray: 4 6;
+    stroke-dasharray: 2 6;
+    stroke-linecap: round;
+  }
+  .lane-head-shadow {
+    fill: var(--color-shadow-pop);
   }
   .lane-head {
     fill: var(--color-diagram-node);
@@ -240,9 +278,10 @@
   }
   .lane-label {
     fill: var(--color-diagram-label);
-    font-family: var(--font-family-display);
+    font-family: var(--font-family-mono);
     font-weight: var(--font-weight-bold);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
+    letter-spacing: var(--font-letter-spacing-wide);
   }
   .wire {
     fill: none;
@@ -279,6 +318,7 @@
   .detail {
     margin-top: var(--space-sm);
     padding: var(--space-sm);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-md);
     background: var(--color-code-bg);
     color: var(--color-code-text);

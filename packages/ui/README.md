@@ -1,6 +1,6 @@
 # @nostrschool/ui
 
-Svelte 5 (runes) primitives, the mascot event bus, motion helpers and springy microinteractions
+Svelte 5 (runes) primitives, the mascot event bus, motion helpers and riso-style microinteractions
 for Nostr School. Everything is styled with `@nostrschool/tokens` CSS variables only (light + dark
 themes come for free), honors `prefers-reduced-motion`, is keyboard operable, and carries
 `data-testid`s (`testid` prop + documented `${testid}-<part>` ids, see `src/types.ts`).
@@ -11,10 +11,10 @@ Text comes from `@nostrschool/i18n` through the `locale` prop, so components nev
 
 | Component | What it does | Test-id parts |
 |---|---|---|
-| `Button` | primary/secondary/ghost/danger, sizes, `loading`, `pressed` (toggle), `href` (link), press squish + hover lift | `-spinner` |
+| `Button` | primary/secondary/ghost/danger, sizes, `loading`, `pressed` (toggle), `href` (link); riso press: hover lifts off a hard ink shadow, press collapses it (pure CSS) | `-spinner` |
 | `Card` | plain/raised/outlined/highlight surface with `header`/`footer` snippets | `-header -footer` |
 | `Drawer` / `UnderTheHood` | "Under the hood" disclosure; "Always expand for me" persists in localStorage | `-toggle -content -always` |
-| `Term` | inline glossary link + hover/focus card (Escape closes, hoverable) | `-card -more` |
+| `Term` | inline glossary link + hover/focus card (Escape closes, hoverable); on touch the first tap opens the card, a second tap or a tap outside closes it, "Read more" navigates | `-card -more` |
 | `Toggle` | accessible switch (`role="switch"`) | `-input` |
 | `Tabs` | WAI-ARIA tabs, arrows/Home/End, skips disabled tabs | `-tab-<id> -panel` |
 | `CodeBlock` | token-colored JSON/TS/JS/bash, highlighted lines, copy with confetti | `-caption -copy -line-<n>` |
@@ -87,8 +87,8 @@ off();
   import { pop, shake, squish } from "@nostrschool/ui";
 </script>
 
-<button use:squish>Squishy</button>
-<p use:pop={{ spring: "wobbly" }}>Pops in</p>
+<button use:squish>Firm press</button>
+<p use:pop>Pops in</p>
 ```
 
 ## Pure helpers
@@ -122,7 +122,12 @@ console.log(half(4)); // { ok: true, value: 2 }
   the glossary link (`data-status="pending"`), never a blank card or a crash.
 - **Always expand**: `$alwaysExpandDrawers` (localStorage `nostrschool:always-expand`). Turning it on
   opens every drawer on the page; turning it off never collapses what the reader has open.
-- **Confetti** colors are resolved from the live theme tokens; it is skipped under reduced motion or
+- **Look**: the "riso field notebook" brand (CONTRACTS.md §2 Brand). Every surface has a 1.5px ink
+  outline (`--color-border-strong`); orange/teal/blue are outlined fills with ink text, never lines
+  or text; "selected" is ink outline + `--shadow-accent`; hit areas are ≥ `--size-touch-target` on
+  touch (`@media (pointer: coarse)`), hover effects only apply under `@media (hover: hover)`, and
+  form controls use ≥16px text so iOS doesn't zoom.
+- **Confetti** is flat paper squares in the riso inks, resolved from the live theme tokens; it is skipped under reduced motion or
   when tokens CSS isn't loaded. `canvas-confetti` is lazy-loaded so it never ships in SSR.
 - **Syntax highlighting** is a tiny synchronous lexer (`src/lib/highlight.ts`), not Shiki: Shiki is
   async (WASM + grammars), which Svelte SSR can't await and which would bloat every island.

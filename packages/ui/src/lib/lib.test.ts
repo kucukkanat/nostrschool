@@ -192,9 +192,9 @@ describe("highlightLines", () => {
 describe("confetti", () => {
   test("themeColors resolves token custom properties and drops missing ones", () => {
     const el = document.createElement("div");
-    el.style.setProperty("--color-primary", "#7A2EF5");
+    el.style.setProperty("--color-primary", "#FF5C39");
     document.body.append(el);
-    expect(themeColors(["--color-primary", "--nope"], el)).toEqual(["#7A2EF5"]);
+    expect(themeColors(["--color-primary", "--nope"], el)).toEqual(["#FF5C39"]);
     expect(CONFETTI_COLOR_VARS).toContain("--color-primary");
     el.remove();
   });
@@ -208,7 +208,7 @@ describe("confetti", () => {
   });
   test("with theme tokens but no 2D canvas context (happy-dom), skips instead of throwing", async () => {
     const root = document.documentElement;
-    root.style.setProperty("--color-primary", "#7A2EF5");
+    root.style.setProperty("--color-primary", "#FF5C39");
     try {
       expect(await burstFrom(document.createElement("button"))).toBe("no-canvas");
     } finally {
@@ -216,7 +216,7 @@ describe("confetti", () => {
     }
   });
   test("burstOptions centers the burst on the element and copies the palette", () => {
-    const colors = ["#7A2EF5"];
+    const colors = ["#FF5C39"];
     const opts = burstOptions({ left: 100, top: 50, width: 20, height: 10 }, colors, {
       width: 220,
       height: 110,
@@ -225,6 +225,7 @@ describe("confetti", () => {
     expect(opts.colors).toEqual(colors);
     expect(opts.colors).not.toBe(colors);
     expect(opts.disableForReducedMotion).toBe(true);
+    expect(opts).toMatchObject({ shapes: ["square"], flat: true });
   });
 });
 

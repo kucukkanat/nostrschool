@@ -131,3 +131,42 @@ export const swimlaneLayout = (
     })),
   });
 };
+
+/**
+ * Mono glyph advance at `--font-size-xs` (12 units ≈ 0.62em), shared with WirePacket's sizing.
+ * Lane labels are sized from it so a lane is never narrower than its own header text.
+ */
+export const MONO_CHAR = 7.5;
+/** Inner padding of a lane header plus the gap to the neighbouring header. */
+const LANE_GUTTER = 28;
+/** Floor for very short labels: still room for packets travelling between lifelines. */
+const LANE_MIN = 96;
+
+/** Narrowest lane that still fits the longest label at full size. */
+export const minLaneWidth = (labels: readonly string[]): number =>
+  Math.max(LANE_MIN, ...labels.map((l) => Math.ceil(l.length * MONO_CHAR + LANE_GUTTER)));
+
+/**
+ * Lane width for a container `available` px wide. Phones get narrower lanes (down to the label
+ * minimum) instead of a shrunken viewBox, so labels keep their real font size; wide screens keep
+ * the default. `available <= 0` (SSR, not measured yet) falls back to the default.
+ */
+export const fitLaneWidth = (
+  available: number,
+  labels: readonly string[],
+  m: LaneMetrics = DEFAULT_METRICS,
+): number => {
+  if (available <= 0 || labels.length === 0) return m.laneWidth;
+  const min = Math.min(m.laneWidth, minLaneWidth(labels));
+  return Math.max(min, Math.min(m.laneWidth, Math.floor(available / labels.length)));
+};
+
+/**
+ * SVG height that only reaches the rows revealed so far (always at least one), so a diagram at
+ * step 0 isn't a tall column of empty lifelines; it grows to the full height as steps play.
+ */
+export const visibleHeight = (
+  current: number,
+  count: number,
+  m: LaneMetrics = DEFAULT_METRICS,
+): number => m.headerHeight + (Math.max(1, Math.min(count, current + 1)) + 0.5) * m.rowHeight;

@@ -42,7 +42,10 @@ const writeOnly = (url: RelayUrl): RelayListEntry => ({ url, read: false, write:
 interface PersonaSpec {
   readonly displayName: string;
   readonly about: string;
-  /** Avatar background. Data (baked into an SVG data URI), not UI styling, so no tokens here. */
+  /**
+   * Avatar background. Data (baked into an SVG data URI), not UI styling, so no tokens here.
+   * Riso fills from the brand palette, each picked so ink initials stay ≥4.5:1.
+   */
   readonly color: string;
   readonly walletDomain: WalletDomain;
   readonly relays: readonly RelayListEntry[];
@@ -55,49 +58,49 @@ const SPECS: Readonly<Record<PersonaId, PersonaSpec>> = {
   alice: {
     displayName: "Alice",
     about: "Protocol nerd. I explain Nostr one event at a time.",
-    color: "#7c3aed",
+    color: "#4B88C4",
     walletDomain: "wallet.alpha.example",
     relays: [rw(ALPHA), rw(BETA)],
   },
   bob: {
     displayName: "Bob",
     about: "Bitcoin farmer. Asks the questions everyone is thinking.",
-    color: "#f97316",
+    color: "#FF5C39",
     walletDomain: "wallet.beta.example",
     relays: [rw(BETA), readOnly(GAMMA)],
   },
   carol: {
     displayName: "Carol",
     about: "Photographer. Morning walks, film cameras, long threads.",
-    color: "#0d9488",
+    color: "#12A193",
     walletDomain: "wallet.beta.example",
     relays: [rw(GAMMA), writeOnly(ALPHA)],
   },
   dave: {
     displayName: "Dave",
     about: "I run relay.delta.example. Ask me about relays, uptime and spam.",
-    color: "#2563eb",
+    color: "#FFE45C",
     walletDomain: "wallet.beta.example",
     relays: [writeOnly(DELTA), rw(ALPHA)],
   },
   erin: {
     displayName: "Erin",
     about: "Artist. Drawing one weird animal per day. Zaps keep me caffeinated.",
-    color: "#db2777",
+    color: "#E7409F",
     walletDomain: "wallet.alpha.example",
     relays: [rw(ALPHA), rw(GAMMA)],
   },
   frank: {
     displayName: "Frank",
     about: "Journalist. Long-form essays about the open web.",
-    color: "#65a30d",
+    color: "#009852",
     walletDomain: "wallet.beta.example",
     relays: [rw(BETA), writeOnly(DELTA)],
   },
   grace: {
     displayName: "Grace",
     about: "New here! Learning Nostr and loving it.",
-    color: "#ca8a04",
+    color: "#E3A512",
     walletDomain: "wallet.alpha.example",
     relays: [rw(GAMMA)],
   },
@@ -105,7 +108,7 @@ const SPECS: Readonly<Record<PersonaId, PersonaSpec>> = {
 
 const avatarFor = (initials: string, color: string): string =>
   `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="${color}"/><text x="32" y="42" font-family="sans-serif" font-size="28" font-weight="700" text-anchor="middle" fill="#ffffff">${initials}</text></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="31.25" fill="${color}" stroke="#1B1A17" stroke-width="1.5"/><text x="32" y="42" font-family="sans-serif" font-size="28" font-weight="700" text-anchor="middle" fill="#1B1A17">${initials}</text></svg>`,
   )}`;
 
 const buildPersona = (id: PersonaId): Persona => {

@@ -9,7 +9,7 @@ export const ch08: typeof en = {
     description:
       "Alice le envía a Bob el mismo mensaje de tres formas. Compara lo que puede leer un relay y luego intenta abrir cada sobre con distintas claves.",
     messageLabel: "Mensaje de Alice para Bob",
-    defaultMessage: "Nos vemos en la panadería a las 9. Trae el cruasán secreto 🥐",
+    defaultMessage: "Nos vemos en la panadería a las 9. Trae el cruasán secreto.",
     charCount: "{count} / {max} caracteres",
     schemeLabel: "¿Cómo debería enviarlo Alice?",
     schemes: {

@@ -7,7 +7,9 @@ Svelte 5 renders plain SVG, so charts server-render in Astro and hydrate as isla
 Every chart:
 
 - **is themed by tokens only** — series use `--color-chart-1…8`, axes/grid use
-  `--color-chart-axis` / `--color-chart-grid`, so light/dark switch automatically;
+  `--color-chart-axis` / `--color-chart-grid`, so light/dark switch automatically. Marks are
+  ink-outlined riso fills; hover lifts a mark with a hard ink shadow, and keyboard focus draws a
+  thick focus ring inside a `--color-focus-halo` outline so it stays visible on every fill;
 - **fills its container** (measured width, 1:1 viewBox; fewer ticks on narrow screens);
 - **animates in** with token durations/easings (bars grow, lines draw, slices spin in). Under
   `prefers-reduced-motion` the duration tokens collapse to `0ms`, so the final state shows instantly;
@@ -48,8 +50,15 @@ loaded once (`import "@nostrschool/tokens/tokens.css"`; the site's `global.css` 
 />
 ```
 
-Parts: `ch11-relays-bar-us`, `ch11-relays-tooltip`, `ch11-relays-table-toggle`, `ch11-relays-table`,
-`ch11-relays-row-us`. Negative values hang below the zero line.
+Parts: `ch11-relays-bar-us`, `ch11-relays-label-us`, `ch11-relays-separator`, `ch11-relays-tooltip`,
+`ch11-relays-table-toggle`, `ch11-relays-table`, `ch11-relays-row-us`. Negative values hang below the
+zero line.
+
+Catch-all buckets (ids `"other"` and `"unknown"` by default) are always drawn last, after a dashed
+ink rule, even with `sorted`. Pass `pinned={["misc"]}` to pin other ids, or `pinned={[]}` to opt out.
+Horizontal bars below the `sm` breakpoint (480px) put each label on its own line above its bar,
+so long names are not cut off; wider charts size the side label column to the longest label (up to
+40% of the width).
 
 ## LineChart
 
@@ -102,7 +111,8 @@ Parts: `ch11-relays-bar-us`, `ch11-relays-tooltip`, `ch11-relays-table-toggle`, 
 ```
 
 Leaves carry `value`; parents sum their children. Cells are colored by top-level group and labelled
-inline when they're big enough. Parts: `-cell-<id>`.
+inline when they're big enough, on an ink-outlined paper plate so the label reads on any fill.
+Parts: `-cell-<id>`, `-cell-<id>-plate`.
 
 ## DonutChart
 

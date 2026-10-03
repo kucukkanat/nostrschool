@@ -81,8 +81,10 @@ export const common = {
     builtWith: "Built with Astro and Svelte",
   },
   home: {
-    eyebrow: "A playful, hands-on Nostr course",
+    eyebrow: "Field notes on the Nostr protocol",
     title: "Learn Nostr by poking at the real thing",
+    /** The phrase of `title` that gets a highlighter mark; must appear verbatim in `title`. */
+    titleMark: "the real thing",
     lead: "Generate keys, sign events and watch packets fly between relays. Real cryptography, running right here in your browser.",
     ctaTools: "Browse the tools",
     ctaContinue: "Continue: {title}",
@@ -107,9 +109,9 @@ export const common = {
         body: "Lessons use friendly example data. Flip on live mode to read real events from public relays.",
       },
     ],
-    mapTitle: "Your course map",
+    mapTitle: "The course, chapter by chapter",
     mapIntro:
-      "Twelve stops, from why Nostr exists to its honest trade-offs. Jump in anywhere; we remember the chapters you finish.",
+      "Twelve chapters, from why Nostr exists to its honest trade-offs. Start anywhere; we remember the chapters you finish.",
     toolsTitle: "Tools for tinkering",
     toolsIntro:
       "The course interactives also work on their own. Handy when you just need to check an event.",

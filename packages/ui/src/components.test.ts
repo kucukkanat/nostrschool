@@ -22,7 +22,7 @@ import {
   Tooltip,
   VisuallyHidden,
 } from "./index.ts";
-import { text, tick, withReducedMotion } from "./test-helpers.ts";
+import { text, tick } from "./test-helpers.ts";
 
 afterEach(() => {
   cleanup();
@@ -83,13 +83,11 @@ describe("Button", () => {
     expect(b.getByTestId("l").hasAttribute("href")).toBe(false);
     expect(b.getByTestId("l").getAttribute("aria-disabled")).toBe("true");
   });
-  test("squish is inert under reduced motion", async () => {
-    await withReducedMotion(async () => {
-      const { getByTestId } = render(Button, { props: { testid: "r", children: text("R") } });
-      await fireEvent.pointerDown(getByTestId("r"));
-      await fireEvent.pointerLeave(getByTestId("r"));
-      expect(getByTestId("r").style.transform).toBe("");
-    });
+  test("press feedback is pure CSS (no inline transform from JS)", async () => {
+    const { getByTestId } = render(Button, { props: { testid: "r", children: text("R") } });
+    await fireEvent.pointerDown(getByTestId("r"));
+    await fireEvent.pointerLeave(getByTestId("r"));
+    expect(getByTestId("r").style.transform).toBe("");
   });
 });
 
@@ -249,6 +247,47 @@ describe("Term", () => {
     await tick();
     // happy-dom has no layout (rect = 0 at x=0), so the card is pushed in to the viewport margin.
     expect(getByTestId("v-card").style.translate).toBe("16px 0");
+  });
+  test("touch: first tap opens the card instead of navigating, second tap or a tap outside closes", async () => {
+    const { getByTestId } = render(Term, {
+      props: { id: "relay", locale: "en", glossaryHref: "/g", testid: "tt" },
+    });
+    const link = getByTestId("tt");
+    const card = getByTestId("tt-card");
+    const tap = (target: Element) => {
+      target.dispatchEvent(
+        new PointerEvent("pointerdown", { pointerType: "touch", bubbles: true }),
+      );
+      const click = new MouseEvent("click", { bubbles: true, cancelable: true });
+      target.dispatchEvent(click);
+      return click;
+    };
+    expect(tap(link).defaultPrevented).toBe(true);
+    await tick();
+    expect(card.hidden).toBe(false);
+    expect(tap(link).defaultPrevented).toBe(true);
+    await tick();
+    expect(card.hidden).toBe(true);
+    tap(link);
+    await tick();
+    expect(card.hidden).toBe(false);
+    document.body.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    await tick();
+    expect(card.hidden).toBe(true);
+  });
+  test("mouse clicks still follow the glossary link", async () => {
+    const { getByTestId } = render(Term, {
+      props: { id: "relay", locale: "en", glossaryHref: "/g", testid: "tm" },
+    });
+    const link = getByTestId("tm");
+    link.dispatchEvent(new PointerEvent("pointerdown", { pointerType: "mouse", bubbles: true }));
+    const click = new MouseEvent("click", { bubbles: true, cancelable: true });
+    // Keep happy-dom from actually navigating; we only care whether the component cancelled it.
+    link.addEventListener("click", (e) => {
+      expect(e.defaultPrevented).toBe(false);
+      e.preventDefault();
+    });
+    link.dispatchEvent(click);
   });
   test("missing glossary entry renders a pending card instead of crashing", async () => {
     const { getByTestId } = render(Term, {
@@ -450,6 +489,8 @@ describe("Quiz", () => {
     expect(events).toEqual(["quiz:correct:q1"]);
     expect(answers).toEqual([true]);
     expect(getByTestId("q1-feedback").textContent).toContain("Correct");
+    // A stamped glyph carries the verdict (no decorative emoji).
+    expect(getByTestId("q1-feedback").textContent).toContain("✓");
     expect(getByTestId("q1").dataset["result"]).toBe("correct");
     expect(getByTestId("q1-explanation-a").textContent).toContain("key holder");
   });
@@ -464,6 +505,7 @@ describe("Quiz", () => {
     off();
     expect(events).toEqual(["q2"]);
     expect(getByTestId("q2-feedback").textContent).toContain("Not quite");
+    expect(getByTestId("q2-feedback").textContent).toContain("✗");
     expect((getByTestId("q2-option-a") as HTMLInputElement).disabled).toBe(true);
     expect(queryByTestId("q2-explanation-a")).toBeNull(); // no answer reveal
     await fireEvent.click(getByTestId("q2-retry"));

@@ -76,6 +76,19 @@ describe("SequenceDiagram", () => {
     );
   });
 
+  test("the plate grows with the revealed steps and never scales labels below 1:1", async () => {
+    const { getByTestId } = render(SequenceDiagram, { props: base });
+    const svg = getByTestId("seq-svg");
+    // Default metrics: 2 lanes x 160 wide; header 56 + 1.5 rows of 64 before anything is sent.
+    expect(svg.getAttribute("viewBox")).toBe("0 0 320 152");
+    expect(svg.getAttribute("style")).toContain("min-width: 320px");
+    await fireEvent.click(getByTestId("seq-controls-forward"));
+    await fireEvent.click(getByTestId("seq-controls-forward"));
+    expect(svg.getAttribute("viewBox")).toBe("0 0 320 216");
+    const head = getByTestId("seq-lane-relay").querySelector(".lane-head");
+    expect(head?.getAttribute("width")).toBe("140");
+  });
+
   test("pause stops autoplay", async () => {
     const { getByTestId } = render(SequenceDiagram, { props: { ...base, stepMs: 5 } });
     await fireEvent.click(getByTestId("seq-controls-play"));

@@ -9,7 +9,7 @@ components and contain no chapter-specific text: you pass the data and they draw
 | `Swimlane` | activities in lanes, with hand-offs | play, pause, step, scrub |
 | `Pipeline` | stages of a computation | select a stage, expand long values |
 | `ForceGraph` | a d3-force social graph | drag, arrow keys, Enter/Space to select, Esc to clear |
-| `Packet` | a colored pill for a wire verb (`REQ`, `EVENT`…) | inline |
+| `Packet` | an ink-outlined riso stamp for a wire verb (`REQ`, `EVENT`…) | inline |
 
 What every diagram does:
 
@@ -23,13 +23,21 @@ What every diagram does:
   shows a visible typed error (`${testid}-error`, `data-code="duplicate-id" | "unknown-ref"`).
 - **Tokens.** Colors, spacing, radii and durations come only from `@nostrschool/tokens`. This
   covers light and dark mode.
+- **Riso look.** Diagrams follow the "field notebook" brand: 1.5px ink outlines, hard offset
+  shadows (an orange one marks the current step or selected node), halftone screens on alternate
+  swimlanes, and mono labels for lanes, packets and names. Bright fills are always ink-outlined
+  and never used as lines; coloured strokes use the `diagram-edge*` tokens.
 - **Reduced motion.** With reduced motion on, animations become instant state changes and
   nothing is lost. `ForceGraph` then shows its settled layout, and dragging moves only the
   dragged node.
 - **Phone widths.** SVG diagrams scale with a `viewBox`. Lane diagrams scroll inside their own
-  box (`${testid}-scroll`) below a readable minimum width; the edges that hide content fade out
-  (`data-overflow-start|end="true"`), and the box scrolls the current step into view as playback
-  advances. `ForceGraph` fits its layout to the whole box and counter-scales name labels so they
+  box (`${testid}-scroll`) below a readable minimum width, with a visible ink scrollbar. Each
+  edge that hides content gets an ink arrow tab (`${testid}-scroll-cue-start|end`, decorative;
+  the strip itself carries `data-overflow-start|end="true"`), and the box scrolls the current step into view as playback
+  advances. The tabs sit on the bottom edge so they never cover a lane header. `SequenceDiagram`
+  narrows its lanes to the container (never below its longest label), keeps the SVG at 1:1 or
+  larger so labels stay at `--font-size-xs`, and grows its lifelines with the revealed steps
+  instead of drawing every empty row up front (`${testid}-svg`). `ForceGraph` fits its layout to the whole box and counter-scales name labels so they
   stay at least `--font-size-xs` on screen. `Pipeline` stacks its stages vertically below 768px.
 
 ## Usage

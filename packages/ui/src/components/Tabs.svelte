@@ -62,7 +62,7 @@
 </div>
 
 <style>
-  /* One row that scrolls sideways instead of wrapping: a wrapped pill turns into a lumpy blob on
+  /* One row that scrolls sideways instead of wrapping: a wrapped row turns into a lumpy blob on
      phones. The padding leaves room for the active tab's offset shadow inside the scroll clip,
      and the tabs themselves are focusable so keyboard users reach every one (arrow keys scroll). */
   /* Tabs often sit in grid/flex cards; without this the root's automatic min size is the whole
@@ -74,8 +74,9 @@
     display: flex;
     flex-wrap: nowrap;
     gap: var(--space-2xs);
-    padding: var(--space-2xs);
-    border-radius: var(--radius-pill);
+    padding: var(--space-2xs) var(--space-xs) var(--space-xs) var(--space-2xs);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
     background: var(--color-surface-sunken);
     inline-size: fit-content;
     max-inline-size: 100%;
@@ -89,32 +90,40 @@
     flex: none;
     scroll-snap-align: start;
     white-space: nowrap;
-    min-height: var(--size-control-md);
+    min-height: var(--size-touch-target);
     padding: 0 var(--space-md);
-    border: none;
-    border-radius: var(--radius-pill);
+    border: var(--border-width-medium) solid transparent;
+    border-radius: var(--radius-sm);
     background: transparent;
     color: var(--color-text-muted);
     font-family: var(--font-family-display);
     font-size: var(--font-size-md);
     font-weight: var(--font-weight-semibold);
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
     transition:
       background-color var(--motion-duration-fast) var(--motion-easing-standard),
       color var(--motion-duration-fast) var(--motion-easing-standard),
-      scale var(--motion-duration-normal) var(--motion-easing-bounce);
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
+      translate var(--motion-duration-press) var(--motion-easing-press);
   }
-  .tab:hover:not(:disabled, [aria-selected="true"]) {
-    background: var(--color-primary-subtle);
-    color: var(--color-text);
+  @media (hover: hover) {
+    .tab:hover:not(:disabled, [aria-selected="true"]) {
+      background: var(--color-surface-raised);
+      color: var(--color-text);
+    }
   }
+  /* Selected: an orange slip with an ink outline, sitting proud on a hard shadow. */
   .tab[aria-selected="true"] {
+    border-color: var(--color-border-strong);
     background: var(--color-primary);
     color: var(--color-on-primary);
     box-shadow: var(--shadow-pop-sm);
   }
   .tab:active:not(:disabled) {
-    scale: 0.95;
+    translate: var(--size-lift) var(--size-lift);
+    box-shadow: var(--shadow-pressed);
   }
   .tab:disabled {
     opacity: var(--opacity-disabled);
@@ -122,7 +131,7 @@
   }
   .tab:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
-    outline-offset: var(--space-3xs);
+    outline-offset: calc(-1 * var(--border-width-thick));
   }
   /* Mirrors tokens.breakpoint.sm (480px): CSS vars can't be used in media queries. Tighter tabs
      let typical 3–4 short labels fit a phone without scrolling at all. */

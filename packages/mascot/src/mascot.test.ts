@@ -107,3 +107,34 @@ test("OstrichSvg freezes loops when still", () => {
   expect(svg.classList.contains("still")).toBe(true);
   expect(svg.querySelectorAll(".prop").length).toBe(5);
 });
+
+test("OstrichSvg prints with per-instance halftone screens", () => {
+  const { getByTestId } = render(OstrichSvg, { props: { pose: "idle", testid: "a" } });
+  render(OstrichSvg, { props: { pose: "idle", testid: "b" } });
+  const ids = (id: string) =>
+    [...getByTestId(id).querySelectorAll("pattern, clipPath")].map((el) => el.id);
+  const [a, b] = [ids("a"), ids("b")];
+  expect(a.length).toBe(4);
+  // Two Nos on one page must not share defs, or one would paint with the other's clip.
+  expect(a.filter((id) => b.includes(id))).toEqual([]);
+  const shade = getByTestId("a-halftone");
+  expect(shade.getAttribute("fill")).toBe(`url(#${a[0]})`);
+  expect(shade.getAttribute("clip-path")).toBe(`url(#${a[2]})`);
+  // Every url(#…) reference resolves inside its own SVG.
+  const refs = getByTestId("a").innerHTML.match(/url\(#([^)]+)\)/g) ?? [];
+  expect(refs.length).toBeGreaterThan(0);
+  for (const ref of refs) expect(a).toContain(ref.slice(5, -1));
+});
+
+test("OstrichSvg paint is tokens only: no raw colours, gradients or blur", async () => {
+  const src = await Bun.file(new URL("./components/OstrichSvg.svelte", import.meta.url)).text();
+  expect(src).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i);
+  expect(src).not.toMatch(/gradient|blur|drop-shadow|purple|violet/i);
+  expect(src).toContain("var(--color-mascot-line)");
+  expect(src).toContain("var(--color-halftone)");
+});
+
+test("small Nos thins its ink line", async () => {
+  const src = await Bun.file(new URL("./components/Mascot.svelte", import.meta.url)).text();
+  expect(src).toMatch(/\.sm \{[^}]*--mascot-line-width: var\(--border-width-thin\)/);
+});

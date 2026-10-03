@@ -23,53 +23,73 @@
 </svelte:element>
 
 <style>
+  /* Cards are notebook pages: a sheet of paper-2 with an ink outline. Raised pages sit on a hard
+     offset shadow; the highlight page is the "featured" one (orange misregistration shadow). */
   .card {
+    --card-shadow: var(--shadow-pressed);
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
+    min-inline-size: 0;
     background: var(--color-surface);
     color: var(--color-text);
-    border: var(--border-width-medium) solid transparent;
-    border-radius: var(--radius-lg);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--card-shadow);
     transition:
-      translate var(--motion-duration-normal) var(--motion-easing-bounce),
-      box-shadow var(--motion-duration-normal) var(--motion-easing-standard);
+      translate var(--motion-duration-press) var(--motion-easing-press),
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .raised {
+    --card-shadow: var(--shadow-pop);
     background: var(--color-surface-raised);
-    box-shadow: var(--shadow-md);
   }
+  /* A loose sheet: no fill, a soft dashed edge, for secondary groupings. */
   .outlined {
-    border-color: var(--color-border);
+    background: transparent;
+    border-style: dashed;
   }
   .highlight {
+    --card-shadow: var(--shadow-accent);
     background: var(--color-primary-subtle);
-    border-color: var(--color-primary);
-    box-shadow: var(--shadow-pop);
   }
-  /* Cards with a link/button inside lift on hover: a playful "you can poke this" hint. */
-  .raised:has(:global(a:hover), :global(button:hover)),
-  .highlight:has(:global(a:hover), :global(button:hover)) {
-    translate: 0 calc(-1 * var(--space-3xs));
-    box-shadow: var(--shadow-lg);
+  /* Cards with a link/button inside lift on hover: a "you can poke this" hint. */
+  @media (hover: hover) {
+    .raised:has(:global(a:hover), :global(button:hover)),
+    .highlight:has(:global(a:hover), :global(button:hover)) {
+      --card-shadow: var(--shadow-lift);
+      translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    }
   }
   .pad-sm {
     padding: var(--space-sm);
   }
   .pad-md {
-    padding: var(--space-lg);
+    padding: var(--space-md);
   }
   .pad-lg {
-    padding: var(--space-xl);
+    padding: var(--space-lg);
+  }
+  /* Mirrors tokens.breakpoint.sm (480px): roomier pages once there's width to spare. */
+  @media (min-width: 480px) {
+    .pad-md {
+      padding: var(--space-lg);
+    }
+    .pad-lg {
+      padding: var(--space-xl);
+    }
   }
   .header {
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--border-width-thin) dashed var(--color-border-strong);
     font-family: var(--font-family-display);
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-lg);
+    line-height: var(--font-line-height-snug);
   }
   .footer {
     padding-top: var(--space-sm);
-    border-top: var(--border-width-thin) solid var(--color-border);
+    border-top: var(--border-width-thin) dashed var(--color-border-strong);
     color: var(--color-text-muted);
     font-size: var(--font-size-sm);
   }

@@ -7,7 +7,7 @@ export const ch03: typeof en = {
   title: "Anatomía de un evento",
   summary:
     "Cada publicación, cada like y cada perfil es un evento JSON firmado. Vamos a desarmar uno.",
-  sampleContent: "¡Hola Nostr! 👋 Esta es mi primera nota firmada.",
+  sampleContent: "¡Hola Nostr! Esta es mi primera nota firmada.",
   fields: {
     heading: "Los siete campos",
     select: "Explicar el campo {field}",

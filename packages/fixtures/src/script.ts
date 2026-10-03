@@ -194,7 +194,7 @@ export const buildFixtures = (): GeneratedFixtures => {
   const aliceWelcome = note(
     "alice",
     ago(2 * HOUR + 15 * MIN),
-    `Welcome Grace! 💜 Try following nostr:${npubOf("erin")} for art and nostr:${npubOf("bob")} for good questions.`,
+    `Welcome Grace! Try following nostr:${npubOf("erin")} for art and nostr:${npubOf("bob")} for good questions.`,
     [eTag(graceHello, "root"), pTag("grace"), pTag("erin"), pTag("bob")],
   );
 
@@ -202,7 +202,7 @@ export const buildFixtures = (): GeneratedFixtures => {
   const erinArt = note(
     "erin",
     ago(90 * MIN),
-    "Today's weird animal: a purple ostrich riding a lightning bolt ⚡ #art #zaps",
+    "Today's weird animal: an orange ostrich riding a lightning bolt ⚡ #art #zaps",
     [
       ["t", "art"],
       ["t", "zaps"],

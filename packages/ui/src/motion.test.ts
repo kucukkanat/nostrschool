@@ -16,10 +16,10 @@ test("durations come from tokens and collapse under reduced motion", () => {
 });
 
 test("springs and tweens", () => {
-  expect(spring("bouncy", false)).toEqual({ type: "spring", stiffness: 300, damping: 12, mass: 1 });
+  expect(spring("bouncy", false)).toEqual({ type: "spring", stiffness: 320, damping: 18, mass: 1 });
   expect(spring("bouncy", true)).toEqual({ duration: 0 });
   expect(easing("standard")).toEqual([0.2, 0, 0, 1]);
-  expect(tween("slow", "bounce", false)).toEqual({ duration: 0.36, ease: [0.34, 1.56, 0.64, 1] });
+  expect(tween("slow", "bounce", false)).toEqual({ duration: 0.36, ease: [0.3, 1.35, 0.55, 1] });
   expect(tween("slow", undefined, true).duration).toBe(0);
 });
 

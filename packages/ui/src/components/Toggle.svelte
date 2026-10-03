@@ -41,6 +41,7 @@
     gap: var(--space-sm);
     min-height: var(--size-touch-target);
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   .disabled {
     opacity: var(--opacity-disabled);
@@ -51,10 +52,12 @@
     position: absolute;
     opacity: 0;
     inline-size: var(--size-control-lg);
-    block-size: var(--size-control-sm);
+    block-size: var(--size-touch-target);
     margin: 0;
     cursor: inherit;
   }
+  /* The one control that keeps a pill: a slide switch with an ink-outlined knob. Off = sunken
+     paper; on = orange, and the knob's position (not the colour) says which. */
   .track {
     position: relative;
     flex: none;
@@ -67,23 +70,24 @@
   }
   .thumb {
     position: absolute;
-    inset-block-start: var(--space-3xs);
+    inset-block: 0;
     inset-inline-start: var(--space-3xs);
+    margin-block: auto;
     inline-size: var(--size-icon-md);
     block-size: var(--size-icon-md);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-round);
     background: var(--color-surface-raised);
     box-shadow: var(--shadow-sm);
     transition:
       translate var(--motion-duration-normal) var(--motion-easing-bounce),
-      scale var(--motion-duration-fast) var(--motion-easing-standard);
+      box-shadow var(--motion-duration-press) var(--motion-easing-press);
   }
   .toggle:active:not(.disabled) .thumb {
-    scale: 1.15 0.9;
+    box-shadow: var(--shadow-pressed);
   }
   .input:checked + .track {
     background: var(--color-primary);
-    border-color: var(--color-primary-active);
   }
   .input:checked + .track .thumb {
     translate: calc(
@@ -97,7 +101,7 @@
   }
   .input:focus-visible + .track {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
-    outline-offset: var(--space-3xs);
+    outline-offset: var(--size-focus-offset);
   }
   .text {
     display: flex;

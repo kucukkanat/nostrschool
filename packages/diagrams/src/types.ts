@@ -151,7 +151,7 @@ export interface ForceGraphProps extends DiagramBase {
 
 /* ---------- Packet ---------- */
 
-/** A small colored pill for a wire message, usable inline or animated along a path. */
+/** A small ink-outlined stamp for a wire message, usable inline or animated along a path. */
 export interface PacketProps {
   readonly type: PacketType;
   /** Defaults to the type itself, e.g. "REQ". */

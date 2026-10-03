@@ -29,7 +29,7 @@ export const ch10: typeof en = {
     app: {
       title: "La app (algún sitio web)",
       noteLabel: "Tu nota",
-      defaultNote: "¡gm! Firmado sin compartir mi clave 🔐",
+      defaultNote: "¡gm! Firmado sin compartir mi clave.",
       sign: "Firmar y publicar",
       reset: "Empezar de nuevo",
       memoryTitle: "Todo lo que recibió la app",
@@ -90,7 +90,7 @@ export const ch10: typeof en = {
     verdict: {
       idle: "Escribe una nota y pulsa “Firmar y publicar”.",
       awaiting: "El firmante te pide tu aprobación. Mira la caja del firmante.",
-      safe: "Firmada y publicada, y la app nunca vio tu clave secreta. 🎉",
+      safe: "Firmada y publicada, y la app nunca vio tu clave secreta.",
       leaked:
         "Publicada… pero ahora la app tiene tu clave secreta. Cualquier fallo, script tramposo o empleado malintencionado podría hacerse pasar por ti, para siempre.",
       rejected: "Dijiste que no, así que no se firmó nada. Así te protege el firmante.",

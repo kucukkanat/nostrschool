@@ -39,8 +39,10 @@ const MIN_HEIGHT = Number.parseFloat(tokens.size.diagramMinHeight);
 export const AXIS_GAP = spacePx("xs");
 /** Baseline offset of labels drawn below the x axis. */
 export const LABEL_OFFSET = spacePx("md");
-/** Corner radius of bars and treemap cells. */
+/** Radius of line-chart points. */
 export const MARK_RADIUS = spacePx("2xs");
+/** Corner radius of bars and treemap cells: the brand's small `--radius-sm` (crisp printed blocks). */
+export const MARK_CORNER = Number.parseFloat(tokens.radius.sm);
 /**
  * Shortest bar we draw. A 0 (or near-0) value would otherwise be a 0px rect that still takes
  * keyboard focus — an invisible focus target with no visible ring (WCAG 2.4.7). The stub sits
@@ -90,16 +92,50 @@ export interface Bar extends Datum {
   readonly anchor: { readonly x: number; readonly y: number };
 }
 
+/**
+ * Side label column for horizontal bars: as wide as the longest label needs, never narrower than
+ * the old fixed column and never more than 40% of the chart (beyond that, labels ellipsize).
+ */
+const labelColumn = (rows: readonly Datum[], width: number): number =>
+  Math.round(
+    Math.min(
+      width * 0.4,
+      Math.max(spacePx("4xl"), ...rows.map((d) => d.label.length * CHAR_PX + AXIS_GAP * 2)),
+    ),
+  );
+
+/** Catch-all buckets kept after every real category (they aren't a peer of the others). */
+export const DEFAULT_PINNED: readonly string[] = ["other", "unknown"];
+/** Height of the label line that sits above each bar in the stacked (phone) layout. */
+export const STACKED_LABEL_ROW = spacePx("md");
+
+export interface BarCategory extends Tick<string> {
+  readonly id: string;
+  /** Where the label text is drawn. */
+  readonly x: number;
+  readonly y: number;
+  readonly anchor: "start" | "middle" | "end";
+  /** Vertically centred on `y` (side labels) vs. sitting on `y` as a baseline (above/below). */
+  readonly centered: boolean;
+}
+
 export interface BarLayout {
   readonly width: number;
   readonly height: number;
   readonly margin: Margin;
   readonly orientation: "vertical" | "horizontal";
   readonly bars: readonly Bar[];
-  readonly categories: readonly (Tick<string> & { readonly id: string })[];
+  readonly categories: readonly BarCategory[];
   readonly valueTicks: readonly Tick[];
   /** Pixel position of value 0 on the value axis. */
   readonly baseline: number;
+  /**
+   * Horizontal bars on a phone: each label sits on its own line above its bar, so long names get
+   * the full width instead of an ellipsis in a narrow side column.
+   */
+  readonly stacked: boolean;
+  /** Category-axis position of the rule between real categories and pinned catch-alls. */
+  readonly separator?: number;
 }
 
 export const barLayout = (
@@ -108,20 +144,35 @@ export const barLayout = (
     width,
     orientation = "vertical",
     sorted = false,
+    pinned = DEFAULT_PINNED,
   }: {
     readonly width: number;
     readonly orientation?: "vertical" | "horizontal";
     readonly sorted?: boolean;
+    /** Datum ids always drawn last, after a rule (default: "other", "unknown"). */
+    readonly pinned?: readonly string[];
   },
 ): BarLayout => {
-  const rows = sorted ? [...data].sort((a, b) => b.value - a.value) : data;
+  const isPinned = (d: Datum): boolean => pinned.includes(d.id);
+  const main = data.filter((d) => !isPinned(d));
+  const tail = data.filter(isPinned);
+  const rows = [...(sorted ? [...main].sort((a, b) => b.value - a.value) : main), ...tail];
   const vertical = orientation === "vertical";
+  const stacked = !vertical && width < tokens.breakpoint.sm;
+  const labelRow = stacked ? STACKED_LABEL_ROW : 0;
   const margin: Margin = vertical
     ? { top: spacePx("md"), right: spacePx("md"), bottom: spacePx("xl"), left: spacePx("2xl") }
-    : { top: spacePx("xs"), right: spacePx("2xl"), bottom: spacePx("xl"), left: spacePx("4xl") };
+    : {
+        top: spacePx("xs"),
+        right: spacePx("2xl"),
+        bottom: spacePx("xl"),
+        left: stacked ? spacePx("xs") : labelColumn(rows, width),
+      };
   const height = vertical
     ? plotHeight(width)
-    : margin.top + margin.bottom + rows.length * Number.parseFloat(tokens.size.controlMd);
+    : margin.top +
+      margin.bottom +
+      rows.length * (Number.parseFloat(tokens.size.controlMd) + labelRow);
   const band = scaleBand<string>()
     .domain(rows.map((d) => d.id))
     .range(vertical ? [margin.left, width - margin.right] : [margin.top, height - margin.bottom])
@@ -132,9 +183,11 @@ export const barLayout = (
     vertical ? [height - margin.bottom, margin.top] : [margin.left, width - margin.right],
   );
   const zero = value(0);
-  const bw = band.bandwidth();
+  const step = band.bandwidth();
+  // Stacked rows give the top of each band to the label; the bar takes the rest.
+  const bw = step - labelRow;
   const bars = rows.map((d, index): Bar => {
-    const start = band(d.id) ?? 0;
+    const start = (band(d.id) ?? 0) + labelRow;
     const end = value(d.value);
     const negative = d.value < 0;
     const length = Math.max(Math.abs(end - zero), MIN_BAR_LENGTH);
@@ -163,6 +216,45 @@ export const barLayout = (
           anchor: { x: left + length, y: start + bw / 2 },
         };
   });
+  const category = (d: Datum): BarCategory => {
+    const start = band(d.id) ?? 0;
+    const pos = start + labelRow + bw / 2;
+    const base = { id: d.id, pos };
+    if (vertical)
+      return {
+        ...base,
+        value: truncate(d.label, bw),
+        x: pos,
+        y: height - margin.bottom + LABEL_OFFSET,
+        anchor: "middle",
+        centered: false,
+      };
+    if (stacked)
+      return {
+        ...base,
+        value: truncate(d.label, width - margin.left * 2),
+        x: margin.left,
+        // Baseline just above the bar, leaving a hairline gap.
+        y: start + labelRow - spacePx("3xs"),
+        anchor: "start",
+        centered: false,
+      };
+    return {
+      ...base,
+      value: truncate(d.label, margin.left - AXIS_GAP),
+      x: margin.left - AXIS_GAP,
+      y: pos,
+      anchor: "end",
+      centered: true,
+    };
+  };
+  const lastMain = main.length > 0 ? rows[main.length - 1] : undefined;
+  const firstTail = tail[0];
+  // Midway through the padding between the last real band and the first pinned one.
+  const separator =
+    lastMain === undefined || firstTail === undefined
+      ? undefined
+      : ((band(lastMain.id) ?? 0) + step + (band(firstTail.id) ?? 0)) / 2;
   return {
     width,
     height,
@@ -170,11 +262,9 @@ export const barLayout = (
     orientation,
     bars,
     baseline: zero,
-    categories: rows.map((d) => ({
-      id: d.id,
-      value: truncate(d.label, vertical ? bw : margin.left - spacePx("xs")),
-      pos: (band(d.id) ?? 0) + bw / 2,
-    })),
+    stacked,
+    ...(separator === undefined ? {} : { separator }),
+    categories: rows.map(category),
     valueTicks: ticksOf(value, tickCount(width)),
   };
 };

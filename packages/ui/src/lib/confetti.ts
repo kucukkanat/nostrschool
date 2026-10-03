@@ -4,12 +4,12 @@
  */
 import { prefersReducedMotion } from "../motion.ts";
 
+/** The riso ink set: orange, teal, blue, marker yellow. */
 export const CONFETTI_COLOR_VARS = [
   "--color-primary",
   "--color-secondary",
   "--color-accent",
-  "--color-success",
-  "--color-chart-3",
+  "--color-highlight",
 ] as const;
 
 /** Resolved token colors; empty entries (tokens CSS not loaded) are dropped. */
@@ -35,6 +35,9 @@ export const burstOptions = (
   scalar: 0.8,
   ticks: 120,
   colors: [...colors],
+  // Flat paper squares (no 3D wobble): torn-up riso scraps rather than glossy party confetti.
+  shapes: ["square" as const],
+  flat: true,
   disableForReducedMotion: true,
   origin: {
     x: (rect.left + rect.width / 2) / viewport.width,

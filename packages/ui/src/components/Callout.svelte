@@ -31,8 +31,10 @@
 </div>
 
 <style>
+  /* A margin note: tinted paper with an ink outline and a square ink-stamped tone marker. The
+     marker is a fill (always outlined, ink glyph), so it never relies on a bright colour as a line. */
   .callout {
-    --callout-accent: var(--color-info-solid);
+    --callout-mark: var(--color-info-solid);
     --callout-bg: var(--color-info-subtle);
     --callout-on: var(--color-on-info);
     display: flex;
@@ -41,26 +43,26 @@
     padding: var(--space-md);
     background: var(--callout-bg);
     color: var(--color-text);
-    border-left: var(--border-width-heavy) solid var(--callout-accent);
+    border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-md);
   }
   .tip {
-    --callout-accent: var(--color-success-solid);
+    --callout-mark: var(--color-success-solid);
     --callout-bg: var(--color-success-subtle);
     --callout-on: var(--color-on-success);
   }
   .warning {
-    --callout-accent: var(--color-warning-solid);
+    --callout-mark: var(--color-warning-solid);
     --callout-bg: var(--color-warning-subtle);
     --callout-on: var(--color-on-warning);
   }
   .danger {
-    --callout-accent: var(--color-danger-solid);
+    --callout-mark: var(--color-danger-solid);
     --callout-bg: var(--color-danger-subtle);
     --callout-on: var(--color-on-danger);
   }
   .safety {
-    --callout-accent: var(--color-accent);
+    --callout-mark: var(--color-accent);
     --callout-bg: var(--color-accent-subtle);
     --callout-on: var(--color-on-accent);
   }
@@ -70,20 +72,25 @@
     flex: none;
     inline-size: var(--size-icon-xl);
     block-size: var(--size-icon-xl);
-    border-radius: var(--radius-round);
-    background: var(--callout-accent);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--callout-mark);
     color: var(--callout-on);
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-black);
+    box-shadow: var(--shadow-pop-sm);
+    font-family: var(--font-family-mono);
+    font-weight: var(--font-weight-bold);
+    rotate: -3deg;
   }
   .body {
     min-width: 0;
+    overflow-wrap: anywhere;
   }
   .title {
     display: block;
     margin-bottom: var(--space-2xs);
     font-family: var(--font-family-display);
     font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
   }
   .content > :global(:first-child) {
     margin-top: 0;

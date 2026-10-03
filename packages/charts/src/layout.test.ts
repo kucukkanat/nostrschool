@@ -5,8 +5,10 @@ import {
   DEFAULT_WIDTH,
   donutLayout,
   lineLayout,
+  MARK_CORNER,
   MIN_BAR_LENGTH,
   plotHeight,
+  STACKED_LABEL_ROW,
   tickCount,
   treemapLayout,
   truncate,
@@ -248,5 +250,68 @@ describe("donutLayout", () => {
     const z = donutLayout([{ id: "a", label: "A", value: 0 }], { width: 300 });
     expect(z.total).toBe(0);
     expect(z.slices[0]?.share).toBe(0);
+  });
+});
+
+describe("mark geometry", () => {
+  test("bars and cells use the small brand radius", () => {
+    expect(MARK_CORNER).toBe(Number.parseFloat(tokens.radius.sm));
+    expect(MARK_CORNER).toBeLessThanOrEqual(2);
+  });
+});
+
+describe("barLayout on phones and with catch-all buckets", () => {
+  const relays = [
+    { id: "other", label: "everything else", value: 900 },
+    { id: "strfry", label: "strfry", value: 500 },
+    { id: "rs", label: "nostr-rs-relay", value: 300 },
+  ];
+
+  test("pins 'other' last after a separator, even when sorted by value", () => {
+    const l = barLayout(relays, { width: 640, orientation: "horizontal", sorted: true });
+    expect(l.bars.map((b) => b.id)).toEqual(["strfry", "rs", "other"]);
+    const [, rs, other] = l.bars;
+    if (!rs || !other || l.separator === undefined) throw new Error("missing layout parts");
+    expect(l.separator).toBeGreaterThan(rs.y + rs.height);
+    expect(l.separator).toBeLessThan(other.y);
+  });
+
+  test("pinned: [] opts out; vertical separator sits between columns", () => {
+    const off = barLayout(relays, { width: 640, sorted: true, pinned: [] });
+    expect(off.bars.map((b) => b.id)).toEqual(["other", "strfry", "rs"]);
+    expect(off.separator).toBeUndefined();
+    const v = barLayout(relays, { width: 640 });
+    const [a, , c] = v.bars;
+    if (!a || !c || v.separator === undefined) throw new Error("missing layout parts");
+    expect(v.bars.map((b) => b.id)).toEqual(["strfry", "rs", "other"]);
+    expect(v.separator).toBeGreaterThan(a.x);
+    expect(v.separator).toBeLessThan(c.x);
+    expect(v.categories[0]).toMatchObject({ anchor: "middle", centered: false });
+  });
+
+  test("no separator when everything (or nothing) is pinned", () => {
+    expect(barLayout(relays.slice(0, 1), { width: 640 }).separator).toBeUndefined();
+    expect(barLayout(relays.slice(1), { width: 640 }).separator).toBeUndefined();
+  });
+
+  test("below the sm breakpoint horizontal labels sit above their bars, untruncated", () => {
+    const wide = barLayout(relays, { width: 640, orientation: "horizontal" });
+    expect(wide.stacked).toBe(false);
+    expect(wide.categories[1]).toMatchObject({ anchor: "end", centered: true });
+    const phone = barLayout(relays, { width: 320, orientation: "horizontal" });
+    expect(phone.stacked).toBe(true);
+    expect(phone.categories.map((c) => c.value)).toEqual([
+      "strfry",
+      "nostr-rs-relay",
+      "everything else",
+    ]);
+    for (const [i, cat] of phone.categories.entries()) {
+      const bar = phone.bars[i];
+      if (!bar) throw new Error("missing bar");
+      expect(cat).toMatchObject({ anchor: "start", centered: false, x: phone.margin.left });
+      expect(cat.y).toBeLessThan(bar.y);
+      expect(cat.y).toBeGreaterThan(bar.y - STACKED_LABEL_ROW);
+    }
+    expect(phone.height).toBeGreaterThan(wide.height);
   });
 });

@@ -4,7 +4,7 @@
 signature, a wrong quiz answer, a finished chapter) by listening to the `@nostrschool/ui`
 event bus, holds the reaction pose for a moment, then goes back to its resting pose.
 
-- **SVG first.** A hand-drawn SVG ostrich with 7 poses, plus ambient life: blinking, a head
+- **SVG first.** A riso-printed SVG ostrich (ink lines, spot fills, halftone shading) with 7 poses, plus ambient life: blinking, a head
   bob and a crest-feather ruffle. All colors come from the `--color-mascot-*` theme tokens, so
   light and dark themes work without extra code.
 - **Rive when available.** If you pass `riveSrc` and the `.riv` file exists, the Rive runtime
@@ -28,7 +28,7 @@ import { assetHref } from "~/lib/href";
 | Prop | Type | Default | Notes |
 |---|---|---|---|
 | `locale` | `"en" \| "es"` | — | Language of the accessible name (`mascot.poses[pose]`) |
-| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Width from `--size-mascot-*`. Height is reserved by `aspect-ratio`, so the layout does not shift |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Width from `--size-mascot-*`. Height is reserved by `aspect-ratio`, so the layout does not shift . `"lg"` renders at the md width below 480px (`tokens.breakpoint.sm`). To resize from outside, set `--mascot-size-override` on a wrapper, e.g. `@media (max-width: 479px) { .hero-mascot { --mascot-size-override: var(--size-mascot-sm); } }` |
 | `pose` | `MascotPose` | `"idle"` | Resting pose. Reactions return to it, and changing it updates Nos live |
 | `reactive` | `boolean` | `true` | Listen to the bus |
 | `say` | `string` | — | Speech bubble text, already localized. It sits in an `aria-live="polite"` region |
@@ -122,7 +122,7 @@ Hand this section to the designer. If the file follows it, it drops in with no c
 
 **Artboard.** Use the default artboard, 200 × 220. That is the same aspect ratio as the SVG,
 so the reserved space matches. Keep Nos centered, feet on a ground line at about y = 205, with
-a soft shadow ellipse under the feet. Leave headroom above the crest for props such as the
+a flat shadow ellipse under the feet. Leave headroom above the crest for props such as the
 thought bubble, "Zzz" and confetti. They may draw outside the bounds; the canvas does not clip
 the layout.
 
@@ -138,9 +138,9 @@ the layout.
 | 0 | `idle` | Standing relaxed, friendly | Blink every ~4 s, gentle 2 px bob, crest feathers sway |
 | 1 | `wave` | One wing raised, waving hello, head tilted | Wing waves |
 | 2 | `think` | Head and neck tilted, eyes looking up, wing tip at the chin, thought bubble with "…" | Dots pulse |
-| 3 | `cheer` | Both wings up, beak open, sparkles | Small hops |
+| 3 | `cheer` | Both wings up, beak open, cheer marks (ink ticks and dots) | Small hops |
 | 4 | `panic` | Big eyes, small pupils, crest spiked up, wings flared, sweat drop and alarm lines | Fast shiver, wings flap |
-| 5 | `celebrate` | Wings fully up, beak open, confetti and sparkles | Big jumps with squash, confetti falls |
+| 5 | `celebrate` | Wings fully up, beak open, confetti and cheer marks | Big jumps with squash, confetti falls |
 | 6 | `sleep` | Head drooped, eyes closed (curved lash line), crest flopped, floating "z z Z" | Slow breathing |
 
 Transitions between any two poses should take about 200–400 ms with a slight overshoot
@@ -150,20 +150,32 @@ Transitions between any two poses should take about 200–400 ms with a slight o
 
 | Part | Light | Dark | Token |
 |---|---|---|---|
-| Body, neck, head | `#312843` | `#453B59` | `--color-mascot-body` |
-| Belly, eye whites | `#F8F5FC` | `#EFEAF6` | `--color-mascot-belly` |
-| Beak | `#FF7410` | `#FF8A33` | `--color-mascot-beak` |
-| Legs, lower beak | `#E05F00` | `#FF8A33` | `--color-mascot-legs` |
-| Crest, wings, tail plumes, neck ruff | `#8B46FF` | `#BD94FF` | `--color-mascot-accent` |
+| Linework (every outline, pupils, lashes, wing and belly marks) | `#1B1A17` | `#1B1A17` | `--color-mascot-line` |
+| Body, neck, head | `#0E8C7F` | `#2BB8A7` | `--color-mascot-body` |
+| Belly, eye whites | `#FFFDF8` | `#EDE7DB` | `--color-mascot-belly` |
+| Beak, cheeks, plume tips, misregistered body pass | `#FF5C39` | `#FF6A48` | `--color-mascot-beak` |
+| Legs, lower beak | `#E65232` | `#FF6A48` | `--color-mascot-legs` |
+| Crest, wings, tail plumes, neck ruff | `#FFE45C` | `#E8CC3A` | `--color-mascot-accent` |
+| Halftone shading dots | `rgba(27, 26, 23, 0.28)` | `rgba(237, 231, 219, 0.22)` | `--color-halftone` |
 
 Current values are in `packages/tokens/tokens/themes/{light,dark}.json`. Rive cannot read CSS
 variables, so pick colors that read well on both the light and the dark page background.
 
+**Style.** Nos is printed, not rendered: think a two-colour riso sticker in a field notebook.
+
+- Flat spot fills only. No gradients, glows, blur or soft shadows.
+- A 1.5 px ink outline on every fill. Linework stays ink in both themes.
+- Shading is halftone dots: under the belly, on the lower flank, down the neck and on the wings.
+- An orange copy of the body sits about 2.5 units down and to the right, behind the teal body.
+  It reads as riso misregistration.
+- The ground shadow is a flat, hard-edged ellipse.
+- Cheer marks are short ink ticks with one printed dot each, not glittery sparkles.
+
 **Character notes.** Nos is a chubby, round, front-facing chibi ostrich. It has a long neck,
-a small round head with two big googly eyes, rosy cheeks and three purple crest feathers. It
-has a fluffy scalloped body, a big pale belly, purple wings and tail plumes, and long orange
-legs with knobbly knees. Nos should look curious and kind, never mean. Panic is comic, not
-scary.
+a small round teal head with two big googly eyes, halftone orange cheeks and three yellow crest
+feathers. It has a fluffy scalloped teal body, a big paper-white belly, yellow wings and tail
+plumes with orange tips, and long orange legs with knobbly knees. Nos should look curious and
+kind, never mean. Panic is comic, not scary.
 
 **Accessibility.** The canvas is `aria-hidden`. The component supplies the accessible name and
 the announcements, so do not bake text into the file. The `z` letters and `…` are

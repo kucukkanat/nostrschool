@@ -71,7 +71,7 @@ export const ch02 = {
     description:
       "A Schnorr signature proves the demo secret key approved exactly this message. Edit one letter after signing and watch the check fail.",
     messageLabel: "Message",
-    defaultMessage: "gm nostr! 🌅",
+    defaultMessage: "gm nostr!",
     sign: "Sign with the demo key",
     signatureLabel: "Signature (64 bytes, hex)",
     valid: "Valid: this exact message was signed by this pubkey.",

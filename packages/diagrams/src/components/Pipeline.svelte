@@ -113,12 +113,12 @@
     min-width: 0;
     padding: var(--space-sm);
     border: var(--border-width-medium) solid var(--color-diagram-node-stroke);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     background: var(--color-diagram-node);
+    box-shadow: var(--shadow-pop-sm);
     transition:
-      border-color var(--motion-duration-normal) var(--motion-easing-standard),
-      box-shadow var(--motion-duration-normal) var(--motion-easing-bounce),
-      transform var(--motion-duration-normal) var(--motion-easing-bounce);
+      box-shadow var(--motion-duration-normal) var(--motion-easing-standard),
+      translate var(--motion-duration-normal) var(--motion-easing-standard);
   }
   /* Hand-off arrow to the next stage: down when stacked, right when side by side. */
   .stage:not(:last-child)::after {
@@ -126,7 +126,7 @@
     position: absolute;
     left: 50%;
     bottom: calc(-1 * var(--space-lg));
-    width: var(--border-width-heavy);
+    width: var(--border-width-thick);
     height: var(--space-lg);
     background: var(--color-diagram-edge);
     transform: translateX(-50%);
@@ -137,23 +137,23 @@
       top: 50%;
       bottom: auto;
       width: var(--space-lg);
-      height: var(--border-width-heavy);
+      height: var(--border-width-thick);
       transform: translateY(-50%);
     }
   }
   .stage.done:not(:last-child)::after {
     background: var(--color-diagram-edge-active);
   }
+  /* Not reached yet: a dashed pencil outline with no shadow, so it sits flat on the page. */
   .stage.pending {
     border-style: dashed;
+    box-shadow: none;
   }
+  /* The brand's "selected": ink line + orange misregistration, lifted off the page. */
   .stage.active {
-    border-color: var(--color-diagram-edge-active);
-    box-shadow: var(--shadow-pop-sm);
-    transform: translateY(calc(-1 * var(--space-3xs)));
-  }
-  .stage.done {
-    border-color: var(--color-success);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-accent);
+    translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
   }
   .stage.error {
     border-color: var(--color-danger);
@@ -177,22 +177,29 @@
   .head:focus-visible,
   .expand:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
-    outline-offset: var(--space-3xs);
+    outline-offset: var(--size-focus-offset);
     border-radius: var(--radius-sm);
   }
+  /* Stage number as an ink-outlined stamp; fills are riso spot colours with ink numerals. */
   .index {
     display: inline-grid;
     place-items: center;
     flex: none;
     width: var(--size-icon-lg);
     height: var(--size-icon-lg);
-    border-radius: var(--radius-round);
-    background: var(--color-primary);
-    color: var(--color-on-primary);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    font-family: var(--font-family-mono);
     font-size: var(--font-size-xs);
   }
+  .active .index {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
   .error .index {
-    background: var(--color-danger);
+    background: var(--color-danger-solid);
     color: var(--color-on-danger);
   }
   .done .index {
@@ -207,6 +214,7 @@
   .value {
     display: block;
     padding: var(--space-2xs) var(--space-xs);
+    border: var(--border-width-thin) solid var(--color-border);
     border-radius: var(--radius-sm);
     background: var(--color-code-bg);
     color: var(--color-code-text);
@@ -223,7 +231,10 @@
     color: var(--color-text-primary);
     font: inherit;
     font-size: var(--font-size-sm);
+    font-family: var(--font-family-mono);
     text-decoration: underline;
+    text-decoration-thickness: var(--border-width-medium);
+    text-underline-offset: var(--space-3xs);
     cursor: pointer;
   }
 </style>

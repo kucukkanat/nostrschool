@@ -14,11 +14,13 @@
 >
 
 <style>
+  /* A rubber-stamped tag: riso spot fill, 1.5px ink outline, hard 2px misregistration shadow. */
   .packet {
     display: inline-flex;
     align-items: center;
-    padding: var(--space-3xs) var(--space-sm);
-    border-radius: var(--radius-pill);
+    padding: var(--space-3xs) var(--space-xs);
+    border: var(--border-width-medium) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
     background: var(--packet-bg);
     color: var(--color-on-packet);
     font-family: var(--font-family-mono);
@@ -26,11 +28,12 @@
     font-size: var(--font-size-sm);
     letter-spacing: var(--font-letter-spacing-wide);
     line-height: var(--font-line-height-tight);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-pop-sm);
     white-space: nowrap;
   }
   .sm {
-    padding: 0 var(--space-xs);
+    padding: 0 var(--space-2xs);
     font-size: var(--font-size-xs);
+    box-shadow: var(--shadow-sm);
   }
 </style>

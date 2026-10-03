@@ -66,7 +66,7 @@ export const ch09 = {
       tally: {
         label: "⚡ shows on the post",
         title: "10. Everyone sees the zap",
-        body: "Apps load receipts from relays, check them, and add them up. {recipient}'s post now glows with ⚡ {sats}.",
+        body: "Apps load receipts from relays, check them, and add them up. {recipient}'s post now shows ⚡ {sats}.",
       },
     },
     payloadTitle: "What travels on this step",

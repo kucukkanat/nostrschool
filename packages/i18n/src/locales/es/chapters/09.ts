@@ -68,7 +68,7 @@ export const ch09: typeof en = {
       tally: {
         label: "⚡ aparece en la publicación",
         title: "10. Todos ven el zap",
-        body: "Las apps cargan los recibos desde los relays, los verifican y los suman. La publicación de {recipient} ahora brilla con ⚡ {sats}.",
+        body: "Las apps cargan los recibos desde los relays, los verifican y los suman. La publicación de {recipient} ahora muestra ⚡ {sats}.",
       },
     },
     payloadTitle: "Qué viaja en este paso",

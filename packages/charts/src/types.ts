@@ -23,7 +23,7 @@ export interface Datum {
   readonly value: number;
 }
 
-/** Parts: `${testid}-bar-${id}`. */
+/** Parts: `${testid}-bar-${id}`, `${testid}-label-${id}`, `${testid}-separator` (pinned rule). */
 export interface BarChartProps extends ChartBase {
   readonly data: readonly Datum[];
   readonly orientation?: "vertical" | "horizontal";
@@ -33,6 +33,11 @@ export interface BarChartProps extends ChartBase {
   readonly highlight?: string;
   /** Sort descending by value (default false = keep input order). */
   readonly sorted?: boolean;
+  /**
+   * Datum ids always drawn last, after a dashed rule, whatever the sort (catch-all buckets aren't
+   * a peer of the real categories). Default `["other", "unknown"]`; pass `[]` to opt out.
+   */
+  readonly pinned?: readonly string[];
 }
 
 export interface LinePoint {

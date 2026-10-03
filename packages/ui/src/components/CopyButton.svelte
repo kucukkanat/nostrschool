@@ -2,7 +2,7 @@
   import { getDictionary } from "@nostrschool/i18n";
   import { tokens } from "@nostrschool/tokens";
   import { onDestroy } from "svelte";
-  import { pop, squish } from "../actions.ts";
+  import { pop } from "../actions.ts";
   import { copyText } from "../lib/clipboard.ts";
   import { burstFrom } from "../lib/confetti.ts";
   import type { CopyButtonProps } from "../types.ts";
@@ -34,7 +34,6 @@
   data-status={status}
   aria-label={label === undefined ? t.copy : undefined}
   onclick={copy}
-  use:squish
 >
   {#if status === "idle"}
     <span class="face"><span class="glyph" aria-hidden="true">⧉</span>{label ?? ""}</span>
@@ -53,7 +52,10 @@
 </VisuallyHidden>
 
 <style>
+  /* Same press recipe as Button (lift on hover, shadow collapses on press), on the brightest paper
+     so it reads on top of code wells. */
   .copy {
+    --copy-shadow: var(--shadow-pop-sm);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -61,32 +63,42 @@
     min-width: var(--size-control-md);
     padding: 0 var(--space-sm);
     border: var(--border-width-medium) solid var(--color-border-strong);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-md);
     background: var(--color-surface-raised);
     color: var(--color-text);
-    font-family: var(--font-family-display);
+    font-family: var(--font-family-mono);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     cursor: pointer;
+    box-shadow: var(--copy-shadow);
     transition:
       background-color var(--motion-duration-fast) var(--motion-easing-standard),
-      translate var(--motion-duration-normal) var(--motion-easing-bounce);
+      box-shadow var(--motion-duration-press) var(--motion-easing-press),
+      translate var(--motion-duration-press) var(--motion-easing-press);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-  .copy:hover {
-    background: var(--color-primary-subtle);
-    translate: 0 calc(-1 * var(--space-3xs));
+  @media (hover: hover) {
+    .copy:hover {
+      --copy-shadow: var(--shadow-lift);
+      background: var(--color-primary-subtle);
+      translate: calc(var(--size-lift) * -1) calc(var(--size-lift) * -1);
+    }
+  }
+  .copy:active {
+    --copy-shadow: var(--shadow-pressed);
+    translate: var(--size-lift) var(--size-lift);
   }
   .copy:focus-visible {
     outline: var(--border-width-thick) solid var(--color-focus-ring);
-    outline-offset: var(--space-3xs);
+    outline-offset: var(--size-focus-offset);
+    box-shadow: var(--shadow-focus-halo), var(--copy-shadow);
   }
   .copy[data-status="copied"] {
     background: var(--color-success-subtle);
-    border-color: var(--color-success-solid);
   }
   .copy[data-status="failed"] {
     background: var(--color-danger-subtle);
-    border-color: var(--color-danger-solid);
   }
   .sm {
     min-height: var(--size-control-sm);
@@ -98,6 +110,12 @@
     min-height: var(--size-control-lg);
     padding: 0 var(--space-md);
     font-size: var(--font-size-md);
+  }
+  @media (pointer: coarse) {
+    .copy {
+      min-height: var(--size-touch-target);
+      min-width: var(--size-touch-target);
+    }
   }
   .face {
     display: inline-flex;

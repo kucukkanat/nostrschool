@@ -1,7 +1,8 @@
 <script lang="ts">
   import { formatNumber, getDictionary } from "@nostrschool/i18n";
+  import { tokens } from "@nostrschool/tokens";
   import { hoverTip } from "../interact.ts";
-  import { DEFAULT_WIDTH, MARK_RADIUS, treemapLayout, truncate } from "../layout.ts";
+  import { DEFAULT_WIDTH, MARK_CORNER, treemapLayout, truncate } from "../layout.ts";
   import { seriesColor, spacePx } from "../scales.ts";
   import type { Tip } from "../types.internal.ts";
   import type { TreemapProps } from "../types.ts";
@@ -14,6 +15,9 @@
   const MIN_LABEL_W = spacePx("3xl");
   const MIN_LABEL_H = spacePx("xl");
   const PAD = spacePx("xs");
+  // Labels sit on a paper "tape" plate: ink on raised paper reads on every riso fill in both
+  // themes, which no single text colour does directly on the fills. One line = 1.4em at xs.
+  const LINE = Number.parseFloat(tokens.font.size.xs) * spacePx("md") * 1.4;
 
   let measured = $state(0);
   let tip = $state<Tip | null>(null);
@@ -66,7 +70,7 @@
           y={cell.y}
           width={cell.width}
           height={cell.height}
-          rx={MARK_RADIUS}
+          rx={MARK_CORNER}
           fill={seriesColor(cell.group)}
           data-mark
           data-value={cell.value}
@@ -80,11 +84,22 @@
           )}
         />
         {#if cell.width >= MIN_LABEL_W && cell.height >= MIN_LABEL_H}
+          {@const lines = cell.height >= MIN_LABEL_H * 2 ? 2 : 1}
+          <rect
+            class="plate"
+            x={cell.x + PAD / 2}
+            y={cell.y + PAD / 2}
+            width={cell.width - PAD}
+            height={lines * LINE + PAD / 2}
+            rx={MARK_CORNER}
+            aria-hidden="true"
+            data-testid="{testid}-cell-{cell.id}-plate"
+          />
           <text class="label" x={cell.x + PAD} y={cell.y + PAD} aria-hidden="true">
             <tspan class="name" dominant-baseline="hanging">
               {truncate(cell.label, cell.width - PAD * 2)}
             </tspan>
-            {#if cell.height >= MIN_LABEL_H * 2}
+            {#if lines === 2}
               <tspan class="val" x={cell.x + PAD} dy="1.4em" dominant-baseline="hanging">
                 {fmt(cell.value)}
               </tspan>
@@ -100,12 +115,17 @@
   .cell {
     transform-box: fill-box;
     transform-origin: center;
-    animation: bloom var(--motion-duration-slower) var(--motion-easing-bounce) backwards;
+    animation: bloom var(--motion-duration-slower) var(--motion-easing-decelerate) backwards;
     animation-delay: calc(var(--i) * var(--motion-duration-fast) / 4);
   }
+  .plate {
+    fill: var(--color-surface-raised);
+    stroke: var(--color-border-strong);
+    stroke-width: var(--border-width-medium);
+    pointer-events: none;
+  }
   .label {
-    /* --color-bg is the inverse of chart fills in both themes (light text on dark fills and vice versa). */
-    fill: var(--color-bg);
+    fill: var(--color-text);
     pointer-events: none;
     font-size: var(--font-size-xs);
   }
@@ -113,12 +133,13 @@
     font-weight: var(--font-weight-bold);
   }
   .val {
+    font-family: var(--font-family-mono);
     font-variant-numeric: tabular-nums;
   }
   @keyframes bloom {
     from {
       opacity: 0;
-      transform: scale(0.6);
+      transform: scale(0.92);
     }
   }
 </style>
