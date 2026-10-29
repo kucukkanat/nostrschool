@@ -86,7 +86,7 @@
       "$description": "Max width of prose."
     },
     "wide": {
-      "$value": "1120px",
+      "$value": "1440px",
       "$description": "Max width of interactives and page chrome."
     },
     "rail": {

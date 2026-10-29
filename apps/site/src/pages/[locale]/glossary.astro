@@ -308,7 +308,7 @@ const chapterLabel = (c: (typeof CHAPTERS)[number]) =>
 
 <style>
   .glossary {
-    max-width: var(--size-content);
+    max-width: var(--size-wide);
     margin-inline: auto;
     padding: var(--space-lg) var(--space-md) var(--space-3xl);
   }
@@ -464,7 +464,21 @@ const chapterLabel = (c: (typeof CHAPTERS)[number]) =>
   }
 
   /* Letter dividers: a big mono initial over a heavy ink rule, like a dictionary's thumb index. */
+  /* Terms flow into as many columns as fit; the letter heading spans them all. */
+  .letter {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(100%, calc(var(--size-content) * 0.5)), 1fr)
+      );
+    gap: var(--space-md);
+    align-items: start;
+  }
+  .letter[hidden] {
+    display: none;
+  }
   .letter-heading {
+    grid-column: 1 / -1;
     font-family: var(--font-family-mono);
     font-size: var(--font-size-3xl);
     color: var(--color-text-primary);
@@ -474,7 +488,6 @@ const chapterLabel = (c: (typeof CHAPTERS)[number]) =>
 
   .term {
     padding: var(--space-md) var(--space-lg);
-    margin-bottom: var(--space-md);
     border: var(--border-width-medium) solid var(--color-border-strong);
     border-radius: var(--radius-md);
     background: var(--color-surface-raised);

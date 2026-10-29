@@ -14,6 +14,9 @@
 :root {
   /* Height of the sticky one-row site header (row + bottom border). Anything that scrolls to an
      anchor or sticks below the header offsets by this. */
+  /* Page side gutter: phone-tight, roomier on wide screens. Header, footer and pages share it so
+     their edges line up. */
+  --size-gutter: clamp(var(--space-md), 3vw, var(--space-2xl));
   --size-header: calc(var(--size-control-md) + var(--space-md) + var(--border-width-medium));
   /* How far a pressed control travels. Zero: controls never move under the pointer. */
   --size-press: 0px;
@@ -251,6 +254,11 @@ table {
 .prose {
   font-size: var(--font-size-lg);
   line-height: var(--font-line-height-relaxed);
+}
+
+/* Running text keeps a readable line length; interactives, figures and code use the full column. */
+.prose > :is(p, ul, ol, dl, blockquote, h2, h3, h4) {
+  max-inline-size: var(--size-content);
 }
 
 .prose > * + * {

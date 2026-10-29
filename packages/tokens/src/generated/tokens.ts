@@ -31,7 +31,7 @@ export const tokens = {
     "mascotMd": "120px",
     "mascotLg": "200px",
     "content": "720px",
-    "wide": "1120px",
+    "wide": "1440px",
     "rail": "280px",
     "drawer": "420px",
     "diagramMinHeight": "320px",

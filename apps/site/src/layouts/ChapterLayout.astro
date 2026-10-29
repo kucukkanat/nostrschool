@@ -137,9 +137,10 @@ const pager = [
     display: grid;
     gap: var(--space-xl);
   }
+  /* The article fills its column so interactives get the room; running text keeps the reading
+     measure (see .prose in global.css). */
   .chapter {
     min-inline-size: 0;
-    max-inline-size: var(--size-content);
   }
   .chapter-head {
     display: grid;

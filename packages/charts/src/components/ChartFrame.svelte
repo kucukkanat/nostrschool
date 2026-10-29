@@ -182,6 +182,12 @@
     height: auto;
     overflow: visible;
   }
+  /* Axes are decoration (aria-hidden): taps pass through to the marks, so a zero-length bar
+     stays tappable even where its category label sits over its hit area. */
+  .plot :global(.axis),
+  .plot :global(.grid) {
+    pointer-events: none;
+  }
   /* Axis and tick labels are data, so they're set in mono like a lab notebook. */
   .plot :global(.axis text),
   .plot :global(.axis-label) {
