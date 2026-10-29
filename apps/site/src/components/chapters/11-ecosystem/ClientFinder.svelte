@@ -205,8 +205,6 @@
       box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
   }
   .card:hover {
-    /* `translate`, not `transform`: the pop action owns the inline transform. */
-    translate: 0 calc(-1 * var(--space-3xs));
     box-shadow: var(--shadow-pop-sm);
   }
   .card a {

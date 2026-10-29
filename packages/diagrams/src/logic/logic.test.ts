@@ -321,7 +321,7 @@ describe("ink geometry", () => {
     expect(ink.INK_RADIUS).toBe(2);
     expect(ink.BOX_RADIUS).toBe(4);
     expect(ink.SHADOW_SM).toBe(2);
-    expect(ink.SHADOW).toBe(3);
+    expect(ink.SHADOW).toBe(2);
     expect(ink.HALFTONE_DOT).toBeLessThan(ink.HALFTONE_CELL / 2);
     expect(() => ink.parsePx("auto")).toThrow("expected a px token");
   });

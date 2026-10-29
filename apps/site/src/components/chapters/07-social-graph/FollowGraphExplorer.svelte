@@ -214,9 +214,6 @@
       background var(--motion-duration-fast) var(--motion-easing-standard),
       transform var(--motion-duration-fast) var(--motion-easing-bounce);
   }
-  .lens-option:hover {
-    transform: translateY(calc(-1 * var(--space-3xs)));
-  }
   .lens-option[aria-pressed="true"] {
     background: var(--color-primary);
     box-shadow: var(--shadow-accent);

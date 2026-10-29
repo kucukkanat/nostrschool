@@ -15,9 +15,8 @@
   /* Height of the sticky one-row site header (row + bottom border). Anything that scrolls to an
      anchor or sticks below the header offsets by this. */
   --size-header: calc(var(--size-control-md) + var(--space-md) + var(--border-width-medium));
-  /* How far a pressed control travels: exactly the --shadow-pop offset (3px), so the shadow
-     collapses under it. Aliased here until the tokens package has a pop-offset size. */
-  --size-press: var(--border-width-thick);
+  /* How far a pressed control travels. Zero: controls never move under the pointer. */
+  --size-press: 0px;
   /* Highlighter fill for marked text (always set in --color-on-highlight). On paper it is the
      partial swipe; on dark paper the swipe would leave ink ascenders on a dark page, so the
      whole line box is filled instead (overridden below). */
@@ -58,32 +57,8 @@ body {
   margin: 0;
   min-block-size: 100dvh;
   overflow-x: clip;
-  /* Transparent so the grain layer (z-index below content) shows; <html> paints the paper. */
-  background: transparent;
+  background: var(--color-bg);
   color: var(--color-text);
-}
-
-/* Paper grain: a fixed, non-interactive speckle layer. A mask (not an image) so the speckle
-   colour follows the theme. It sits under all content (negative z-index, body has no stacking
-   context), so cards and code blocks stay clean. Off in print and under reduced data. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: calc(var(--z-base) - 1);
-  pointer-events: none;
-  background-color: var(--color-grain);
-  opacity: var(--opacity-grain);
-  -webkit-mask-image: var(--pattern-grain);
-  mask-image: var(--pattern-grain);
-  -webkit-mask-size: var(--size-grain-tile);
-  mask-size: var(--size-grain-tile);
-}
-
-@media (prefers-reduced-data: reduce) {
-  body::before {
-    display: none;
-  }
 }
 
 h1,
@@ -107,18 +82,18 @@ li {
   text-wrap: pretty;
 }
 
-/* Links: accent-ink text, underline thickens on hover. */
+/* Links: accent-ink text; hover darkens the underline colour only (thickness changes reflow text). */
 a {
   color: var(--color-text-primary);
   text-decoration-line: underline;
-  text-decoration-color: currentColor;
-  text-decoration-thickness: var(--border-width-medium);
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-decoration-thickness: var(--border-width-thin);
   text-underline-offset: 0.2em;
-  transition: text-decoration-thickness var(--motion-duration-fast) var(--motion-easing-standard);
+  transition: text-decoration-color var(--motion-duration-fast) var(--motion-easing-standard);
 }
 
 a:hover {
-  text-decoration-thickness: var(--border-width-thick);
+  text-decoration-color: currentColor;
 }
 
 code,
@@ -351,9 +326,6 @@ table {
   :root {
     --color-bg: var(--color-surface-raised);
     --color-surface: var(--color-surface-raised);
-  }
-  body::before {
-    display: none;
   }
   *,
   *::before,

@@ -37,7 +37,7 @@
       "$description": "Soft hairline/divider. Decorative only (no contrast requirement)."
     },
     "border-strong": {
-      "$value": "{palette.ink.1000}",
+      "$value": "{palette.ink.800}",
       "$description": "The ink line: 1.5px outlines on cards, buttons, inputs and every fill."
     },
     "focus-ring": {
@@ -179,7 +179,7 @@
       "$description": "Flat translucent cast shadow (e.g. under the mascot). Never blurred; box shadows use shadow-pop."
     },
     "shadow-pop": {
-      "$value": "{palette.ink.1000}",
+      "$value": "{palette.ink.500}",
       "$description": "Hard offset shadow colour (the second print layer)."
     },
     "shadow-accent": {
@@ -372,28 +372,28 @@
       "$value": "1px 1px 0 0 {color.shadow-pop}"
     },
     "md": {
-      "$value": "3px 3px 0 0 {color.shadow-pop}"
+      "$value": "2px 2px 0 0 {color.shadow-pop}"
     },
     "lg": {
-      "$value": "5px 5px 0 0 {color.shadow-pop}"
+      "$value": "3px 3px 0 0 {color.shadow-pop}"
     },
     "pop": {
-      "$value": "3px 3px 0 0 {color.shadow-pop}",
+      "$value": "2px 2px 0 0 {color.shadow-pop}",
       "$description": "Default card/button shadow."
     },
     "pop-sm": {
       "$value": "2px 2px 0 0 {color.shadow-pop}"
     },
     "lift": {
-      "$value": "5px 5px 0 0 {color.shadow-pop}",
-      "$description": "Hover: element lifts (translate -2px) and the offset grows."
+      "$value": "2px 2px 0 0 {color.shadow-pop}",
+      "$description": "Hover: same as pop. Nothing moves or grows on hover, so pointer movement never shifts content."
     },
     "pressed": {
       "$value": "0 0 0 0 {color.shadow-pop}",
-      "$description": "Active: the shadow collapses (translate by the pop offset)."
+      "$description": "Active: the shadow collapses in place (no movement)."
     },
     "accent": {
-      "$value": "3px 3px 0 0 {color.shadow-accent}",
+      "$value": "2px 2px 0 0 {color.shadow-accent}",
       "$description": "Orange misregistration for featured cards/selected state."
     },
     "focus-halo": {

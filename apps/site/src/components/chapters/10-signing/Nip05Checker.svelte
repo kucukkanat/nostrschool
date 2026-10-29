@@ -189,9 +189,6 @@
     cursor: pointer;
     transition: transform var(--motion-duration-fast) var(--motion-easing-bounce);
   }
-  .chip:hover {
-    transform: translateY(calc(-1 * var(--space-3xs)));
-  }
   .chip[aria-pressed="true"] {
     border-color: var(--color-border-strong);
     box-shadow: var(--shadow-accent);

@@ -468,9 +468,6 @@
       background var(--motion-duration-fast) var(--motion-easing-standard),
       transform var(--motion-duration-fast) var(--motion-easing-bounce);
   }
-  .mode:hover {
-    transform: translateY(calc(-1 * var(--space-3xs)));
-  }
   .mode[aria-pressed="true"] {
     background: var(--color-primary);
     box-shadow: var(--shadow-accent);

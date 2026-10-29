@@ -71,7 +71,4 @@
     font-family: var(--font-family-mono);
     transition: translate var(--motion-duration-normal) var(--motion-easing-bounce);
   }
-  .cta:hover .arrow {
-    translate: var(--space-2xs) 0;
-  }
 </style>

@@ -35,7 +35,7 @@
   --size-halftone-dot: 1.4px;
   --size-grain-tile: 180px;
   --size-focus-offset: 2px;
-  --size-lift: 2px;
+  --size-lift: 0px;
   --radius-none: 0px;
   --radius-sm: 2px;
   --radius-md: 4px;
@@ -52,7 +52,7 @@
   --opacity-overlay: 0.6;
   --opacity-subtle: 0.12;
   --opacity-dimmed: 0.35;
-  --opacity-grain: 0.07;
+  --opacity-grain: 0;
   --opacity-halftone: 1;
   --z-base: 0;
   --z-raised: 10;
@@ -135,7 +135,7 @@
   --color-text-subtle: #5D594F;
   --color-text-inverse: #F4EFE6;
   --color-border: #D3C9B6;
-  --color-border-strong: #1B1A17;
+  --color-border-strong: #3A3731;
   --color-focus-ring: #1B1A17;
   --color-focus-halo: #FFFDF8;
   --color-selection: #FFE45C;
@@ -179,7 +179,7 @@
   --color-on-live: #1B1A17;
   --color-overlay: rgba(27, 26, 23, 0.55);
   --color-shadow: rgba(27, 26, 23, 0.16);
-  --color-shadow-pop: #1B1A17;
+  --color-shadow-pop: #6E685D;
   --color-shadow-accent: #FF5C39;
   --color-code-bg: #E6DFD2;
   --color-code-text: #1B1A17;
@@ -240,14 +240,14 @@
   --color-mascot-beak: #FF5C39;
   --color-mascot-legs: #E65232;
   --color-mascot-accent: #FFE45C;
-  --shadow-sm: 1px 1px 0 0 #1B1A17;
-  --shadow-md: 3px 3px 0 0 #1B1A17;
-  --shadow-lg: 5px 5px 0 0 #1B1A17;
-  --shadow-pop: 3px 3px 0 0 #1B1A17;
-  --shadow-pop-sm: 2px 2px 0 0 #1B1A17;
-  --shadow-lift: 5px 5px 0 0 #1B1A17;
-  --shadow-pressed: 0 0 0 0 #1B1A17;
-  --shadow-accent: 3px 3px 0 0 #FF5C39;
+  --shadow-sm: 1px 1px 0 0 #6E685D;
+  --shadow-md: 2px 2px 0 0 #6E685D;
+  --shadow-lg: 3px 3px 0 0 #6E685D;
+  --shadow-pop: 2px 2px 0 0 #6E685D;
+  --shadow-pop-sm: 2px 2px 0 0 #6E685D;
+  --shadow-lift: 2px 2px 0 0 #6E685D;
+  --shadow-pressed: 0 0 0 0 #6E685D;
+  --shadow-accent: 2px 2px 0 0 #FF5C39;
   --shadow-focus-halo: 0 0 0 2px #FFFDF8;
 }
 @media (prefers-color-scheme: dark) {
@@ -369,13 +369,13 @@
     --color-mascot-legs: #FF6A48;
     --color-mascot-accent: #E8CC3A;
     --shadow-sm: 1px 1px 0 0 #A69E8F;
-    --shadow-md: 3px 3px 0 0 #A69E8F;
-    --shadow-lg: 5px 5px 0 0 #A69E8F;
-    --shadow-pop: 3px 3px 0 0 #A69E8F;
+    --shadow-md: 2px 2px 0 0 #A69E8F;
+    --shadow-lg: 3px 3px 0 0 #A69E8F;
+    --shadow-pop: 2px 2px 0 0 #A69E8F;
     --shadow-pop-sm: 2px 2px 0 0 #A69E8F;
-    --shadow-lift: 5px 5px 0 0 #A69E8F;
+    --shadow-lift: 2px 2px 0 0 #A69E8F;
     --shadow-pressed: 0 0 0 0 #A69E8F;
-    --shadow-accent: 3px 3px 0 0 #FF6A48;
+    --shadow-accent: 2px 2px 0 0 #FF6A48;
     --shadow-focus-halo: 0 0 0 2px #161512;
   }
 }
@@ -497,13 +497,13 @@
   --color-mascot-legs: #FF6A48;
   --color-mascot-accent: #E8CC3A;
   --shadow-sm: 1px 1px 0 0 #A69E8F;
-  --shadow-md: 3px 3px 0 0 #A69E8F;
-  --shadow-lg: 5px 5px 0 0 #A69E8F;
-  --shadow-pop: 3px 3px 0 0 #A69E8F;
+  --shadow-md: 2px 2px 0 0 #A69E8F;
+  --shadow-lg: 3px 3px 0 0 #A69E8F;
+  --shadow-pop: 2px 2px 0 0 #A69E8F;
   --shadow-pop-sm: 2px 2px 0 0 #A69E8F;
-  --shadow-lift: 5px 5px 0 0 #A69E8F;
+  --shadow-lift: 2px 2px 0 0 #A69E8F;
   --shadow-pressed: 0 0 0 0 #A69E8F;
-  --shadow-accent: 3px 3px 0 0 #FF6A48;
+  --shadow-accent: 2px 2px 0 0 #FF6A48;
   --shadow-focus-halo: 0 0 0 2px #161512;
 }
 /* Reduced motion: every duration collapses so state changes are instant but still happen. */

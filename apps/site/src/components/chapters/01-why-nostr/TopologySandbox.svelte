@@ -557,9 +557,6 @@
   .toggle {
     cursor: pointer;
   }
-  .toggle:hover:not(.down) .shape {
-    transform: scale(1.08);
-  }
   .toggle:focus {
     outline: none;
   }

@@ -115,8 +115,8 @@
       "$value": "2px"
     },
     "lift": {
-      "$value": "2px",
-      "$description": "Hover lift distance (translate) paired with shadow-lift."
+      "$value": "0px",
+      "$description": "Hover lift distance. Zero: hover must not move content (it made the page jitter under the pointer)."
     }
   },
   "radius": {
@@ -181,7 +181,7 @@
       "$description": "Unreachable/offline diagram nodes."
     },
     "grain": {
-      "$value": 0.07,
+      "$value": 0,
       "$description": "Paper grain overlay strength."
     },
     "halftone": {

@@ -39,7 +39,7 @@ export const tokens = {
     "halftoneDot": "1.4px",
     "grainTile": "180px",
     "focusOffset": "2px",
-    "lift": "2px"
+    "lift": "0px"
   },
   "radius": {
     "none": "0px",
@@ -62,7 +62,7 @@ export const tokens = {
     "overlay": 0.6,
     "subtle": 0.12,
     "dimmed": 0.35,
-    "grain": 0.07,
+    "grain": 0,
     "halftone": 1
   },
   "z": {
@@ -235,7 +235,7 @@ export const themes = {
       "textSubtle": "#5D594F",
       "textInverse": "#F4EFE6",
       "border": "#D3C9B6",
-      "borderStrong": "#1B1A17",
+      "borderStrong": "#3A3731",
       "focusRing": "#1B1A17",
       "focusHalo": "#FFFDF8",
       "selection": "#FFE45C",
@@ -279,7 +279,7 @@ export const themes = {
       "onLive": "#1B1A17",
       "overlay": "rgba(27, 26, 23, 0.55)",
       "shadow": "rgba(27, 26, 23, 0.16)",
-      "shadowPop": "#1B1A17",
+      "shadowPop": "#6E685D",
       "shadowAccent": "#FF5C39",
       "codeBg": "#E6DFD2",
       "codeText": "#1B1A17",
@@ -342,14 +342,14 @@ export const themes = {
       "mascotAccent": "#FFE45C"
     },
     "shadow": {
-      "sm": "1px 1px 0 0 #1B1A17",
-      "md": "3px 3px 0 0 #1B1A17",
-      "lg": "5px 5px 0 0 #1B1A17",
-      "pop": "3px 3px 0 0 #1B1A17",
-      "popSm": "2px 2px 0 0 #1B1A17",
-      "lift": "5px 5px 0 0 #1B1A17",
-      "pressed": "0 0 0 0 #1B1A17",
-      "accent": "3px 3px 0 0 #FF5C39",
+      "sm": "1px 1px 0 0 #6E685D",
+      "md": "2px 2px 0 0 #6E685D",
+      "lg": "3px 3px 0 0 #6E685D",
+      "pop": "2px 2px 0 0 #6E685D",
+      "popSm": "2px 2px 0 0 #6E685D",
+      "lift": "2px 2px 0 0 #6E685D",
+      "pressed": "0 0 0 0 #6E685D",
+      "accent": "2px 2px 0 0 #FF5C39",
       "focusHalo": "0 0 0 2px #FFFDF8"
     }
   },
@@ -473,13 +473,13 @@ export const themes = {
     },
     "shadow": {
       "sm": "1px 1px 0 0 #A69E8F",
-      "md": "3px 3px 0 0 #A69E8F",
-      "lg": "5px 5px 0 0 #A69E8F",
-      "pop": "3px 3px 0 0 #A69E8F",
+      "md": "2px 2px 0 0 #A69E8F",
+      "lg": "3px 3px 0 0 #A69E8F",
+      "pop": "2px 2px 0 0 #A69E8F",
       "popSm": "2px 2px 0 0 #A69E8F",
-      "lift": "5px 5px 0 0 #A69E8F",
+      "lift": "2px 2px 0 0 #A69E8F",
       "pressed": "0 0 0 0 #A69E8F",
-      "accent": "3px 3px 0 0 #FF6A48",
+      "accent": "2px 2px 0 0 #FF6A48",
       "focusHalo": "0 0 0 2px #161512"
     }
   }
